@@ -368,11 +368,8 @@ audio { width: 100%; border-radius: 8px }
 .clip-player { margin-top: 6px; display: none }
 .clip-player audio { width: 100%; border-radius: 8px }
 
-/* ── Neon Landing Reskin (screen-login only) ── */
-#screen-login {
-  background: radial-gradient(circle at 50% 20%, #042133 0%, #020a17 38%, #010611 78%);
-  color: #d9e6f0;
-}
+/* ── Neon Landing Reskin ── */
+#screen-login { background: radial-gradient(circle at 50% 20%, #042133 0%, #020a17 38%, #010611 78%); color: #d9e6f0; }
 #screen-login .scroll-body { max-width: 740px; padding-top: 26px; padding-bottom: 30px; }
 #screen-login .hero.landing { background: transparent; box-shadow: none; text-align: center; margin-bottom: 18px; padding: 8px 12px 12px; }
 #screen-login .hero-label { color: #88a0b3; letter-spacing: 1.1px; }
@@ -390,7 +387,7 @@ audio { width: 100%; border-radius: 8px }
 #screen-login .feature-card p { color: #9fb3c4; }
 
 /* ══════════════════════════════════════════════
-   UppHátt — Parent Login & Signup Popups
+   Parent Login & Signup Popups
    ══════════════════════════════════════════════ */
 
 .rg-popup-card {
@@ -457,7 +454,7 @@ audio { width: 100%; border-radius: 8px }
 }
 
 /* ══════════════════════════════════════════════
-   UppHátt — Parent Dashboard
+   Parent Dashboard
    ══════════════════════════════════════════════ */
 
 #screen-parent-home {
@@ -502,13 +499,24 @@ audio { width: 100%; border-radius: 8px }
 
 .ph-screen { background: var(--ph-bg); flex-direction: column; min-height: 100dvh; }
 
+/* ── Logo í topbar ── */
+.ph-logo-img {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+/* Ljóst þema — skipta yfir í light logo */
+#screen-parent-home.ph-light #ph-logo {
+  content: url('logo-light.svg');
+}
+
 .ph-topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; background: rgba(0,0,0,0.2);
+  padding: 12px 20px; background: rgba(0,0,0,0.2);
   border-bottom: 1px solid var(--ph-tile-border);
   position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px);
 }
-.ph-topbar-left { display: flex; flex-direction: column; gap: 2px; }
+.ph-topbar-left { display: flex; align-items: center; }
 .ph-topbar-right { display: flex; align-items: center; gap: 10px; }
 .ph-brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
 .ph-brand-upp  { color: var(--ph-accent); }
@@ -553,7 +561,7 @@ audio { width: 100%; border-radius: 8px }
 .ph-family-code-hint { font-size: 11px; color: var(--ph-soft); line-height: 1.4; }
 
 .ph-week-grid { display: flex; gap: 6px; }
-.ph-wday-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ph-wday-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .ph-wday-lbl { font-size: 9px; font-weight: 700; color: var(--ph-soft); text-transform: uppercase; }
 .ph-wday-today { color: var(--ph-accent); }
 .ph-wdot { width: 100%; aspect-ratio: 1; border-radius: 6px; background: var(--ph-dot-empty); transition: background 0.2s ease; }
@@ -562,6 +570,8 @@ audio { width: 100%; border-radius: 8px }
 .ph-wdot-mid   { background: var(--ph-dot-mid); }
 .ph-wdot-full  { background: var(--ph-dot-full); }
 .ph-wdot-today { outline: 2px solid var(--ph-accent); outline-offset: 1px; }
+.ph-wday-num { font-size: 12px; font-weight: 700; color: var(--ph-soft); }
+.ph-wday-num.ph-wday-today { color: var(--ph-accent); }
 
 .ph-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .ph-stat-card { background: var(--ph-tile); border: 1px solid var(--ph-tile-border); border-radius: 16px; padding: 20px 16px; text-align: center; }
@@ -619,11 +629,12 @@ audio { width: 100%; border-radius: 8px }
   .ph-stat-val { font-size: 26px; }
   .ph-rec-clips { grid-template-columns: repeat(2, 1fr); }
   .ph-body { padding: 12px; }
-  .ph-topbar { padding: 12px 14px; }
+  .ph-topbar { padding: 10px 14px; }
+  .ph-logo-img { height: 28px; }
 }
 
 /* ══════════════════════════════════════════════
-   Heatmap — toggle tabs + views
+   Heatmap
    ══════════════════════════════════════════════ */
 
 .ph-hm-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border: 1px solid var(--ph-tile-border); border-radius: 10px; padding: 3px; }
@@ -681,14 +692,4 @@ audio { width: 100%; border-radius: 8px }
   .ph-hm-hour-lbl { font-size: 9px; padding-right: 5px; }
   .ph-hm-cell    { height: 18px; }
   .ph-hm-yr-cell { width: 10px; height: 10px; }
-}
-/* ── Dagstölur undir 7 daga dotum ── */
-.ph-wday-cell { gap: 3px; }
-.ph-wday-num {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ph-soft);
-}
-.ph-wday-num.ph-wday-today {
-  color: var(--ph-accent);
 }
