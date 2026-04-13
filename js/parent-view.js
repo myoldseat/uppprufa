@@ -9,6 +9,34 @@ import { S }    from './state.js';
 import { fmtTime, makeDateKey, formatLabel, getMonday, getStreak } from './helpers.js';
 
 // ══════════════════════════════════════════════
+// DAGSETNINGAR — íslenskt snið
+// ══════════════════════════════════════════════
+
+const IS_MONTHS = ['janúar','febrúar','mars','apríl','maí','júní',
+                   'júlí','ágúst','september','október','nóvember','desember'];
+
+// "2026-4-13" → "13. apríl"
+function fmtDateIS(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return dateStr;
+  const day   = parseInt(parts[2]);
+  const month = parseInt(parts[1]) - 1;
+  return `${day}. ${IS_MONTHS[month] || ''}`;
+}
+
+// "2026-4-13" → "13. apríl 2026"
+function fmtDateISFull(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return dateStr;
+  const day   = parseInt(parts[2]);
+  const month = parseInt(parts[1]) - 1;
+  const year  = parts[0];
+  return `${day}. ${IS_MONTHS[month] || ''} ${year}`;
+}
+
+// ══════════════════════════════════════════════
 // REALTIME FAMILY LISTENER
 // ══════════════════════════════════════════════
 
@@ -85,7 +113,7 @@ export function selectChild(key) {
   renderRecordings();
 }
 
-// ── 7 daga grid ──
+// ── 7 daga grid — með dagstölum ──
 function renderWeekGrid() {
   const grid = document.getElementById('ph-week-grid');
   if (!grid) return;
@@ -106,7 +134,9 @@ function renderWeekGrid() {
     cells.push(`
       <div class="ph-wday-cell">
         <div class="ph-wday-lbl ${isToday ? 'ph-wday-today' : ''}">${days[6-i]}</div>
-        <div class="ph-wdot ${dotClass} ${isToday ? 'ph-wdot-today' : ''}" title="${mins > 0 ? mins + ' mín' : 'Ekki lesið'}"></div>
+        <div class="ph-wdot ${dotClass} ${isToday ? 'ph-wdot-today' : ''}" title="${mins > 0 ? mins + ' mín' : 'Ekki lesið'}" style="display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:9px;font-weight:800;color:rgba(255,255,255,0.75);line-height:1;">${d.getDate()}</span>
+        </div>
       </div>`);
   }
   grid.innerHTML = cells.join('');
@@ -129,7 +159,7 @@ function updateStats() {
 }
 
 // ══════════════════════════════════════════════
-// HEATMAP — aðalaðgerð
+// HEATMAP
 // ══════════════════════════════════════════════
 
 export function switchHeatmap(view) {
@@ -184,7 +214,7 @@ function legendHtml() {
     </div>`;
 }
 
-// ── VIKA — vikudagar × klukkustundir 13–22 ──
+// ── VIKA ──
 function buildWeekHeatmap(sessions) {
   const HOURS = [13,14,15,16,17,18,19,20,21,22];
   const DAYS  = ['Mán','Þri','Mið','Fim','Fös','Lau','Sun'];
@@ -226,11 +256,11 @@ function buildWeekHeatmap(sessions) {
     </div>`;
 }
 
-// ── MÁNUÐUR — dagatal með nav ──
+// ── MÁNUÐUR ──
 function buildMonthHeatmap(sessions) {
   const DAYS   = ['Mán','Þri','Mið','Fim','Fös','Lau','Sun'];
-  const MONTHS = ['Janúar','Febrúar','Mars','Apríl','Maí','Júní',
-                  'Júlí','Ágúst','September','Október','Nóvember','Desember'];
+  const MONTHS_FULL = ['Janúar','Febrúar','Mars','Apríl','Maí','Júní',
+                       'Júlí','Ágúst','September','Október','Nóvember','Desember'];
 
   const map = {};
   sessions.forEach(s => {
@@ -255,7 +285,7 @@ function buildMonthHeatmap(sessions) {
     const key  = `${y}-${m+1}-${day}`;
     const mins = map[key] || 0;
     const isToday = key === todayKey;
-    cells += `<div class="ph-hm-mcal-cell ${levelClass(minsToLevel(mins))} ${isToday ? 'ph-hm-today-cell' : ''}" title="${day}. — ${mins > 0 ? mins + ' mín' : 'Ekki lesið'}">
+    cells += `<div class="ph-hm-mcal-cell ${levelClass(minsToLevel(mins))} ${isToday ? 'ph-hm-today-cell' : ''}" title="${day}. ${IS_MONTHS[m]} — ${mins > 0 ? mins + ' mín' : 'Ekki lesið'}">
       <span class="ph-hm-mcal-num">${day}</span></div>`;
   }
 
@@ -263,7 +293,7 @@ function buildMonthHeatmap(sessions) {
     <div class="ph-hm-wrap">
       <div class="ph-hm-mnav">
         <button class="ph-hm-nav-btn" onclick="${prevFn}">‹</button>
-        <div class="ph-hm-mname">${MONTHS[m]} ${y}</div>
+        <div class="ph-hm-mname">${MONTHS_FULL[m]} ${y}</div>
         <button class="ph-hm-nav-btn" onclick="${nextFn}" ${isNow ? 'disabled' : ''}>›</button>
       </div>
       <div class="ph-hm-mcal-grid">${dayHdrs}${cells}</div>
@@ -271,7 +301,7 @@ function buildMonthHeatmap(sessions) {
     </div>`;
 }
 
-// ── ÁR — síðustu 52 vikur ──
+// ── ÁR ──
 function buildYearHeatmap(sessions) {
   const map = {};
   sessions.forEach(s => {
@@ -299,18 +329,18 @@ function buildYearHeatmap(sessions) {
     weeks.push(week);
   }
 
-  const MONTHS = ['Jan','Feb','Mar','Apr','Maí','Jún','Júl','Ágú','Sep','Okt','Nóv','Des'];
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','Maí','Jún','Júl','Ágú','Sep','Okt','Nóv','Des'];
   let lastM = -1;
   const mlbls = weeks.map((week, wi) => {
     const m = new Date(week[0].key).getMonth();
-    if (m !== lastM) { lastM = m; return `<div class="ph-hm-yr-mlbl" style="grid-column:${wi+1}">${MONTHS[m]}</div>`; }
+    if (m !== lastM) { lastM = m; return `<div class="ph-hm-yr-mlbl" style="grid-column:${wi+1}">${MONTHS_SHORT[m]}</div>`; }
     return '';
   }).join('');
 
   const cols = weeks.map(week => {
     const days = week.map(cell => {
       if (cell.future) return `<div class="ph-hm-yr-cell ph-hm-c0"></div>`;
-      return `<div class="ph-hm-yr-cell ${levelClass(minsToLevel(cell.mins))} ${cell.isToday ? 'ph-hm-today-cell' : ''}" title="${cell.key}: ${cell.mins > 0 ? cell.mins + ' mín' : 'Ekki lesið'}"></div>`;
+      return `<div class="ph-hm-yr-cell ${levelClass(minsToLevel(cell.mins))} ${cell.isToday ? 'ph-hm-today-cell' : ''}" title="${fmtDateIS(cell.key)}: ${cell.mins > 0 ? cell.mins + ' mín' : 'Ekki lesið'}"></div>`;
     }).join('');
     return `<div class="ph-hm-yr-week">${days}</div>`;
   }).join('');
@@ -363,7 +393,7 @@ function renderRecordings() {
 
   list.innerHTML = filtered.slice(0, 20).map((s, idx) => {
     const mins  = Math.floor((s.seconds||0) / 60);
-    const label = `${s.date || ''} · ${mins} mín`;
+    const label = `${fmtDateIS(s.date)} · ${mins} mín`;
     const clips = clipDefs.map(({key: pathKey, label: clipLabel}, i) => {
       const path     = s[pathKey] || (i === 0 ? s.audioPath : null);
       const btnId    = `ph-clipbtn-${s._docId}-${i}`;
