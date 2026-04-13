@@ -289,21 +289,14 @@
     <div class="ph-tab-content" id="ph-content-activity">
       <div class="ph-tile">
         <div class="ph-tile-header" style="margin-bottom:14px">
-          <div class="ph-tile-title">Lestrarferðalag</div>
-          <div class="ph-calendar-legend">
-            <span class="ph-dot-eg ph-dot-none"></span>
-            <span class="ph-legend-lbl">Minna</span>
-            <span class="ph-dot-eg ph-dot-low"></span>
-            <span class="ph-dot-eg ph-dot-mid"></span>
-            <span class="ph-dot-eg ph-dot-full"></span>
-            <span class="ph-legend-lbl">Meira</span>
+          <div class="ph-tile-title">Lestarmynstur</div>
+          <div class="ph-hm-tabs">
+            <button class="ph-hm-tab ph-hm-tab-active" id="ph-hm-week" onclick="switchHeatmap('week')">Vika</button>
+            <button class="ph-hm-tab" id="ph-hm-month" onclick="switchHeatmap('month')">Mánuður</button>
+            <button class="ph-hm-tab" id="ph-hm-year" onclick="switchHeatmap('year')">Ár</button>
           </div>
         </div>
-        <div class="ph-calendar-days-row" id="ph-calendar-days"></div>
-        <div class="ph-calendar-grid" id="ph-calendar-grid"></div>
-        <div class="ph-calendar-empty" id="ph-calendar-empty" style="display:none">
-          Engar lotur enn. Lotur birtast hér þegar barnið byrjar að lesa!
-        </div>
+        <div id="ph-heatmap-content"></div>
       </div>
     </div>
 
