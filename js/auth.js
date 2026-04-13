@@ -1,4 +1,5 @@
 // ─── Authentication & user processing ───
+// TODO: Bæta við emailVerified check í firebaseLogin, parentLoginFromPopup og onAuthStateChanged
 import {
   auth, db,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
@@ -227,6 +228,7 @@ export async function firebaseSignupPopup() {
   if (pw.length < 6) { errEl.textContent = 'Lykilorð verður að vera minnst 6 stafir.'; return; }
   if (pw !== pw2)    { errEl.textContent = 'Lykilorðin passa ekki saman.'; return; }
   try {
+    _signupInProgress = true;
     ['su-name','su-email','su-pw','su-pw2'].forEach(id => {
       const el = document.getElementById(id); if (el) el.disabled = true;
     });
@@ -239,9 +241,12 @@ export async function firebaseSignupPopup() {
     });
     await sendEmailVerification(user);
     await signOut(auth);
+    localStorage.removeItem('upphatt_child'); // TÍMABUNDIÐ — þarf að laga emailVerified check síðar
+    _signupInProgress = false;
     document.getElementById('signup-view-form').style.display    = 'none';
     document.getElementById('signup-view-success').style.display = '';
   } catch (e) {
+    _signupInProgress = false;
     let msg = 'Villa við skráningu. Reyndu aftur.';
     if (e.code === 'auth/email-already-in-use') msg = 'Þetta netfang er þegar skráð.';
     if (e.code === 'auth/invalid-email')        msg = 'Netfang er ekki gilt.';
@@ -290,6 +295,7 @@ export async function firebaseSignup() {
       name, email, role: 'parent', familyId, children: childrenArray, createdAt: serverTimestamp()
     });
     await signOut(auth);
+    localStorage.removeItem('upphatt_child'); // TÍMABUNDIÐ — þarf að laga emailVerified check síðar
     _signupInProgress = false;
     alert('Aðgangur tilbúinn! Þú getur nú skráð þig inn.');
     goTo('screen-parent-login');
@@ -365,7 +371,6 @@ export function toggleParentTheme() {
   const isLight = el.classList.toggle('ph-light');
   localStorage.setItem('upphatt_parent_theme', isLight ? 'light' : 'dark');
   if (btn) btn.textContent = isLight ? '🌙' : '☀️';
-  // ALDREI kallar á renderDashboard() — audio óhreyft ✅
 }
 
 // ── Add child placeholder ──
