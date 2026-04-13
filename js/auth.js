@@ -14,7 +14,31 @@ import { startFamilyListener, renderDashboard } from './parent-view.js';
 
 let _signupInProgress = false;
 
-// ── Restore missing code docs ──
+// ══════════════════════════════════════════
+// KÓÐA BÚNINGUR
+// ══════════════════════════════════════════
+
+// Nýr fjölskyldukóði — FAM + 4 tölur + 1 bókstafur — t.d. FAM4161B
+function makeFamilyCode() {
+  const nums   = Math.floor(1000 + Math.random() * 9000);
+  const alpha  = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const letter = alpha[Math.floor(Math.random() * alpha.length)];
+  return `FAM${nums}${letter}`;
+}
+
+// Nýr barnakóði — 3 nafnstafir + 4 random (tölur+bókstafir) — t.d. HRA4K2B9
+function makeChildCode(name) {
+  const prefix = name.replace(/\s/g, '').substr(0, 3).toUpperCase();
+  const chars  = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+  const suffix = Array.from({length: 4}, () =>
+    chars[Math.floor(Math.random() * chars.length)]).join('');
+  return prefix + suffix;
+}
+
+// ══════════════════════════════════════════
+// RESTORE MISSING CODE DOCS
+// ══════════════════════════════════════════
+
 async function restoreMissingCodeDocsFromProfile(familyId, children) {
   if (!familyId || !Array.isArray(children) || !children.length) return;
   await Promise.all(children.map(async (c) => {
@@ -22,12 +46,17 @@ async function restoreMissingCodeDocsFromProfile(familyId, children) {
     if (!code || !c?.key || !c?.name) return;
     try {
       const snap = await getDoc(doc(db, 'codes', code));
-      if (!snap.exists()) await setDoc(doc(db, 'codes', code), { familyId, childKey: c.key, childName: c.name });
+      if (!snap.exists()) await setDoc(doc(db, 'codes', code), {
+        familyId, childKey: c.key, childName: c.name
+      });
     } catch (e) { console.warn('Could not restore code doc for', code, e); }
   }));
 }
 
-// ── Process authenticated parent ──
+// ══════════════════════════════════════════
+// PROCESS AUTHENTICATED PARENT
+// ══════════════════════════════════════════
+
 async function processAuthUser(user) {
   const snap    = await getDoc(doc(db, 'users', user.uid));
   const profile = snap.exists() ? snap.data() : null;
@@ -39,8 +68,20 @@ async function processAuthUser(user) {
   S.parentChildren  = profile?.children || [];
   S.expandedChildren = {};
 
+  // Auto-migration — ef familyCode vantar, búum við til og vistum
+  if (!profile?.familyCode) {
+    const newCode = makeFamilyCode();
+    try {
+      await setDoc(doc(db, 'users', user.uid), { familyCode: newCode }, { merge: true });
+      S.familyCode = newCode;
+    } catch(e) { console.warn('Could not save familyCode:', e); S.familyCode = '—'; }
+  } else {
+    S.familyCode = profile.familyCode;
+  }
+
   await restoreMissingCodeDocsFromProfile(S.familyId, S.parentChildren);
 
+  // Legacy IDs
   document.getElementById('parent-pill').textContent = S.parentName;
   document.getElementById('parent-hero').textContent = `Góðan dag, ${S.parentName}`;
 
@@ -61,10 +102,11 @@ async function processAuthUser(user) {
     } catch (e) { console.error('Kóðaleit villa:', e); }
   }
 
+  // Dashboard UI
   const emailEl = document.getElementById('ph-user-email');
   if (emailEl) emailEl.textContent = S.parentEmail;
   const fcEl = document.getElementById('ph-family-code');
-  if (fcEl) fcEl.textContent = profile?.familyCode || '—';
+  if (fcEl) fcEl.textContent = S.familyCode || '—';
 
   initParentTheme();
   startFamilyListener();
@@ -75,7 +117,10 @@ async function processAuthUser(user) {
   document.getElementById('login-error').textContent = '';
 }
 
-// ── Parent login (screen) ──
+// ══════════════════════════════════════════
+// PARENT LOGIN (screen)
+// ══════════════════════════════════════════
+
 export async function firebaseLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pw    = document.getElementById('login-pw').value;
@@ -196,7 +241,6 @@ export function openSignupPopup() {
 }
 
 export function closeSignupPopup() {
-  // Hreinsa _signupInProgress og fara á child-login þegar popup lokar
   _signupInProgress = false;
   const modal = document.getElementById('parent-signup-popup');
   if (modal) modal.style.display = 'none';
@@ -229,21 +273,22 @@ export async function firebaseSignupPopup() {
   if (pw.length < 6) { errEl.textContent = 'Lykilorð verður að vera minnst 6 stafir.'; return; }
   if (pw !== pw2)    { errEl.textContent = 'Lykilorðin passa ekki saman.'; return; }
   try {
-    _signupInProgress = true; // Blokkum onAuthStateChanged meðan signup er í gangi
+    _signupInProgress = true;
     ['su-name','su-email','su-pw','su-pw2'].forEach(id => {
       const el = document.getElementById(id); if (el) el.disabled = true;
     });
     if (btn) { btn.textContent = 'Stofna...'; btn.disabled = true; }
-    const cred     = await createUserWithEmailAndPassword(auth, email, pw);
-    const user     = cred.user;
-    const familyId = 'FAM-' + Math.random().toString(36).substr(2,5).toUpperCase();
+    const cred       = await createUserWithEmailAndPassword(auth, email, pw);
+    const user       = cred.user;
+    const familyId   = 'FAM-' + Math.random().toString(36).substr(2,5).toUpperCase();
+    const familyCode = makeFamilyCode();
     await setDoc(doc(db, 'users', user.uid), {
-      name, email, role: 'parent', familyId, children: [], createdAt: serverTimestamp()
+      name, email, role: 'parent', familyId, familyCode, children: [], createdAt: serverTimestamp()
     });
     await sendEmailVerification(user);
     await signOut(auth);
-    localStorage.removeItem('upphatt_child'); // TÍMABUNDIÐ — þarf að laga emailVerified check síðar
-    // _signupInProgress = false kemur í closeSignupPopup — ekki hér
+    localStorage.removeItem('upphatt_child'); // TÍMABUNDIÐ — þarf emailVerified check síðar
+    // _signupInProgress = false kemur í closeSignupPopup
     document.getElementById('signup-view-form').style.display    = 'none';
     document.getElementById('signup-view-success').style.display = '';
   } catch (e) {
@@ -256,6 +301,124 @@ export async function firebaseSignupPopup() {
       const el = document.getElementById(id); if (el) el.disabled = false;
     });
     if (btn) { btn.textContent = 'Stofna aðgang'; btn.disabled = false; }
+  }
+}
+
+// ══════════════════════════════════════════
+// BÆTA VIÐ BARNI — popup
+// ══════════════════════════════════════════
+
+export function openAddChildPopup() {
+  // Búa til popup ef hann er ekki til
+  let popup = document.getElementById('add-child-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'add-child-popup';
+    popup.className = 'modal-overlay';
+    popup.innerHTML = `
+      <div class="rg-popup-card">
+        <div class="rg-popup-glow-line"></div>
+        <button class="rg-popup-close" onclick="closeAddChildPopup()" aria-label="Loka">✕</button>
+        <div class="rg-popup-header">
+          <div class="rg-popup-brand"><span class="rg-popup-brand-read">Upp</span><span class="rg-popup-brand-glow">Hátt</span></div>
+          <p class="rg-popup-subtitle">Bæta við barni</p>
+        </div>
+        <div class="rg-popup-body">
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(29,205,211,0.15);border:2px solid rgba(29,205,211,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dcdd3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+          <div class="rg-field">
+            <label class="rg-label" for="ac-name">Nafn barns</label>
+            <input id="ac-name" class="rg-input" type="text" placeholder="t.d. Jón Jónsson" autocomplete="off">
+          </div>
+          <div class="rg-field">
+            <label class="rg-label" for="ac-year">Fæðingarár</label>
+            <select id="ac-year" class="rg-input" style="cursor:pointer">
+              <option value="">Veldu ár</option>
+              ${Array.from({length:11}, (_,i) => 2020-i).map(y =>
+                `<option value="${y}">${y}</option>`).join('')}
+            </select>
+          </div>
+          <div id="ac-code-display" style="display:none;background:rgba(29,205,211,0.08);border:1px solid rgba(29,205,211,0.25);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;color:#7a8fa0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Innskráningarkóði barns</div>
+            <div id="ac-code-val" style="font-family:Georgia,serif;font-size:28px;font-weight:800;color:#1dcdd3;letter-spacing:4px"></div>
+            <div style="font-size:11px;color:#7a8fa0;margin-top:6px">Gefðu barninu þennan kóða</div>
+          </div>
+          <div id="ac-error" class="rg-popup-error"></div>
+          <button id="ac-btn" class="rg-popup-btn" onclick="submitAddChild()">Bæta við barni</button>
+        </div>
+      </div>`;
+    document.body.appendChild(popup);
+    window.closeAddChildPopup = closeAddChildPopup;
+    window.submitAddChild     = submitAddChild;
+  }
+
+  // Hreinsa
+  document.getElementById('ac-name').value  = '';
+  document.getElementById('ac-year').value  = '';
+  document.getElementById('ac-error').textContent = '';
+  document.getElementById('ac-code-display').style.display = 'none';
+  const btn = document.getElementById('ac-btn');
+  if (btn) { btn.textContent = 'Bæta við barni'; btn.disabled = false; }
+
+  popup.style.display = 'grid';
+  setTimeout(() => document.getElementById('ac-name')?.focus(), 80);
+}
+
+export function closeAddChildPopup() {
+  const popup = document.getElementById('add-child-popup');
+  if (popup) popup.style.display = 'none';
+}
+
+export async function submitAddChild() {
+  const name     = document.getElementById('ac-name').value.trim();
+  const birthYear = document.getElementById('ac-year').value;
+  const errEl    = document.getElementById('ac-error');
+  const btn      = document.getElementById('ac-btn');
+  errEl.textContent = '';
+
+  if (!name)      { errEl.textContent = 'Sláðu inn nafn barns.'; return; }
+  if (!birthYear) { errEl.textContent = 'Veldu fæðingarár.'; return; }
+
+  btn.textContent = 'Hleður...'; btn.disabled = true;
+
+  try {
+    const code     = makeChildCode(name);
+    const childKey = Math.random().toString(36).substr(2, 10);
+
+    // Vista í codes collection
+    await setDoc(doc(db, 'codes', code), {
+      familyId:  S.familyId,
+      childKey,
+      childName: name,
+      birthYear: parseInt(birthYear)
+    });
+
+    // Uppfæra users document
+    const newChild = { name, key: childKey, code, birthYear: parseInt(birthYear) };
+    const updatedChildren = [...(S.parentChildren || []), newChild];
+    await setDoc(doc(db, 'users', auth.currentUser.uid), {
+      children: updatedChildren
+    }, { merge: true });
+
+    // Uppfæra local state
+    S.parentChildren = updatedChildren;
+
+    // Sýna kóðann
+    document.getElementById('ac-code-val').textContent = code;
+    document.getElementById('ac-code-display').style.display = '';
+    btn.textContent = 'Lokað'; btn.disabled = false;
+    btn.onclick = closeAddChildPopup;
+
+    // Endurnýja dashboard
+    renderDashboard();
+
+  } catch(e) {
+    errEl.textContent = 'Villa — reyndu aftur.';
+    console.error('Add child villa:', e);
+    btn.textContent = 'Bæta við barni'; btn.disabled = false;
   }
 }
 
@@ -282,18 +445,19 @@ export async function firebaseSignup() {
     errorEl.style.color = 'var(--ocean)';
     errorEl.textContent = 'Stofna fjölskyldu... ⏳';
     _signupInProgress = true;
-    const userCred = await createUserWithEmailAndPassword(auth, email, pw);
-    const uid      = userCred.user.uid;
-    const familyId = 'FAM-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    const userCred   = await createUserWithEmailAndPassword(auth, email, pw);
+    const uid        = userCred.user.uid;
+    const familyId   = 'FAM-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    const familyCode = makeFamilyCode();
     const childrenArray = [];
     for (const cName of childNames) {
-      const loginCode = cName.replace(/\s/g, '').substr(0, 3).toUpperCase() + Math.floor(10 + Math.random() * 90);
-      const childKey  = Math.random().toString(36).substr(2, 8);
+      const loginCode = makeChildCode(cName);
+      const childKey  = Math.random().toString(36).substr(2, 10);
       await setDoc(doc(db, 'codes', loginCode), { familyId, childKey, childName: cName });
       childrenArray.push({ name: cName, key: childKey, code: loginCode });
     }
     await setDoc(doc(db, 'users', uid), {
-      name, email, role: 'parent', familyId, children: childrenArray, createdAt: serverTimestamp()
+      name, email, role: 'parent', familyId, familyCode, children: childrenArray, createdAt: serverTimestamp()
     });
     await signOut(auth);
     localStorage.removeItem('upphatt_child');
@@ -372,11 +536,6 @@ export function toggleParentTheme() {
   const isLight = el.classList.toggle('ph-light');
   localStorage.setItem('upphatt_parent_theme', isLight ? 'light' : 'dark');
   if (btn) btn.textContent = isLight ? '🌙' : '☀️';
-}
-
-// ── Add child placeholder ──
-export function openAddChildPopup() {
-  alert('Bæta við barni — kemur bráðum!');
 }
 
 // ── Auth state observer ──

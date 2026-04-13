@@ -8,14 +8,15 @@ import {
   openParentLoginPopup, closeParentLoginPopup, parentLoginFromPopup,
   showForgotPassword, backToLogin, sendPasswordReset,
   openSignupPopup, closeSignupPopup, backToLoginFromSignup, firebaseSignupPopup,
-  toggleParentTheme, openAddChildPopup
+  toggleParentTheme, openAddChildPopup, closeAddChildPopup, submitAddChild
 } from './auth.js';
 
 import { setMode, startReading, stopReading, cancelReading, saveSession, skipSave } from './child-view.js';
 
 import {
   toggleExpand, playClip, toggleCodes,
-  phPlayClip, switchTab, toggleRec, selectChild, renderDashboard
+  phPlayClip, switchTab, toggleRec, selectChild, renderDashboard,
+  switchHeatmap, switchHeatmapMonth
 } from './parent-view.js';
 
 // ── Wire all HTML onclick handlers ──
@@ -43,11 +44,15 @@ window.firebaseSignupPopup   = firebaseSignupPopup;
 // Parent dashboard
 window.toggleParentTheme     = toggleParentTheme;
 window.openAddChildPopup     = openAddChildPopup;
+window.closeAddChildPopup    = closeAddChildPopup;
+window.submitAddChild        = submitAddChild;
 window.selectChild           = selectChild;
 window.switchTab             = switchTab;
 window.toggleRec             = toggleRec;
 window.phPlayClip            = phPlayClip;
 window.renderDashboard       = renderDashboard;
+window.switchHeatmap         = switchHeatmap;
+window.switchHeatmapMonth    = switchHeatmapMonth;
 
 // Legacy
 window.toggleExpand          = toggleExpand;
