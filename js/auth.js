@@ -18,7 +18,6 @@ let _signupInProgress = false;
 // KÓÐA BÚNINGUR
 // ══════════════════════════════════════════
 
-// Nýr fjölskyldukóði — FAM + 4 tölur + 1 bókstafur — t.d. FAM4161B
 function makeFamilyCode() {
   const nums   = Math.floor(1000 + Math.random() * 9000);
   const alpha  = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -26,7 +25,6 @@ function makeFamilyCode() {
   return `FAM${nums}${letter}`;
 }
 
-// Nýr barnakóði — 3 nafnstafir + 4 random (tölur+bókstafir) — t.d. HRA4K2B9
 function makeChildCode(name) {
   const prefix = name.replace(/\s/g, '').substr(0, 3).toUpperCase();
   const chars  = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
@@ -68,7 +66,6 @@ async function processAuthUser(user) {
   S.parentChildren  = profile?.children || [];
   S.expandedChildren = {};
 
-  // Auto-migration — ef familyCode vantar, búum við til og vistum
   if (!profile?.familyCode) {
     const newCode = makeFamilyCode();
     try {
@@ -81,7 +78,6 @@ async function processAuthUser(user) {
 
   await restoreMissingCodeDocsFromProfile(S.familyId, S.parentChildren);
 
-  // Legacy IDs
   document.getElementById('parent-pill').textContent = S.parentName;
   document.getElementById('parent-hero').textContent = `Góðan dag, ${S.parentName}`;
 
@@ -102,7 +98,6 @@ async function processAuthUser(user) {
     } catch (e) { console.error('Kóðaleit villa:', e); }
   }
 
-  // Dashboard UI
   const emailEl = document.getElementById('ph-user-email');
   if (emailEl) emailEl.textContent = S.parentEmail;
   const fcEl = document.getElementById('ph-family-code');
@@ -287,8 +282,7 @@ export async function firebaseSignupPopup() {
     });
     await sendEmailVerification(user);
     await signOut(auth);
-    localStorage.removeItem('upphatt_child'); // TÍMABUNDIÐ — þarf emailVerified check síðar
-    // _signupInProgress = false kemur í closeSignupPopup
+    localStorage.removeItem('upphatt_child');
     document.getElementById('signup-view-form').style.display    = 'none';
     document.getElementById('signup-view-success').style.display = '';
   } catch (e) {
@@ -305,18 +299,94 @@ export async function firebaseSignupPopup() {
 }
 
 // ══════════════════════════════════════════
+// YEAR PICKER — iOS scroll wheel stíll
+// ══════════════════════════════════════════
+
+const YEARS = Array.from({length: 11}, (_, i) => 2010 + i); // 2010–2020
+const ITEM_H = 44; // px per item
+
+function buildYearPicker(containerId, selectedYear) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="yp-wrap" id="yp-wrap">
+      <div class="yp-fade-top"></div>
+      <div class="yp-drum" id="yp-drum"></div>
+      <div class="yp-selector"></div>
+      <div class="yp-fade-bottom"></div>
+    </div>`;
+
+  const drum = document.getElementById('yp-drum');
+
+  // Fylla drum með árum — með padding ofan og neðan til að hægt sé að skruna
+  const pad = 2; // fjöldi tómra lína ofan/neðan
+  for (let p = 0; p < pad; p++) {
+    const el = document.createElement('div');
+    el.className = 'yp-item yp-padding';
+    drum.appendChild(el);
+  }
+  YEARS.forEach(y => {
+    const el = document.createElement('div');
+    el.className = 'yp-item';
+    el.textContent = y;
+    el.dataset.year = y;
+    drum.appendChild(el);
+  });
+  for (let p = 0; p < pad; p++) {
+    const el = document.createElement('div');
+    el.className = 'yp-item yp-padding';
+    drum.appendChild(el);
+  }
+
+  // Setja upphafsstaðsetningu
+  const initIdx = YEARS.indexOf(selectedYear || 2015);
+  drum.scrollTop = initIdx * ITEM_H;
+  updateYearHighlight(drum);
+
+  // Hlusta á scroll
+  let scrollTimer;
+  drum.addEventListener('scroll', () => {
+    updateYearHighlight(drum);
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => snapToNearest(drum), 150);
+  }, { passive: true });
+}
+
+function updateYearHighlight(drum) {
+  const centerIdx = Math.round(drum.scrollTop / ITEM_H);
+  drum.querySelectorAll('.yp-item:not(.yp-padding)').forEach((el, i) => {
+    const dist = Math.abs(i - centerIdx);
+    el.classList.toggle('yp-item-selected', i === centerIdx);
+    el.classList.toggle('yp-item-near', dist === 1);
+    el.classList.toggle('yp-item-far', dist >= 2);
+  });
+}
+
+function snapToNearest(drum) {
+  const idx = Math.round(drum.scrollTop / ITEM_H);
+  drum.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
+}
+
+function getSelectedYear() {
+  const drum = document.getElementById('yp-drum');
+  if (!drum) return null;
+  const idx = Math.round(drum.scrollTop / ITEM_H);
+  return YEARS[idx] || null;
+}
+
+// ══════════════════════════════════════════
 // BÆTA VIÐ BARNI — popup
 // ══════════════════════════════════════════
 
 export function openAddChildPopup() {
-  // Búa til popup ef hann er ekki til
   let popup = document.getElementById('add-child-popup');
   if (!popup) {
     popup = document.createElement('div');
     popup.id = 'add-child-popup';
     popup.className = 'modal-overlay';
     popup.innerHTML = `
-      <div class="rg-popup-card">
+      <div class="rg-popup-card" style="max-height:90vh;overflow-y:auto">
         <div class="rg-popup-glow-line"></div>
         <button class="rg-popup-close" onclick="closeAddChildPopup()" aria-label="Loka">✕</button>
         <div class="rg-popup-header">
@@ -325,8 +395,8 @@ export function openAddChildPopup() {
         </div>
         <div class="rg-popup-body">
           <div style="text-align:center;margin-bottom:16px">
-            <div style="width:64px;height:64px;border-radius:50%;background:rgba(29,205,211,0.15);border:2px solid rgba(29,205,211,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dcdd3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div style="width:56px;height:56px;border-radius:50%;background:rgba(29,205,211,0.15);border:2px solid rgba(29,205,211,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1dcdd3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
           </div>
           <div class="rg-field">
@@ -334,36 +404,103 @@ export function openAddChildPopup() {
             <input id="ac-name" class="rg-input" type="text" placeholder="t.d. Jón Jónsson" autocomplete="off">
           </div>
           <div class="rg-field">
-            <label class="rg-label" for="ac-year">Fæðingarár</label>
-            <select id="ac-year" class="rg-input" style="cursor:pointer">
-              <option value="">Veldu ár</option>
-              ${Array.from({length:11}, (_,i) => 2020-i).map(y =>
-                `<option value="${y}">${y}</option>`).join('')}
-            </select>
+            <label class="rg-label">Fæðingarár</label>
+            <div id="ac-year-picker"></div>
           </div>
-          <div id="ac-code-display" style="display:none;background:rgba(29,205,211,0.08);border:1px solid rgba(29,205,211,0.25);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px">
-            <div style="font-size:11px;font-weight:700;color:#7a8fa0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Innskráningarkóði barns</div>
-            <div id="ac-code-val" style="font-family:Georgia,serif;font-size:28px;font-weight:800;color:#1dcdd3;letter-spacing:4px"></div>
-            <div style="font-size:11px;color:#7a8fa0;margin-top:6px">Gefðu barninu þennan kóða</div>
+          <div id="ac-code-display" style="display:none;background:rgba(29,205,211,0.08);border:1px solid rgba(29,205,211,0.25);border-radius:10px;padding:16px;text-align:center;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;color:#7a8fa0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Innskráningarkóði barns</div>
+            <div id="ac-code-val" style="font-family:Georgia,serif;font-size:32px;font-weight:800;color:#1dcdd3;letter-spacing:5px"></div>
+            <div style="font-size:11px;color:#7a8fa0;margin-top:8px">Gefðu barninu þennan kóða</div>
           </div>
           <div id="ac-error" class="rg-popup-error"></div>
           <button id="ac-btn" class="rg-popup-btn" onclick="submitAddChild()">Bæta við barni</button>
         </div>
-      </div>`;
+      </div>
+      <style>
+        .yp-wrap {
+          position: relative;
+          height: ${ITEM_H * 5}px;
+          overflow: hidden;
+          border-radius: 12px;
+          background: rgba(29,205,211,0.05);
+          border: 1px solid rgba(29,205,211,0.18);
+          margin: 4px 0 8px;
+        }
+        .yp-drum {
+          height: 100%;
+          overflow-y: scroll;
+          scroll-snap-type: y mandatory;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .yp-drum::-webkit-scrollbar { display: none; }
+        .yp-item {
+          height: ${ITEM_H}px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: Georgia, serif;
+          font-size: 22px;
+          font-weight: 700;
+          color: rgba(29,205,211,0.25);
+          scroll-snap-align: start;
+          cursor: pointer;
+          transition: color 0.15s ease, font-size 0.15s ease;
+          user-select: none;
+        }
+        .yp-item-near  { color: rgba(29,205,211,0.5); font-size: 20px; }
+        .yp-item-selected {
+          color: #1dcdd3;
+          font-size: 28px;
+          text-shadow: 0 0 20px rgba(29,205,211,0.4);
+        }
+        .yp-item-far   { color: rgba(29,205,211,0.15); font-size: 16px; }
+        .yp-padding    { color: transparent; }
+        .yp-selector {
+          position: absolute;
+          top: 50%;
+          left: 12px; right: 12px;
+          height: ${ITEM_H}px;
+          transform: translateY(-50%);
+          border-top: 1px solid rgba(29,205,211,0.35);
+          border-bottom: 1px solid rgba(29,205,211,0.35);
+          pointer-events: none;
+          border-radius: 4px;
+        }
+        .yp-fade-top {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: ${ITEM_H * 2}px;
+          background: linear-gradient(to bottom, rgba(6,14,26,0.9) 0%, transparent 100%);
+          pointer-events: none;
+          z-index: 2;
+        }
+        .yp-fade-bottom {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          height: ${ITEM_H * 2}px;
+          background: linear-gradient(to top, rgba(6,14,26,0.9) 0%, transparent 100%);
+          pointer-events: none;
+          z-index: 2;
+        }
+      </style>`;
     document.body.appendChild(popup);
     window.closeAddChildPopup = closeAddChildPopup;
     window.submitAddChild     = submitAddChild;
   }
 
   // Hreinsa
-  document.getElementById('ac-name').value  = '';
-  document.getElementById('ac-year').value  = '';
+  document.getElementById('ac-name').value = '';
   document.getElementById('ac-error').textContent = '';
   document.getElementById('ac-code-display').style.display = 'none';
   const btn = document.getElementById('ac-btn');
-  if (btn) { btn.textContent = 'Bæta við barni'; btn.disabled = false; }
+  if (btn) { btn.textContent = 'Bæta við barni'; btn.disabled = false; btn.onclick = submitAddChild; }
 
   popup.style.display = 'grid';
+
+  // Byggja year picker
+  buildYearPicker('ac-year-picker', 2015);
+
   setTimeout(() => document.getElementById('ac-name')?.focus(), 80);
 }
 
@@ -373,10 +510,10 @@ export function closeAddChildPopup() {
 }
 
 export async function submitAddChild() {
-  const name     = document.getElementById('ac-name').value.trim();
-  const birthYear = document.getElementById('ac-year').value;
-  const errEl    = document.getElementById('ac-error');
-  const btn      = document.getElementById('ac-btn');
+  const name      = document.getElementById('ac-name').value.trim();
+  const birthYear = getSelectedYear();
+  const errEl     = document.getElementById('ac-error');
+  const btn       = document.getElementById('ac-btn');
   errEl.textContent = '';
 
   if (!name)      { errEl.textContent = 'Sláðu inn nafn barns.'; return; }
@@ -388,7 +525,6 @@ export async function submitAddChild() {
     const code     = makeChildCode(name);
     const childKey = Math.random().toString(36).substr(2, 10);
 
-    // Vista í codes collection
     await setDoc(doc(db, 'codes', code), {
       familyId:  S.familyId,
       childKey,
@@ -396,23 +532,19 @@ export async function submitAddChild() {
       birthYear: parseInt(birthYear)
     });
 
-    // Uppfæra users document
     const newChild = { name, key: childKey, code, birthYear: parseInt(birthYear) };
     const updatedChildren = [...(S.parentChildren || []), newChild];
     await setDoc(doc(db, 'users', auth.currentUser.uid), {
       children: updatedChildren
     }, { merge: true });
 
-    // Uppfæra local state
     S.parentChildren = updatedChildren;
 
-    // Sýna kóðann
     document.getElementById('ac-code-val').textContent = code;
     document.getElementById('ac-code-display').style.display = '';
-    btn.textContent = 'Lokað'; btn.disabled = false;
+    btn.textContent = 'Loka'; btn.disabled = false;
     btn.onclick = closeAddChildPopup;
 
-    // Endurnýja dashboard
     renderDashboard();
 
   } catch(e) {
