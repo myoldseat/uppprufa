@@ -345,12 +345,74 @@ button,
   background: rgba(29,205,211,.10) !important;
 }
 
+
+/* ── Bookshelf top-left logout button ── */
+.top {
+  grid-template-columns: 72px 1fr 92px !important;
+}
+.logout-btn {
+  width: 66px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(29,205,211,.22);
+  background: rgba(7,18,33,.96);
+  color: rgba(217,229,239,.86);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .1px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.04),
+    0 0 12px rgba(29,205,211,.10);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    color .18s ease,
+    transform .12s ease;
+}
+.logout-btn:hover,
+.logout-btn:focus-visible {
+  outline: none;
+  border-color: rgba(29,205,211,.58);
+  background: rgba(10,28,48,.98);
+  color: #dffbff;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.10),
+    0 0 18px rgba(29,205,211,.24),
+    0 0 34px rgba(29,205,211,.12);
+}
+.logout-btn:active {
+  transform: scale(.97);
+  border-color: rgba(29,205,211,.72);
+  box-shadow:
+    0 0 0 2px rgba(29,205,211,.14),
+    0 0 24px rgba(29,205,211,.34);
+}
+@media(max-width:390px){
+  .top{grid-template-columns:68px 1fr 88px !important}
+  .logout-btn{width:62px;font-size:11.5px}
+}
+
+
+/* FINAL mobile spacing fix: keep rows above bottom nav/browser UI */
+.app {
+  padding-bottom: calc(178px + var(--safe)) !important;
+}
+.row:last-of-type {
+  margin-bottom: 110px !important;
+}
+
 </style>
 </head>
 <body>
 <main class="app">
 <header class="top">
-  <button class="icon-btn" aria-label="Heim">⌂</button>
+  <button class="logout-btn" id="bookshelfLogout" type="button" aria-label="Útskrá">Útskrá</button>
   <div class="header-title"><h1>Bókahilla</h1><p>Bækurnar þínar</p></div>
   <div class="header-actions"><button class="add-book" id="openAdd" aria-label="Bæta við bók">+</button><button class="child-initials" id="openProfile" aria-label="Kolbeinn Kvasir">KK</button></div>
 </header>
@@ -368,13 +430,13 @@ button,
 </section>
 </main>
 
-<nav class="bottom"><a class="nav" href="#"><span>▥</span><span>Lesa</span></a><a class="nav active" href="#"><span>▥</span><span>Bókahilla</span></a><a class="nav" href="#"><span>⚙</span><span>Stillingar</span></a></nav>
+<nav class="bottom"><a class="nav" href="child-v2.html"><span>▥</span><span>Lesa</span></a><a class="nav active" href="#"><span>▥</span><span>Bókahilla</span></a><a class="nav" href="#"><span>⚙</span><span>Stillingar</span></a></nav>
 
 <div class="overlay" id="addModal">
   <section class="dialog">
     <button class="close" id="closeAdd">×</button>
     <h2>Bæta við bók</h2>
-    <p class="dialog-sub">Local prufa — mynd vistast í browsernum</p>
+    <p class="dialog-sub">Local prufa — létt thumbnail vistast í browsernum</p>
     <div class="field"><label>Nafn bókar</label><input id="bookTitle" placeholder="t.d. Drekastormur"></div>
     <div class="field"><label>Höfundur / flokkur</label><input id="bookAuthor" placeholder="valfrjálst"></div>
     <div class="field"><label>Staða</label><select id="bookStatus"><option value="shelf">Á hillunni</option><option value="reading">Í lestri</option><option value="finished">Lokið</option></select></div>
@@ -441,7 +503,15 @@ function load(){
   const raw = localStorage.getItem(STORAGE_KEY);
   books = raw ? JSON.parse(raw) : defaultBooks;
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(books)); }
+function save(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+    return true;
+  } catch (e) {
+    console.warn("Bookshelf localStorage save failed:", e);
+    return false;
+  }
+}
 
 function esc(str=""){return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));}
 function chipText(b){ if(b.status==="finished") return "Lokið"; if(b.status==="reading") return (b.progressPercent||0)+"%"; return "Á hillu"; }
@@ -507,7 +577,7 @@ function openJourney(id){
   openOverlay("journeyModal");
 }
 
-async function compressToDataUrl(file, targetW=300, targetH=450, quality=.78){
+async function compressToDataUrl(file, targetW=180, targetH=270, quality=.66){
   const img = await new Promise((resolve,reject)=>{
     const i = new Image();
     i.onload=()=>resolve(i); i.onerror=reject;
@@ -546,19 +616,21 @@ document.getElementById("coverInput").addEventListener("change", async (e)=>{
   const file = e.target.files?.[0];
   if(!file) return;
   const beforeKB = Math.round(file.size/1024);
-  currentCover = await compressToDataUrl(file,300,450,.78);
+  currentCover = await compressToDataUrl(file,180,270,.66);
   const afterKB = Math.round((currentCover.length*0.75)/1024);
   document.getElementById("previewImg").src = currentCover;
-  document.getElementById("previewMeta").textContent = `Upprunalegt: ${beforeKB} KB · Local thumbnail: ~${afterKB} KB · 300×450 WebP`;
+  document.getElementById("previewMeta").textContent = `Upprunalegt: ${beforeKB} KB · Local thumbnail: ~${afterKB} KB · 180×270 WebP`;
   document.getElementById("previewRow").style.display = "grid";
 });
 
 document.getElementById("saveBook").addEventListener("click",()=>{
   const title = document.getElementById("bookTitle").value.trim();
   if(!title){ alert("Settu inn nafn bókar."); return; }
+
   const status = document.getElementById("bookStatus").value;
   const totalPages = Number(document.getElementById("bookPages").value || 0);
   const now = Date.now();
+
   const book = {
     id:"book_"+now,
     title,
@@ -574,8 +646,22 @@ document.getElementById("saveBook").addEventListener("click",()=>{
     lastReadAt: status==="reading" ? now : null,
     journeyEntries: status==="reading" ? [{date:"Í dag",pageFrom:1,pageTo:Math.min(10,totalPages||10),note:"Bókin er byrjuð.",reactions:[]}] : []
   };
-  books.unshift(book); save(); render();
-  currentCover=null; document.getElementById("bookTitle").value=""; document.getElementById("bookAuthor").value=""; document.getElementById("bookPages").value=""; document.getElementById("coverInput").value=""; document.getElementById("previewRow").style.display="none";
+
+  books.unshift(book);
+
+  if(!save()){
+    books.shift();
+    alert("Geymslan í browsernum er orðin full. Prófaðu að hreinsa local bækur eða nota færri myndir í þessari prufu.");
+    return;
+  }
+
+  render();
+  currentCover=null;
+  document.getElementById("bookTitle").value="";
+  document.getElementById("bookAuthor").value="";
+  document.getElementById("bookPages").value="";
+  document.getElementById("coverInput").value="";
+  document.getElementById("previewRow").style.display="none";
   closeOverlay("addModal");
 });
 document.getElementById("clearBooks").addEventListener("click",()=>{
@@ -590,6 +676,16 @@ document.getElementById("shareLastReading").addEventListener("click",()=>{
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".overlay.open").forEach(o=>closeOverlay(o.id));});
 
 load(); render();
+
+document.getElementById("bookshelfLogout")?.addEventListener("click",()=>{
+  try {
+    localStorage.removeItem("upphatt_child");
+    localStorage.removeItem("childName");
+    sessionStorage.setItem("upphatt_skip_child_redirect_once","1");
+  } catch(e) {}
+  window.location.href = "index.html";
+});
+
 </script>
 </body>
 </html>

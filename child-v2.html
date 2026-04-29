@@ -900,7 +900,258 @@
       .child-float-btn svg { width: 18px !important; height: 18px !important; }
     }
 
-  </style>
+  
+    /* FINAL SIMPLE LINK FIX: bookshelf is a real anchor */
+    a.child-float-btn {
+      text-decoration: none !important;
+    }
+    a.child-float-btn:visited {
+      color: #1dcdd3 !important;
+    }
+
+  
+    /* FINAL NAV VERSION: floating bookshelf is a real link */
+    a.child-float-btn {
+      text-decoration: none !important;
+    }
+    a.child-float-btn:visited {
+      color: #1dcdd3 !important;
+    }
+    .child-floating-actions {
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
+      width: 100vw !important;
+      height: 0 !important;
+      z-index: 9999 !important;
+      pointer-events: none !important;
+    }
+    .child-float-btn {
+      position: fixed !important;
+      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
+      z-index: 10000 !important;
+      pointer-events: auto !important;
+    }
+    .child-float-btn svg,
+    .child-float-btn svg path {
+      stroke: currentColor !important;
+    }
+    @media (min-width: 721px) {
+      .child-floating-actions { bottom: 28px !important; }
+      .child-float-btn {
+        bottom: 28px !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+      .child-float-btn.left { left: 28px !important; }
+      .child-float-btn.right { right: 28px !important; }
+      .child-float-btn svg { width: 18px !important; height: 18px !important; }
+    }
+
+  
+/* ══════════════════════════════════════════════
+   Post-save share popup after reading is saved
+   ══════════════════════════════════════════════ */
+.post-save-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background: rgba(2, 7, 13, 0.66);
+  backdrop-filter: blur(8px);
+}
+
+.post-save-overlay.open {
+  display: grid;
+}
+
+.post-save-card {
+  width: min(92vw, 390px);
+  position: relative;
+  border-radius: 22px;
+  border: 1px solid rgba(29, 205, 211, 0.22);
+  background: rgba(6, 14, 26, 0.985);
+  color: #d9e5ef;
+  padding: 24px 22px 22px;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.62),
+    0 0 60px rgba(29,205,211,0.09);
+  text-align: center;
+}
+
+.post-save-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(29,205,211,0),
+    rgba(29,205,211,0.60),
+    rgba(29,205,211,0)
+  );
+}
+
+.post-save-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 13px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(29,205,211,0.42);
+  background:
+    radial-gradient(circle at 50% 36%, rgba(29,205,211,0.25), rgba(8,19,31,0.96) 68%);
+  color: #1dcdd3;
+  font-size: 25px;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,0.10),
+    0 0 22px rgba(29,205,211,0.30),
+    0 0 44px rgba(29,205,211,0.16);
+}
+
+.post-save-card h2 {
+  margin: 0 0 7px;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.55px;
+}
+
+.post-save-card p {
+  margin: 0 0 18px;
+  color: rgba(148, 164, 180, 0.84);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.post-save-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.post-save-btn {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 11px;
+  border: 1px solid rgba(29,205,211,0.34);
+  background: rgba(29,205,211,0.10);
+  color: #dffbff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,0.05),
+    0 0 18px rgba(29,205,211,0.16);
+  transition:
+    transform 140ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.post-save-btn:hover,
+.post-save-btn:focus-visible {
+  outline: none;
+  background: rgba(29,205,211,0.16);
+  border-color: rgba(29,205,211,0.58);
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,0.10),
+    0 0 22px rgba(29,205,211,0.30),
+    0 0 44px rgba(29,205,211,0.16);
+}
+
+.post-save-btn:active {
+  transform: scale(0.985);
+  background: rgba(29,205,211,0.22);
+}
+
+.post-save-btn.secondary {
+  background: rgba(255,255,255,0.025);
+  border-color: rgba(122,187,218,0.18);
+  color: rgba(217,229,239,0.82);
+  box-shadow: none;
+}
+
+.post-save-note {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(29,205,211,0.08);
+  border: 1px solid rgba(29,205,211,0.22);
+  color: #1dcdd3;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.post-save-note.show {
+  display: block;
+}
+
+
+/* Final reading setup: modal only chooses book + starting page */
+.child-row {
+  grid-template-columns: 1fr !important;
+}
+
+
+.post-save-tagline {
+  margin: 0 0 9px !important;
+  color: #1dcdd3 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: .45px !important;
+  text-transform: uppercase !important;
+}
+.post-save-intro {
+  margin-bottom: 16px !important;
+}
+.post-save-field {
+  text-align: left;
+  margin-bottom: 13px;
+}
+.post-save-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #d9e5ef;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.post-save-field input,
+.post-save-field textarea {
+  width: 100%;
+  border-radius: 11px;
+  border: 1px solid rgba(122,187,218,.18);
+  background: rgba(7,18,33,.96);
+  color: #d9e5ef;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  resize: vertical;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.post-save-field input:focus,
+.post-save-field textarea:focus {
+  border-color: rgba(29,205,211,.70);
+  background: rgba(9,25,43,.98);
+  box-shadow:
+    0 0 0 3px rgba(29,205,211,.14),
+    0 0 18px rgba(29,205,211,.32),
+    0 0 36px rgba(29,205,211,.18);
+}
+.post-save-field textarea::placeholder,
+.post-save-field input::placeholder {
+  color: rgba(148,164,180,.48);
+}
+
+</style>
 </head>
 <body>
   <main class="screen">
@@ -959,7 +1210,7 @@
       <section class="child-action-modal" role="dialog" aria-modal="true" aria-labelledby="child-reading-modal-title">
         <button id="child-reading-modal-close" class="child-action-close" type="button" aria-label="Loka">×</button>
         <h2 id="child-reading-modal-title">Veldu bók</h2>
-        <p class="child-action-sub">Settu inn blaðsíður fyrir næsta lestur.</p>
+        <p class="child-action-sub">Veldu bók og hvar þú byrjar að lesa.</p>
 
         <div class="child-field">
           <label>Bók</label>
@@ -973,13 +1224,10 @@
 
         <div class="child-row">
           <div class="child-field">
-            <label for="child-page-from">Frá bls.</label>
+            <label for="child-page-from">Byrja á bls.</label>
             <input id="child-page-from" class="child-input" inputmode="numeric" placeholder="21">
           </div>
-          <div class="child-field">
-            <label for="child-page-to">Til bls.</label>
-            <input id="child-page-to" class="child-input" inputmode="numeric" placeholder="29">
-          </div>
+          <input id="child-page-to" type="hidden" value="">
         </div>
 
         <div class="child-action-preview">
@@ -991,18 +1239,41 @@
         <div id="child-reading-result" class="child-modal-result">Vistað fyrir næsta lestur.</div>
       </section>
     </div>
+    <div id="post-save-overlay" class="post-save-overlay" aria-hidden="true">
+      <section class="post-save-card" role="dialog" aria-modal="true" aria-labelledby="post-save-title">
+        <div class="post-save-icon" aria-hidden="true">✓</div>
+        <p id="post-save-tagline" class="post-save-tagline">Smá lestrarspor verða að stórri ferð.</p>
+        <h2 id="post-save-title">Lestur vistaður</h2>
+        <p class="post-save-intro">Bættu einu atriði við lestrarferðalagið.</p>
 
+        <div class="post-save-field">
+          <label for="post-save-note-input">Ein setning um það sem gerðist í bókinni í dag</label>
+          <textarea id="post-save-note-input" rows="3" placeholder="T.d. Þau fundu hellinn."></textarea>
+        </div>
+
+        <div class="post-save-field">
+          <label for="post-save-end-page">Ég endaði á bls.</label>
+          <input id="post-save-end-page" inputmode="numeric" placeholder="29">
+        </div>
+
+        <div class="post-save-actions">
+          <button id="post-save-save-journey" class="post-save-btn" type="button">Vista lestrarferðalag</button>
+          <button id="post-save-close" class="post-save-btn secondary" type="button">Loka</button>
+        </div>
+        <div id="post-save-note" class="post-save-note">Vistað í lestrarferðalaginu.</div>
+      </section>
+    </div>
 
     <span id="recording-dependency" class="dependency-node" aria-hidden="true">recording active</span>
     <div id="listen-toast" class="toast" role="status" aria-live="polite">Einhver hlustaði í dag</div>
-  
+
     <div class="child-floating-actions" aria-label="Flýtiaðgerðir">
-      <button id="child-bookshelf-float" class="child-float-btn left" type="button" aria-label="Bókahilla">
+      <a id="child-bookshelf-float" class="child-float-btn left" href="bookshelf.html" aria-label="Bókahilla">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 5.5V19M9.5 4.5V20M15 5.5V19M19 7V19" stroke-width="1.8" stroke-linecap="round"/>
           <path d="M4.2 19.5H20" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-      </button>
+      </a>
       <button id="child-reading-settings-float" class="child-float-btn right" type="button" aria-label="Velja bók og blaðsíður">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke-width="1.7"/>
@@ -1541,12 +1812,104 @@
         if (!childReadingPreview) return;
         var title = getSelectedBookTitle();
         var from = (childPageFrom && childPageFrom.value.trim()) || childPageFrom?.placeholder || "21";
-        var to = (childPageTo && childPageTo.value.trim()) || childPageTo?.placeholder || "29";
-        childReadingPreview.textContent = title + " · bls. " + from + "–" + to;
+        childReadingPreview.textContent = title + " · byrjar á bls. " + from;
       }
+
+
+      function readBookshelfBooksForChildModal() {
+        try {
+          var rawBooks = localStorage.getItem("upphatt_bookshelf_local_v1");
+          var parsedBooks = rawBooks ? JSON.parse(rawBooks) : [];
+          if (!Array.isArray(parsedBooks)) return [];
+
+          return parsedBooks
+            .filter(function (book) {
+              return book && book.id && book.title;
+            })
+            .map(function (book) {
+              return {
+                id: String(book.id),
+                title: String(book.title),
+                status: book.status || "shelf",
+                progressPercent: Number(book.progressPercent || 0),
+                pageFrom: book.currentPageFrom || "",
+                pageTo: book.currentPageTo || ""
+              };
+            });
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function populateChildBookListFromBookshelf() {
+        if (!childBookList) return;
+
+        var storedBooks = readBookshelfBooksForChildModal();
+        if (!storedBooks.length) {
+          return;
+        }
+
+        var previousSelectedId = getSelectedBookId ? getSelectedBookId() : "";
+        var activeBook = storedBooks.find(function (book) {
+          return book.status === "reading";
+        }) || storedBooks[0];
+
+        childBookList.innerHTML = storedBooks.map(function (book) {
+          var isSelected = book.id === (previousSelectedId || activeBook.id);
+          var meta = book.status === "reading"
+            ? "Í lestri"
+            : book.status === "finished"
+              ? "Lokið"
+              : "Á hillunni";
+
+          return '' +
+            '<button class="child-book-option' + (isSelected ? ' selected' : '') + '" ' +
+            'type="button" ' +
+            'data-book-id="' + book.id.replace(/"/g, "&quot;") + '" ' +
+            'data-book-title="' + book.title.replace(/"/g, "&quot;") + '" ' +
+            'data-page-from="' + String(book.pageFrom).replace(/"/g, "&quot;") + '" ' +
+            'data-page-to="' + String(book.pageTo).replace(/"/g, "&quot;") + '" ' +
+            'aria-selected="' + (isSelected ? "true" : "false") + '">' +
+              '<span class="child-book-option-title">' + book.title + '</span>' +
+              '<span class="child-book-option-meta">' + meta + (book.progressPercent ? " · " + book.progressPercent + "%" : "") + '</span>' +
+            '</button>';
+        }).join("");
+
+        childBookOptions = Array.prototype.slice.call(document.querySelectorAll(".child-book-option"));
+        bindChildBookOptionClicks();
+
+        if (activeBook && !previousSelectedId) {
+          setSelectedBookById(activeBook.id);
+          if (activeBook.pageFrom && childPageFrom && !childPageFrom.value) childPageFrom.value = activeBook.pageFrom;
+          if (activeBook.pageTo && childPageTo && !childPageTo.value) childPageTo.value = activeBook.pageTo;
+        }
+
+        updateChildReadingPreview();
+      }
+
+      function bindChildBookOptionClicks() {
+        childBookOptions.forEach(function (btn) {
+          if (btn.dataset.bound === "1") return;
+          btn.dataset.bound = "1";
+          btn.addEventListener("click", function () {
+            setSelectedBookById(btn.getAttribute("data-book-id") || "drekastormur");
+
+            var pageFrom = btn.getAttribute("data-page-from") || "";
+            var pageTo = btn.getAttribute("data-page-to") || "";
+            var suggestedStart = pageTo ? String(Number(pageTo) + 1) : pageFrom;
+            if (suggestedStart && childPageFrom) childPageFrom.value = suggestedStart;
+            if (childPageTo) childPageTo.value = "";
+
+            updateChildReadingPreview();
+          });
+        });
+      }
+
 
       function openChildReadingModal() {
         if (!childReadingModal) return;
+
+        populateChildBookListFromBookshelf();
 
         try {
           var rawSetup = localStorage.getItem(getChildReadingSetupKey());
@@ -1554,7 +1917,7 @@
             var setup = JSON.parse(rawSetup);
             if (setup && setup.bookId) setSelectedBookById(setup.bookId);
             if (setup && setup.pageFrom && childPageFrom) childPageFrom.value = setup.pageFrom;
-            if (setup && setup.pageTo && childPageTo) childPageTo.value = setup.pageTo;
+            if (childPageTo) childPageTo.value = "";
           }
         } catch (e) {
           // no-op
@@ -1575,17 +1938,8 @@
         childReadingModal.classList.remove("open");
         childReadingModal.setAttribute("aria-hidden", "true");
       }
+      // Bookshelf button is a plain <a href="bookshelf.html"> link now.
 
-      if (bookshelfFloatBtn) {
-        bookshelfFloatBtn.addEventListener("click", function () {
-          try {
-            sessionStorage.setItem("upphatt_return_to_child_v2", "1");
-          } catch (e) {
-            // no-op
-          }
-          window.location.href = "bookshelf.html";
-        });
-      }
 
       if (readingSettingsFloatBtn) {
         readingSettingsFloatBtn.addEventListener("click", openChildReadingModal);
@@ -1601,12 +1955,7 @@
         });
       }
 
-      childBookOptions.forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          setSelectedBookById(btn.getAttribute("data-book-id") || "drekastormur");
-          updateChildReadingPreview();
-        });
-      });
+      bindChildBookOptionClicks();
 
       [childPageFrom, childPageTo].forEach(function (el) {
         if (el) el.addEventListener("input", updateChildReadingPreview);
@@ -1619,7 +1968,7 @@
             bookId: getSelectedBookId(),
             bookTitle: getSelectedBookTitle(),
             pageFrom: childPageFrom ? childPageFrom.value.trim() : "",
-            pageTo: childPageTo ? childPageTo.value.trim() : "",
+            pageTo: "",
             updatedAt: Date.now()
           };
 
@@ -1910,6 +2259,156 @@
         updateHelperVisibility();
       }
 
+
+      var postSaveOverlay = document.getElementById("post-save-overlay");
+      var postSaveCloseBtn = document.getElementById("post-save-close");
+      var postSaveJourneyBtn = document.getElementById("post-save-save-journey");
+      var postSaveNote = document.getElementById("post-save-note");
+      var postSaveTagline = document.getElementById("post-save-tagline");
+      var postSaveNoteInput = document.getElementById("post-save-note-input");
+      var postSaveEndPageInput = document.getElementById("post-save-end-page");
+
+      var postSaveTaglines = [
+        "Smá lestrarspor verða að stórri ferð.",
+        "Ein setning í dag verður minning á morgun.",
+        "Bókin heldur áfram — og þú líka.",
+        "Það sem þú last í dag fer á hilluna þína.",
+        "Lestrarferðalagið stækkar með hverri lotu."
+      ];
+
+      function getChildReadingSetup() {
+        try {
+          var rawSetup = localStorage.getItem(getChildReadingSetupKey());
+          return rawSetup ? JSON.parse(rawSetup) : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function updateBookshelfBookAfterReading(note, endPage) {
+        try {
+          var setup = getChildReadingSetup();
+          var rawBooks = localStorage.getItem("upphatt_bookshelf_local_v1");
+          var books = rawBooks ? JSON.parse(rawBooks) : [];
+          if (!Array.isArray(books) || !setup || !setup.bookId) return false;
+
+          var book = books.find(function (item) {
+            return item && String(item.id) === String(setup.bookId);
+          });
+          if (!book) return false;
+
+          var startPage = Number(setup.pageFrom || 0);
+          var finalPage = Number(endPage || 0);
+          var totalPages = Number(book.totalPages || 0);
+          var now = Date.now();
+
+          book.status = "reading";
+          book.currentPageFrom = startPage || book.currentPageFrom || null;
+          book.currentPageTo = finalPage || book.currentPageTo || null;
+          if (totalPages && finalPage) {
+            book.progressPercent = Math.min(100, Math.max(0, Math.round((finalPage / totalPages) * 100)));
+          }
+          book.lastReadAt = now;
+          book.updatedAt = now;
+          book.note = note || book.note || "";
+
+          if (!Array.isArray(book.journeyEntries)) book.journeyEntries = [];
+          book.journeyEntries.unshift({
+            date: "Í dag",
+            pageFrom: startPage || "",
+            pageTo: finalPage || "",
+            note: note || "",
+            reactions: []
+          });
+
+          localStorage.setItem("upphatt_bookshelf_local_v1", JSON.stringify(books));
+          return true;
+        } catch (e) {
+          console.warn("Failed updating bookshelf book after reading:", e);
+          return false;
+        }
+      }
+
+      function openPostSavePopup() {
+        if (!postSaveOverlay) return;
+
+        var tagline = postSaveTaglines[Math.floor(Math.random() * postSaveTaglines.length)];
+        if (postSaveTagline) postSaveTagline.textContent = tagline;
+
+        var setup = getChildReadingSetup();
+        if (postSaveEndPageInput) {
+          postSaveEndPageInput.value = "";
+          postSaveEndPageInput.placeholder = setup && setup.pageFrom ? String(Number(setup.pageFrom) + 8) : "29";
+        }
+        if (postSaveNoteInput) postSaveNoteInput.value = "";
+        if (postSaveNote) postSaveNote.classList.remove("show");
+        if (postSaveJourneyBtn) {
+          postSaveJourneyBtn.textContent = "Vista lestrarferðalag";
+          postSaveJourneyBtn.disabled = false;
+        }
+
+        postSaveOverlay.classList.add("open");
+        postSaveOverlay.setAttribute("aria-hidden", "false");
+
+        setTimeout(function () {
+          if (postSaveNoteInput) postSaveNoteInput.focus();
+        }, 80);
+      }
+
+      function closePostSavePopup() {
+        if (!postSaveOverlay) return;
+        postSaveOverlay.classList.remove("open");
+        postSaveOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      if (postSaveCloseBtn) {
+        postSaveCloseBtn.addEventListener("click", closePostSavePopup);
+      }
+
+      if (postSaveOverlay) {
+        postSaveOverlay.addEventListener("click", function (event) {
+          if (event.target === postSaveOverlay) closePostSavePopup();
+        });
+      }
+
+      if (postSaveJourneyBtn) {
+        postSaveJourneyBtn.addEventListener("click", function () {
+          var note = postSaveNoteInput ? postSaveNoteInput.value.trim() : "";
+          var endPage = postSaveEndPageInput ? postSaveEndPageInput.value.trim() : "";
+
+          if (!note) {
+            alert("Skrifaðu eina setningu um hvað gerðist í bókinni.");
+            return;
+          }
+
+          if (!endPage) {
+            alert("Settu inn blaðsíðuna sem þú endaðir á.");
+            return;
+          }
+
+          updateBookshelfBookAfterReading(note, endPage);
+
+          try {
+            localStorage.setItem("upphatt_last_reading_journey_entry", JSON.stringify({
+              childKey: childStorageKey,
+              childName: childName,
+              note: note,
+              endPage: endPage,
+              timestamp: Date.now(),
+              source: "post-save-popup"
+            }));
+          } catch (e) {
+            // no-op
+          }
+
+          triggerHaptic([8, 20, 8]);
+          postSaveJourneyBtn.textContent = "Vistað";
+          postSaveJourneyBtn.disabled = true;
+          if (postSaveNote) postSaveNote.classList.add("show");
+          setTimeout(closePostSavePopup, 850);
+        });
+      }
+
       saveSessionBtn.addEventListener("click", function () {
         if (saveInFlight || !pendingSavePayload || typeof window.saveChildV2Session !== "function") {
           return;
@@ -1930,6 +2429,7 @@
               saveSessionStatus.textContent = "Lota vistuð.";
               pendingSavePayload = null;
               saveSessionBtn.hidden = true;
+              openPostSavePopup();
             } else {
               saveSessionStatus.textContent = "Engin hljóðbrot til vistunar enn.";
             }
@@ -2076,6 +2576,10 @@
       window.debugTriggerListen = function (listenerName) {
         triggerListenEvent(listenerName || "Dad");
       };
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closePostSavePopup();
+      });
 
       updateHelperVisibility();
       startSettleLoop();
