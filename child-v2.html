@@ -866,6 +866,40 @@
   }
 }
 
+  
+    /* FINAL FIX: ensure floating buttons exist visually above the child page */
+    .child-floating-actions {
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
+      width: 100vw !important;
+      height: 0 !important;
+      z-index: 9999 !important;
+      pointer-events: none !important;
+    }
+    .child-float-btn {
+      position: fixed !important;
+      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
+      z-index: 10000 !important;
+      pointer-events: auto !important;
+    }
+    .child-float-btn svg,
+    .child-float-btn svg path {
+      stroke: currentColor !important;
+    }
+    @media (min-width: 721px) {
+      .child-floating-actions { bottom: 28px !important; }
+      .child-float-btn {
+        bottom: 28px !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+      .child-float-btn.left { left: 28px !important; }
+      .child-float-btn.right { right: 28px !important; }
+      .child-float-btn svg { width: 18px !important; height: 18px !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -961,6 +995,22 @@
 
     <span id="recording-dependency" class="dependency-node" aria-hidden="true">recording active</span>
     <div id="listen-toast" class="toast" role="status" aria-live="polite">Einhver hlustaði í dag</div>
+  
+    <div class="child-floating-actions" aria-label="Flýtiaðgerðir">
+      <button id="child-bookshelf-float" class="child-float-btn left" type="button" aria-label="Bókahilla">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 5.5V19M9.5 4.5V20M15 5.5V19M19 7V19" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4.2 19.5H20" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="child-reading-settings-float" class="child-float-btn right" type="button" aria-label="Velja bók og blaðsíður">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke-width="1.7"/>
+          <path d="M19 12a7 7 0 0 0-.1-1.1l2-1.5-2-3.4-2.4 1a7.6 7.6 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.9c-.7.3-1.3.6-1.9 1.1l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.1l-2 1.5 2 3.4 2.4-1c.6.5 1.2.8 1.9 1.1l.3 2.9h4.6l.3-2.9c.7-.3 1.3-.6 1.9-1.1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1.1Z" stroke-width="1.15"/>
+        </svg>
+      </button>
+    </div>
+
   </main>
 
   <script>
