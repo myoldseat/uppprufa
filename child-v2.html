@@ -1151,6 +1151,48 @@
   color: rgba(148,164,180,.48);
 }
 
+
+/* Final book picker polish: only “Að lesa” books + clear spacing */
+.child-book-option {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 7px !important;
+  line-height: 1.12 !important;
+}
+
+.child-book-option-title {
+  display: block !important;
+  width: 100% !important;
+  color: #d9e5ef !important;
+  line-height: 1.14 !important;
+}
+
+.child-book-option-meta {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  color: rgba(148, 164, 180, 0.78) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: .15px !important;
+  line-height: 1.15 !important;
+}
+
+.child-book-option.selected .child-book-option-meta {
+  color: #1dcdd3 !important;
+}
+
+.child-book-empty {
+  padding: 14px 13px;
+  border-radius: 12px;
+  border: 1px dashed rgba(29,205,211,.25);
+  background: rgba(29,205,211,.045);
+  color: rgba(217,229,239,.78);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
 </style>
 </head>
 <body>
@@ -1792,12 +1834,12 @@
 
       function getSelectedBookTitle() {
         var option = getSelectedBookOption();
-        return option ? (option.getAttribute("data-book-title") || option.textContent || "Drekastormur") : "Drekastormur";
+        return option ? (option.getAttribute("data-book-title") || option.textContent || "Bók") : "Bók";
       }
 
       function getSelectedBookId() {
         var option = getSelectedBookOption();
-        return option ? (option.getAttribute("data-book-id") || "drekastormur") : "drekastormur";
+        return option ? (option.getAttribute("data-book-id") || "") : "";
       }
 
       function setSelectedBookById(bookId) {
@@ -1824,7 +1866,7 @@
 
           return parsedBooks
             .filter(function (book) {
-              return book && book.id && book.title;
+              return book && book.id && book.title && book.status === "reading";
             })
             .map(function (book) {
               return {
@@ -1846,6 +1888,9 @@
 
         var storedBooks = readBookshelfBooksForChildModal();
         if (!storedBooks.length) {
+          childBookList.innerHTML = '<div class="child-book-empty">Engin bók merkt “Að lesa” enn. Farðu í bókahilluna og byrjaðu bók fyrst.</div>';
+          childBookOptions = [];
+          updateChildReadingPreview();
           return;
         }
 
@@ -1857,7 +1902,7 @@
         childBookList.innerHTML = storedBooks.map(function (book) {
           var isSelected = book.id === (previousSelectedId || activeBook.id);
           var meta = book.status === "reading"
-            ? "Í lestri"
+            ? "Að lesa"
             : book.status === "finished"
               ? "Lokið"
               : "Á hillunni";
@@ -1964,6 +2009,11 @@
 
       if (childReadingSave) {
         childReadingSave.addEventListener("click", function () {
+          if (!getSelectedBookId()) {
+            alert("Engin bók er merkt “Að lesa” enn.");
+            return;
+          }
+
           var setup = {
             bookId: getSelectedBookId(),
             bookTitle: getSelectedBookTitle(),
