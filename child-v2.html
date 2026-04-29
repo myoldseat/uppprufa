@@ -451,7 +451,67 @@
       color: var(--bg);
     }
 
-    @media (max-width: 720px) {
+    
+      .child-book-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .child-book-option {
+        width: 100%;
+        min-height: 44px;
+        border-radius: 12px;
+        border: 1px solid rgba(122, 187, 218, 0.16);
+        background: rgba(7, 18, 33, 0.96);
+        color: #d9e5ef;
+        text-align: left;
+        padding: 11px 13px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          background 180ms ease,
+          transform 120ms ease,
+          color 180ms ease;
+      }
+
+      .child-book-option:hover,
+      .child-book-option:focus-visible {
+        outline: none;
+        border-color: rgba(29, 205, 211, 0.56);
+        background: rgba(9, 25, 43, 0.98);
+        color: #e9fcff;
+        box-shadow:
+          0 0 0 1px rgba(29,205,211,0.08),
+          0 0 18px rgba(29,205,211,0.22),
+          0 0 36px rgba(29,205,211,0.12);
+      }
+
+      .child-book-option:active {
+        transform: scale(0.985);
+        border-color: rgba(29, 205, 211, 0.72);
+        box-shadow:
+          0 0 0 2px rgba(29,205,211,0.14),
+          0 0 24px rgba(29,205,211,0.34);
+      }
+
+      .child-book-option.selected {
+        border-color: rgba(29, 205, 211, 0.72);
+        background:
+          linear-gradient(180deg, rgba(29,205,211,0.14), rgba(29,205,211,0.08)),
+          rgba(9, 25, 43, 0.98);
+        color: #e9fcff;
+        box-shadow:
+          0 0 0 2px rgba(29,205,211,0.12),
+          0 0 22px rgba(29,205,211,0.30),
+          0 0 42px rgba(29,205,211,0.16);
+      }
+
+
+      @media (max-width: 720px) {
       .screen {
         padding: 0;
       }
@@ -498,6 +558,314 @@
         margin-top: 12px;
       }
     }
+  
+/* ══════════════════════════════════════════════
+   Floating child actions — bookshelf + reading setup
+   ══════════════════════════════════════════════ */
+.child-floating-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 60;
+  pointer-events: none;
+}
+
+.child-float-btn {
+  position: absolute;
+  bottom: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 205, 211, 0.28);
+  background: rgba(6, 14, 26, 0.78);
+  color: #1dcdd3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 0 1px rgba(29, 205, 211, 0.06),
+    0 0 18px rgba(29, 205, 211, 0.18),
+    0 12px 34px rgba(0, 0, 0, 0.34);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 160ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.child-float-btn.left {
+  left: calc(18px + env(safe-area-inset-left));
+}
+
+.child-float-btn.right {
+  right: calc(18px + env(safe-area-inset-right));
+}
+
+.child-float-btn svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+}
+
+.child-float-btn:hover,
+.child-float-btn:focus-visible {
+  outline: none;
+  border-color: rgba(29, 205, 211, 0.62);
+  background: rgba(8, 22, 37, 0.92);
+  box-shadow:
+    0 0 0 2px rgba(29, 205, 211, 0.10),
+    0 0 22px rgba(29, 205, 211, 0.34),
+    0 14px 38px rgba(0, 0, 0, 0.38);
+}
+
+.child-float-btn:active {
+  transform: scale(0.94);
+  border-color: rgba(29, 205, 211, 0.78);
+  box-shadow:
+    0 0 0 3px rgba(29, 205, 211, 0.14),
+    0 0 30px rgba(29, 205, 211, 0.46);
+}
+
+.child-action-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: end center;
+  padding:
+    18px
+    calc(16px + env(safe-area-inset-right))
+    calc(18px + env(safe-area-inset-bottom))
+    calc(16px + env(safe-area-inset-left));
+  background: rgba(2, 7, 13, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+.child-action-overlay.open {
+  display: grid;
+}
+
+.child-action-modal {
+  width: min(100%, 420px);
+  max-height: min(84svh, 620px);
+  overflow: auto;
+  position: relative;
+  background: rgba(6, 14, 26, 0.985);
+  border: 1px solid rgba(29, 205, 211, 0.20);
+  border-radius: 22px;
+  padding: 22px;
+  color: #d9e5ef;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.62),
+    0 0 60px rgba(29, 205, 211, 0.08);
+}
+
+.child-action-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(29,205,211,0),
+    rgba(29,205,211,0.55),
+    rgba(29,205,211,0)
+  );
+}
+
+.child-action-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(122, 187, 218, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(148, 164, 180, 0.86);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.child-action-modal h2 {
+  margin: 2px 0 4px;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.6px;
+  text-align: center;
+}
+
+.child-action-sub {
+  margin: 0 0 20px;
+  color: rgba(148, 164, 180, 0.78);
+  font-size: 13px;
+  text-align: center;
+}
+
+.child-field {
+  margin-bottom: 13px;
+}
+
+.child-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #d9e5ef;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.25px;
+}
+
+.child-select,
+.child-input {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(122, 187, 218, 0.18);
+  background: rgba(7, 18, 33, 0.96);
+  color: #d9e5ef;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.child-select {
+  color-scheme: dark;
+}
+
+.child-input::placeholder {
+  color: rgba(148, 164, 180, 0.45);
+}
+
+.child-select:focus,
+.child-input:focus {
+  border-color: rgba(29, 205, 211, 0.70);
+  background: rgba(9, 25, 43, 0.98);
+  box-shadow:
+    0 0 0 3px rgba(29, 205, 211, 0.14),
+    0 0 18px rgba(29, 205, 211, 0.32),
+    0 0 36px rgba(29, 205, 211, 0.18);
+}
+
+.child-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.child-action-preview {
+  margin: 4px 0 14px;
+  padding: 13px;
+  border-radius: 15px;
+  border: 1px solid rgba(122, 187, 218, 0.13);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.child-action-preview-title {
+  color: #1dcdd3;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  margin-bottom: 7px;
+}
+
+.child-action-preview-text {
+  margin: 0;
+  color: rgba(217, 229, 239, 0.86);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.child-modal-btn {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 11px;
+  border: 1px solid rgba(29, 205, 211, 0.34);
+  background: rgba(29, 205, 211, 0.10);
+  color: #dffbff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,0.05),
+    0 0 18px rgba(29,205,211,0.16);
+  transition:
+    transform 140ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.child-modal-btn:hover,
+.child-modal-btn:focus-visible {
+  outline: none;
+  background: rgba(29, 205, 211, 0.16);
+  border-color: rgba(29, 205, 211, 0.58);
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,0.10),
+    0 0 22px rgba(29,205,211,0.30),
+    0 0 44px rgba(29,205,211,0.16);
+}
+
+.child-modal-btn:active {
+  transform: scale(0.985);
+  background: rgba(29, 205, 211, 0.22);
+  border-color: rgba(29, 205, 211, 0.72);
+  box-shadow:
+    0 0 0 2px rgba(29,205,211,0.14),
+    0 0 30px rgba(29,205,211,0.44),
+    0 0 64px rgba(29,205,211,0.24);
+}
+
+.child-modal-result {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(29,205,211,0.08);
+  border: 1px solid rgba(29,205,211,0.22);
+  color: #1dcdd3;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.child-modal-result.show {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .child-float-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .child-float-btn.left {
+    left: calc(16px + env(safe-area-inset-left));
+  }
+
+  .child-float-btn.right {
+    right: calc(16px + env(safe-area-inset-right));
+  }
+
+  .child-action-modal {
+    border-radius: 20px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -553,6 +921,44 @@
       <p id="save-session-status" class="save-status"></p>
     </section>
 
+    <div id="child-reading-modal" class="child-action-overlay" aria-hidden="true">
+      <section class="child-action-modal" role="dialog" aria-modal="true" aria-labelledby="child-reading-modal-title">
+        <button id="child-reading-modal-close" class="child-action-close" type="button" aria-label="Loka">×</button>
+        <h2 id="child-reading-modal-title">Veldu bók</h2>
+        <p class="child-action-sub">Settu inn blaðsíður fyrir næsta lestur.</p>
+
+        <div class="child-field">
+          <label>Bók</label>
+          <div id="child-book-list" class="child-book-list" role="listbox" aria-label="Veldu bók">
+            <button class="child-book-option selected" type="button" data-book-id="drekastormur" data-book-title="Drekastormur" aria-selected="true">Drekastormur</button>
+            <button class="child-book-option" type="button" data-book-id="herra-zippo" data-book-title="Herra Zippo" aria-selected="false">Herra Zippo</button>
+            <button class="child-book-option" type="button" data-book-id="lappa-vandamal" data-book-title="Lappa vandamál" aria-selected="false">Lappa vandamál</button>
+            <button class="child-book-option" type="button" data-book-id="uglubarn" data-book-title="Uglubarn" aria-selected="false">Uglubarn</button>
+          </div>
+        </div>
+
+        <div class="child-row">
+          <div class="child-field">
+            <label for="child-page-from">Frá bls.</label>
+            <input id="child-page-from" class="child-input" inputmode="numeric" placeholder="21">
+          </div>
+          <div class="child-field">
+            <label for="child-page-to">Til bls.</label>
+            <input id="child-page-to" class="child-input" inputmode="numeric" placeholder="29">
+          </div>
+        </div>
+
+        <div class="child-action-preview">
+          <div class="child-action-preview-title">Forskoðun</div>
+          <p id="child-reading-preview" class="child-action-preview-text">Drekastormur · bls. 21–29</p>
+        </div>
+
+        <button id="child-reading-save" class="child-modal-btn" type="button">Vista</button>
+        <div id="child-reading-result" class="child-modal-result">Vistað fyrir næsta lestur.</div>
+      </section>
+    </div>
+
+
     <span id="recording-dependency" class="dependency-node" aria-hidden="true">recording active</span>
     <div id="listen-toast" class="toast" role="status" aria-live="polite">Einhver hlustaði í dag</div>
   </main>
@@ -603,9 +1009,10 @@
       var activeSnippetRecorders = [];
       var snippetClips = {
         min1: { chunks: [], mimeType: "" },
+        min2: { chunks: [], mimeType: "" },
         min5: { chunks: [], mimeType: "" },
-        min9: { chunks: [], mimeType: "" },
-        min13: { chunks: [], mimeType: "" }
+        min8: { chunks: [], mimeType: "" },
+        min10: { chunks: [], mimeType: "" }
       };
       var rafId = null;
       var settleTimer = null;
@@ -815,9 +1222,10 @@
 
         [
           { label: "min1", atMs: 30 * 1000 },
-          { label: "min5", atMs: 2 * 60 * 1000 },
-          { label: "min9", atMs: 5 * 60 * 1000 },
-          { label: "min13", atMs: 8 * 60 * 1000 }
+          { label: "min2", atMs: 2 * 60 * 1000 },
+          { label: "min5", atMs: 5 * 60 * 1000 },
+          { label: "min8", atMs: 8 * 60 * 1000 },
+          { label: "min10", atMs: 10 * 60 * 1000 }
         ].forEach(function (item) {
           var t = setTimeout(function () {
             captureSnippet(item.label, 15 * 1000);
@@ -1033,6 +1441,150 @@
 
         return availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
       }
+
+
+      // Floating bookshelf/settings prototype hooks.
+      var bookshelfFloatBtn = document.getElementById("child-bookshelf-float");
+      var readingSettingsFloatBtn = document.getElementById("child-reading-settings-float");
+      var childReadingModal = document.getElementById("child-reading-modal");
+      var childReadingModalClose = document.getElementById("child-reading-modal-close");
+      var childBookList = document.getElementById("child-book-list");
+      var childBookOptions = Array.prototype.slice.call(document.querySelectorAll(".child-book-option"));
+      var childPageFrom = document.getElementById("child-page-from");
+      var childPageTo = document.getElementById("child-page-to");
+      var childReadingPreview = document.getElementById("child-reading-preview");
+      var childReadingSave = document.getElementById("child-reading-save");
+      var childReadingResult = document.getElementById("child-reading-result");
+
+      function getChildReadingSetupKey() {
+        return "upphatt_child_reading_setup_" + childStorageKey;
+      }
+
+      function getSelectedBookOption() {
+        for (var i = 0; i < childBookOptions.length; i += 1) {
+          if (childBookOptions[i].classList.contains("selected")) {
+            return childBookOptions[i];
+          }
+        }
+        return childBookOptions[0] || null;
+      }
+
+      function getSelectedBookTitle() {
+        var option = getSelectedBookOption();
+        return option ? (option.getAttribute("data-book-title") || option.textContent || "Drekastormur") : "Drekastormur";
+      }
+
+      function getSelectedBookId() {
+        var option = getSelectedBookOption();
+        return option ? (option.getAttribute("data-book-id") || "drekastormur") : "drekastormur";
+      }
+
+      function setSelectedBookById(bookId) {
+        childBookOptions.forEach(function (btn) {
+          var isSelected = btn.getAttribute("data-book-id") === bookId;
+          btn.classList.toggle("selected", isSelected);
+          btn.setAttribute("aria-selected", isSelected ? "true" : "false");
+        });
+      }
+
+      function updateChildReadingPreview() {
+        if (!childReadingPreview) return;
+        var title = getSelectedBookTitle();
+        var from = (childPageFrom && childPageFrom.value.trim()) || childPageFrom?.placeholder || "21";
+        var to = (childPageTo && childPageTo.value.trim()) || childPageTo?.placeholder || "29";
+        childReadingPreview.textContent = title + " · bls. " + from + "–" + to;
+      }
+
+      function openChildReadingModal() {
+        if (!childReadingModal) return;
+
+        try {
+          var rawSetup = localStorage.getItem(getChildReadingSetupKey());
+          if (rawSetup) {
+            var setup = JSON.parse(rawSetup);
+            if (setup && setup.bookId) setSelectedBookById(setup.bookId);
+            if (setup && setup.pageFrom && childPageFrom) childPageFrom.value = setup.pageFrom;
+            if (setup && setup.pageTo && childPageTo) childPageTo.value = setup.pageTo;
+          }
+        } catch (e) {
+          // no-op
+        }
+
+        updateChildReadingPreview();
+        if (childReadingResult) childReadingResult.classList.remove("show");
+        childReadingModal.classList.add("open");
+        childReadingModal.setAttribute("aria-hidden", "false");
+        setTimeout(function () {
+          var firstTarget = childPageFrom || (childBookOptions[0] || null);
+          if (firstTarget) firstTarget.focus();
+        }, 60);
+      }
+
+      function closeChildReadingModal() {
+        if (!childReadingModal) return;
+        childReadingModal.classList.remove("open");
+        childReadingModal.setAttribute("aria-hidden", "true");
+      }
+
+      if (bookshelfFloatBtn) {
+        bookshelfFloatBtn.addEventListener("click", function () {
+          try {
+            sessionStorage.setItem("upphatt_return_to_child_v2", "1");
+          } catch (e) {
+            // no-op
+          }
+          window.location.href = "bookshelf.html";
+        });
+      }
+
+      if (readingSettingsFloatBtn) {
+        readingSettingsFloatBtn.addEventListener("click", openChildReadingModal);
+      }
+
+      if (childReadingModalClose) {
+        childReadingModalClose.addEventListener("click", closeChildReadingModal);
+      }
+
+      if (childReadingModal) {
+        childReadingModal.addEventListener("click", function (event) {
+          if (event.target === childReadingModal) closeChildReadingModal();
+        });
+      }
+
+      childBookOptions.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setSelectedBookById(btn.getAttribute("data-book-id") || "drekastormur");
+          updateChildReadingPreview();
+        });
+      });
+
+      [childPageFrom, childPageTo].forEach(function (el) {
+        if (el) el.addEventListener("input", updateChildReadingPreview);
+        if (el) el.addEventListener("change", updateChildReadingPreview);
+      });
+
+      if (childReadingSave) {
+        childReadingSave.addEventListener("click", function () {
+          var setup = {
+            bookId: getSelectedBookId(),
+            bookTitle: getSelectedBookTitle(),
+            pageFrom: childPageFrom ? childPageFrom.value.trim() : "",
+            pageTo: childPageTo ? childPageTo.value.trim() : "",
+            updatedAt: Date.now()
+          };
+
+          try {
+            localStorage.setItem(getChildReadingSetupKey(), JSON.stringify(setup));
+          } catch (e) {
+            // no-op
+          }
+
+          if (childReadingResult) childReadingResult.classList.add("show");
+          triggerHaptic([8, 20, 8]);
+          setTimeout(closeChildReadingModal, 650);
+        });
+      }
+
 
       homeBtn.addEventListener("click", function () {
         try {
@@ -1260,9 +1812,10 @@
           saveSessionStatus.textContent = "";
           snippetClips = {
             min1: { chunks: [], mimeType: "" },
+            min2: { chunks: [], mimeType: "" },
             min5: { chunks: [], mimeType: "" },
-            min9: { chunks: [], mimeType: "" },
-            min13: { chunks: [], mimeType: "" }
+            min8: { chunks: [], mimeType: "" },
+            min10: { chunks: [], mimeType: "" }
           };
           clearSnippetTimers();
           activeSnippetRecorders = [];
@@ -1484,6 +2037,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
     import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp, onSnapshot, query, where } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
     import { getStorage, ref, uploadBytes } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js';
+    import { analyzeSnippetBlob } from './js/audio-analysis.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyAgTY3Uxd9_ZxixjqLj-sH8V3OhFAzg6DU',
@@ -1519,36 +2073,90 @@
       const ts = payload?.startedAt || Date.now();
       const clipDefs = [
         { key: 'min1', fileName: 'hljod_30s' },
-        { key: 'min5', fileName: 'hljod_2m' },
-        { key: 'min9', fileName: 'hljod_5m' },
-        { key: 'min13', fileName: 'hljod_8m' }
+        { key: 'min2', fileName: 'hljod_2m' },
+        { key: 'min5', fileName: 'hljod_5m' },
+        { key: 'min8', fileName: 'hljod_8m' },
+        { key: 'min10', fileName: 'hljod_10m' }
       ];
 
-      const audioPaths = { min1: null, min5: null, min9: null, min13: null };
+      const audioPaths = { min1: null, min2: null, min5: null, min8: null, min10: null };
+      const snippetResults = {};
       let uploadCount = 0;
 
       for (const def of clipDefs) {
         const snippet = snippetClips[def.key];
-        if (!snippet?.chunks?.length) continue;
+        if (!snippet?.chunks?.length) {
+          snippetResults[def.key] = { usable: false, reason: 'no_data' };
+          continue;
+        }
 
         const mimeType = snippet.mimeType || 'audio/webm';
-        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
         const blob = new Blob(snippet.chunks, { type: mimeType });
+
+        // Run analysis on snippet
+        try {
+          const result = await analyzeSnippetBlob(blob);
+          snippetResults[def.key] = {
+          usable: result.usable,
+          quality: result.quality,
+          reason: result.reason,
+          totalScore: result.totalScore,
+          profile: result.profile,
+          activeRatio: result.activeRatio,
+          praatSyllables: result.praatSyllables,
+          longestBurst: result.longestBurst,
+          fragmentationScore: Number(result.fragmentationScore ?? result.summary?.fragmentationScore ?? 0),
+          decodingPauseCount: Number(result.decodingPauseCount ?? result.summary?.decodingPauseCount ?? 0),
+          summary: result.summary || null
+        };
+        } catch (e) {
+          console.warn('Snippet analysis failed for ' + def.key + ':', e);
+          snippetResults[def.key] = { usable: true, quality: 'unknown', reason: null };
+        }
+
+        // Only upload usable snippets
+        if (snippetResults[def.key].usable === false) {
+          audioPaths[def.key] = null;
+          continue;
+        }
+
+        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
         const path = `recordings/${childData.familyId}/${childData.childKey}/${ts}/${def.fileName}.${ext}`;
         await uploadBytes(ref(storage, path), blob, { contentType: mimeType });
         audioPaths[def.key] = path;
         uploadCount += 1;
       }
 
-      if (uploadCount === 0) {
+      if (uploadCount === 0 && Object.values(snippetResults).every(r => r.reason === 'no_data')) {
         return { saved: false, reason: 'no-snippets' };
       }
+
+      // Build analysis object
+      const usableSnippets = Object.values(snippetResults).filter(r => r.usable);
+      const usableScores = usableSnippets.map(r => r.totalScore).filter(s => s != null && s > 0);
+      const bestScore = usableScores.length ? Math.max(...usableScores) : 0;
+      const avgScore = usableScores.length
+        ? Number((usableScores.reduce((a, b) => a + b, 0) / usableScores.length).toFixed(1))
+        : 0;
+
+      const analysis = {
+        session: null,
+        snippets: snippetResults,
+        overall: {
+          usableCount: usableSnippets.length,
+          totalSnippets: clipDefs.length,
+          bestScore,
+          avgScore,
+          readingQuality: usableSnippets.length >= 3 ? 'good'
+                        : usableSnippets.length >= 1 ? 'fair' : 'poor'
+        }
+      };
 
       await addDoc(collection(db, 'sessions'), {
         familyId: childData.familyId,
         childKey: childData.childKey,
         childName: payload?.childName || childData.childName || 'Barn',
-        title: 'Lestur (child-v2 prufa)',
+        title: 'Lestur',
         pageStart: null,
         pageEnd: null,
         pagesRead: null,
@@ -1556,12 +2164,14 @@
         imagePath: null,
         seconds: payload?.elapsedSeconds || 0,
         timerMode: 'up',
-        hasAudio: true,
+        hasAudio: uploadCount > 0,
         audioPath_min1: audioPaths.min1,
+        audioPath_min2: audioPaths.min2,
         audioPath_min5: audioPaths.min5,
-        audioPath_min9: audioPaths.min9,
-        audioPath_min13: audioPaths.min13,
-        audioPath: audioPaths.min1 || audioPaths.min5 || audioPaths.min9 || audioPaths.min13,
+        audioPath_min8: audioPaths.min8,
+        audioPath_min10: audioPaths.min10,
+        audioPath: audioPaths.min1 || audioPaths.min2 || audioPaths.min5 || audioPaths.min8 || audioPaths.min10,
+        analysis,
         timestamp: ts,
         date: makeDateKey(new Date(ts)),
         createdAt: serverTimestamp()

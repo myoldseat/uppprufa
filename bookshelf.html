@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="is">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UppHátt — local bókamyndapróf</title>
+<style>
+:root{
+  --bg:#050b14;--surface:#060e1a;--line:rgba(29,205,211,.18);--line2:rgba(29,205,211,.34);
+  --text:#d9e5ef;--soft:#94a3b8;--accent:#1dcdd3;--accent2:#18bcc2;--safe:env(safe-area-inset-bottom,0px);
+  --danger:#ff6b6b;--ok:#4ade80;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(500px 270px at 50% 8%,rgba(29,205,211,.105),transparent 62%),radial-gradient(420px 260px at 12% 28%,rgba(29,205,211,.06),transparent 70%),#050b14}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{width:min(100%,430px);min-height:100svh;margin:0 auto;padding:12px 16px calc(104px + var(--safe));position:relative}
+.top{display:grid;grid-template-columns:42px 1fr 92px;gap:10px;align-items:center;margin-bottom:14px}
+.icon-btn,.add-book,.child-initials{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.16);color:rgba(217,229,239,.86);display:grid;place-items:center;padding:0}
+.add-book{border-color:rgba(29,205,211,.22);color:var(--accent);font-size:22px;font-weight:500;line-height:1;background:rgba(29,205,211,.055)}
+.child-initials{border-color:rgba(29,205,211,.44);background:radial-gradient(circle at 50% 35%,rgba(29,205,211,.20),rgba(8,19,31,.96) 68%);color:#dff8fb;font-size:12px;font-weight:800;letter-spacing:.3px;box-shadow:0 0 0 1px rgba(29,205,211,.10),0 0 12px rgba(29,205,211,.24),0 0 24px rgba(29,205,211,.16)}
+.header-title{text-align:center}.header-title h1{margin:0;font-size:29px;line-height:1;font-weight:800;letter-spacing:-.9px;color:#d9e5ef}.header-title p{margin:5px 0 0;color:rgba(148,164,180,.78);font-size:13px}.header-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px}
+
+.card{position:relative;background:rgba(6,14,26,.88);border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 64px rgba(0,0,0,.36),0 0 38px rgba(29,205,211,.075);overflow:hidden}
+.card:before,.dialog:before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,rgba(29,205,211,0),rgba(29,205,211,.55),rgba(29,205,211,0))}
+.featured{padding:18px 16px 16px;margin-bottom:24px}
+.featured-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:11px;border:1px solid rgba(29,205,211,.28);background:rgba(29,205,211,.08);color:var(--accent);font-size:13px;font-weight:700}
+.chev{border:0;background:none;color:rgba(217,229,239,.65);font-size:26px;line-height:1;padding:0 3px}
+.feature-grid{display:grid;grid-template-columns:36% 1fr;gap:16px;align-items:center}
+.stage{position:relative;min-height:188px;display:flex;align-items:flex-end;justify-content:center}
+.stage:before{content:"";position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:128px;height:230px;background:radial-gradient(ellipse at top,rgba(29,205,211,.40),rgba(29,205,211,.16) 34%,transparent 74%);filter:blur(9px)}
+.stage:after{content:"";position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:125px;height:28px;border-radius:50%;background:radial-gradient(ellipse,rgba(29,205,211,.38),rgba(29,205,211,.08) 56%,transparent 78%);box-shadow:0 0 18px rgba(29,205,211,.16)}
+.book,.tile{position:relative;overflow:hidden;border:0;background:linear-gradient(140deg,var(--c1,#2b8f91),var(--c2,#0a2341));box-shadow:0 15px 24px rgba(0,0,0,.32),0 0 0 1px rgba(255,255,255,.045)}
+.book{width:122px;aspect-ratio:2/3;z-index:1;border-radius:12px;transform:perspective(800px) rotateY(-7deg) rotateZ(-1.4deg);box-shadow:0 22px 38px rgba(0,0,0,.44),0 0 0 1px rgba(255,255,255,.06),0 0 28px rgba(29,205,211,.13)}
+.book img,.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.book:before,.tile:before{content:"";position:absolute;left:0;top:0;bottom:0;z-index:4;background:linear-gradient(90deg,rgba(0,0,0,.42),rgba(255,255,255,.10),transparent);border-right:1px solid rgba(255,255,255,.06);pointer-events:none}
+.book:before{width:16px}.tile:before{width:12px}
+.book:after,.tile:after{content:"";position:absolute;inset:9px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(120deg,rgba(255,255,255,.14),transparent 35%,transparent);pointer-events:none}
+.tile:after{inset:7px;border-radius:7px}
+.book-title{position:absolute;left:18px;right:10px;top:46px;z-index:2;font-size:15px;font-weight:800;letter-spacing:-.5px;line-height:1.02;color:#eaf3fb;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.book-author{position:absolute;left:18px;right:10px;top:84px;z-index:2;color:rgba(217,229,239,.75);font-size:10px;font-weight:700}
+.book-mark{position:absolute;right:12px;bottom:34px;font-size:24px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));z-index:2}
+.shelf-light{position:absolute;bottom:-3px;width:92px;height:3px;border-radius:999px;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.meta h2{margin:0 0 10px;font-size:23px;font-weight:800;letter-spacing:-.6px}
+.meta-row{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;color:rgba(217,229,239,.74);font-size:14px}.meta-row strong{color:var(--accent);font-size:15px}
+.progress{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:12px}.progress span{display:block;height:100%;width:58%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 14px rgba(29,205,211,.34)}
+.quote{border-radius:14px;border:1px solid rgba(122,187,218,.12);background:rgba(255,255,255,.025);padding:12px 13px}.quote p{margin:0;color:rgba(217,229,239,.88);font-size:14px;font-weight:650;font-style:italic}.quote small{display:block;text-align:right;color:var(--accent);font-size:12px;font-weight:700;margin-top:7px}
+
+.row{margin-bottom:26px}.row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.row-title{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;letter-spacing:-.45px}.add-mini{width:22px;height:22px;border-radius:50%;border:1px solid rgba(29,205,211,.32);background:rgba(29,205,211,.06);color:var(--accent);display:grid;place-items:center;font-size:18px;line-height:1}.see-all{border:0;background:none;color:var(--accent);font-size:14px;font-weight:700}
+.rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:1px 0 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:relative}.rail::-webkit-scrollbar{display:none}.rail:after{content:"";position:absolute;left:0;right:0;bottom:4px;height:7px;background:linear-gradient(180deg,rgba(29,205,211,.24),rgba(29,205,211,.04));border-top:1px solid rgba(29,205,211,.16);box-shadow:0 0 14px rgba(29,205,211,.10)}
+.tile-wrap{flex:0 0 86px;scroll-snap-align:start;text-align:center}.tile{height:129px;border-radius:10px;width:100%}.tile-title{position:absolute;left:12px;right:8px;top:40px;z-index:2;color:#f4fbff;font-size:11px;font-weight:800;letter-spacing:-.25px;line-height:1.05;text-shadow:0 2px 9px rgba(0,0,0,.55)}.tile-author{position:absolute;left:12px;right:8px;top:72px;z-index:2;color:rgba(255,255,255,.72);font-size:8px;font-weight:650;text-shadow:0 2px 8px rgba(0,0,0,.55)}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:40px;margin-top:7px;padding:4px 9px;border-radius:999px;background:rgba(29,205,211,.12);border:1px solid rgba(29,205,211,.26);color:var(--accent);font-size:10px;font-weight:750}.chip.done{background:var(--accent);color:#061018}
+.empty{color:rgba(148,164,180,.72);font-size:13px;padding:10px 0 20px}
+
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + var(--safe));width:min(398px,calc(100vw - 32px));height:72px;background:rgba(6,14,26,.94);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.42),0 0 34px rgba(29,205,211,.06);display:grid;grid-template-columns:1fr 1fr 1fr;backdrop-filter:blur(10px);overflow:hidden}.nav{display:grid;place-items:center;align-content:center;gap:4px;color:rgba(148,164,180,.8);font-size:12px;font-weight:650;text-decoration:none}.nav.active{color:var(--accent)}.nav.active:after{content:"";width:34px;height:3px;border-radius:99px;background:var(--accent);box-shadow:0 0 10px rgba(29,205,211,.4)}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(8px);z-index:80;display:none;place-items:center;padding:18px}.overlay.open{display:grid}.dialog{width:min(94vw,390px);max-height:92svh;overflow:auto;background:rgba(6,14,26,.97);border:1px solid var(--line);border-radius:22px;box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 60px rgba(29,205,211,.07);padding:22px;position:relative}.close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(122,187,218,.16);color:rgba(148,164,180,.8)}.dialog h2{margin:4px 0;text-align:center;font-size:25px;letter-spacing:-.6px}.dialog-sub{text-align:center;margin:0 0 18px;color:rgba(148,164,180,.78);font-size:13px}
+.field{margin-bottom:13px}.field label{display:block;font-size:11px;font-weight:800;color:#d9e5ef;margin-bottom:6px}.field input,.field select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(122,187,218,.18);border-radius:9px;padding:10px 13px;font-size:14px;color:#d9e5ef;outline:none}.field input:focus,.field select:focus{border-color:rgba(29,205,211,.55);background:rgba(29,205,211,.04);box-shadow:0 0 0 3px rgba(29,205,211,.12)}
+.file-card{border:1px dashed rgba(29,205,211,.25);border-radius:14px;padding:14px;background:rgba(29,205,211,.04);text-align:center;margin-bottom:13px}.file-card input{display:none}.file-card label{display:block;color:var(--accent);font-weight:800;font-size:14px;cursor:pointer}.hint{font-size:12px;color:rgba(148,164,180,.78);margin-top:5px}
+.preview-row{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center;margin:12px 0 14px}.preview-cover{width:112px;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(122,187,218,.14);position:relative}.preview-cover img{width:100%;height:100%;object-fit:cover}.preview-info{font-size:12px;color:rgba(148,164,180,.8);line-height:1.45}.preview-info strong{display:block;color:#d9e5ef;font-size:13px;margin-bottom:4px}
+.dialog-btn{width:100%;padding:11px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061018;font-weight:800;margin-top:8px}.dialog-btn.secondary{background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.14);color:rgba(217,229,239,.78);box-shadow:none}.dialog-btn.danger{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.28);color:var(--danger)}
+.entry{border-left:2px dotted rgba(29,205,211,.3);padding-left:16px;margin-left:7px}.event{position:relative;background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.12);border-radius:13px;padding:11px 12px;margin-bottom:9px}.event:before{content:"";position:absolute;left:-24px;top:15px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}.event-date{font-size:12px;color:var(--accent);font-weight:750;margin-bottom:4px}.event p{margin:0 0 8px;font-size:14px}.reactions{display:flex;flex-wrap:wrap;gap:6px}.react{font-size:11px;color:rgba(217,229,239,.9);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);padding:5px 8px;border-radius:999px}
+.share-result{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(29,205,211,.08);border:1px solid rgba(29,205,211,.22);color:var(--accent);font-size:13px;font-weight:700;text-align:center}.share-result.show{display:block}
+@media(max-width:390px){.app{padding-left:12px;padding-right:12px}.top{grid-template-columns:40px 1fr 88px}.feature-grid{gap:12px}.book{width:112px}.meta h2{font-size:21px}.quote{display:none}.tile-wrap{flex-basis:82px}.tile{height:123px}}
+
+/* ══════════════════════════════════════════════
+   Unified UppHátt controls: darker, same tone,
+   perimeter glow on focus / hover / press
+   ══════════════════════════════════════════════ */
+:root{
+  --uh-control-bg: rgba(7, 18, 33, 0.96);
+  --uh-control-bg-hover: rgba(10, 28, 48, 0.98);
+  --uh-control-border: rgba(29,205,211,.18);
+  --uh-control-border-hot: rgba(29,205,211,.58);
+  --uh-control-glow: rgba(29,205,211,.28);
+  --uh-control-glow-strong: rgba(29,205,211,.46);
+}
+
+button,
+.icon-btn,
+.add-book,
+.child-initials,
+.chev,
+.see-all,
+.add-mini,
+.dialog-btn,
+.close,
+.file-card,
+.file-card label,
+.nav,
+.tile,
+.book{
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-btn,
+.add-book,
+.child-initials,
+.close,
+.add-mini{
+  background: var(--uh-control-bg) !important;
+  border: 1px solid var(--uh-control-border) !important;
+  color: rgba(217,229,239,.86) !important;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    color .18s ease,
+    transform .12s ease,
+    filter .12s ease !important;
+}
+
+.add-book,
+.add-mini,
+.child-initials{
+  color: var(--accent) !important;
+}
+
+.icon-btn:hover,
+.add-book:hover,
+.child-initials:hover,
+.close:hover,
+.add-mini:hover{
+  background: var(--uh-control-bg-hover) !important;
+  border-color: var(--uh-control-border-hot) !important;
+  color: #dffbff !important;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.10),
+    0 0 14px var(--uh-control-glow),
+    0 0 28px rgba(29,205,211,.16) !important;
+}
+
+.icon-btn:active,
+.add-book:active,
+.child-initials:active,
+.close:active,
+.add-mini:active{
+  transform: scale(.96) !important;
+  border-color: rgba(29,205,211,.72) !important;
+  box-shadow:
+    0 0 0 2px rgba(29,205,211,.16),
+    0 0 20px var(--uh-control-glow-strong),
+    0 0 42px rgba(29,205,211,.24) !important;
+}
+
+.icon-btn:focus-visible,
+.add-book:focus-visible,
+.child-initials:focus-visible,
+.close:focus-visible,
+.add-mini:focus-visible,
+.dialog-btn:focus-visible,
+.tile:focus-visible,
+.book:focus-visible,
+.nav:focus-visible{
+  outline: none !important;
+  border-color: rgba(29,205,211,.72) !important;
+  box-shadow:
+    0 0 0 3px rgba(29,205,211,.14),
+    0 0 18px rgba(29,205,211,.34),
+    0 0 38px rgba(29,205,211,.20) !important;
+}
+
+/* Inputs / selects: same dark tone + perimeter glow on click/focus */
+.field input,
+.field select{
+  background: var(--uh-control-bg) !important;
+  border: 1px solid rgba(122,187,218,.18) !important;
+  color: #d9e5ef !important;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease !important;
+}
+
+.field input:hover,
+.field select:hover{
+  border-color: rgba(29,205,211,.34) !important;
+  background: var(--uh-control-bg-hover) !important;
+}
+
+.field input:focus,
+.field select:focus{
+  outline: none !important;
+  border-color: rgba(29,205,211,.70) !important;
+  background: rgba(9, 25, 43, 0.98) !important;
+  box-shadow:
+    0 0 0 3px rgba(29,205,211,.14),
+    0 0 18px rgba(29,205,211,.32),
+    0 0 36px rgba(29,205,211,.18) !important;
+}
+
+.field input::placeholder{
+  color: rgba(148,164,180,.46) !important;
+}
+
+/* Main buttons: dark base, teal perimeter glow, stronger on hover/press */
+.dialog-btn{
+  background: rgba(29,205,211,.10) !important;
+  border: 1px solid rgba(29,205,211,.34) !important;
+  color: #dffbff !important;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.05),
+    0 0 18px rgba(29,205,211,.16) !important;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    transform .12s ease,
+    filter .12s ease !important;
+}
+
+.dialog-btn:hover{
+  background: rgba(29,205,211,.16) !important;
+  border-color: rgba(29,205,211,.58) !important;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.10),
+    0 0 22px rgba(29,205,211,.30),
+    0 0 44px rgba(29,205,211,.16) !important;
+}
+
+.dialog-btn:active{
+  transform: scale(.985) !important;
+  background: rgba(29,205,211,.22) !important;
+  border-color: rgba(29,205,211,.72) !important;
+  box-shadow:
+    0 0 0 2px rgba(29,205,211,.14),
+    0 0 30px rgba(29,205,211,.44),
+    0 0 64px rgba(29,205,211,.24) !important;
+}
+
+.dialog-btn.secondary{
+  background: rgba(255,255,255,.025) !important;
+  border-color: rgba(122,187,218,.18) !important;
+  color: rgba(217,229,239,.82) !important;
+  box-shadow: none !important;
+}
+
+.dialog-btn.secondary:hover{
+  border-color: rgba(29,205,211,.42) !important;
+  color: #dffbff !important;
+  box-shadow:
+    0 0 16px rgba(29,205,211,.18) !important;
+}
+
+.dialog-btn.danger{
+  background: rgba(255,107,107,.08) !important;
+  border-color: rgba(255,107,107,.26) !important;
+  color: rgba(255,107,107,.86) !important;
+  box-shadow: none !important;
+}
+
+.dialog-btn.danger:hover{
+  background: rgba(255,107,107,.13) !important;
+  border-color: rgba(255,107,107,.42) !important;
+  box-shadow:
+    0 0 18px rgba(255,107,107,.18) !important;
+}
+
+/* File upload card behaves like an input */
+.file-card{
+  background: var(--uh-control-bg) !important;
+  border: 1px dashed rgba(29,205,211,.24) !important;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    transform .12s ease !important;
+}
+
+.file-card:hover{
+  background: var(--uh-control-bg-hover) !important;
+  border-color: rgba(29,205,211,.54) !important;
+  box-shadow:
+    0 0 0 1px rgba(29,205,211,.08),
+    0 0 20px rgba(29,205,211,.20) !important;
+}
+
+/* Select arrow color consistency */
+.field select{
+  color-scheme: dark;
+}
+
+/* Modal surface matches popup language */
+.dialog{
+  background: rgba(6,14,26,.985) !important;
+  border-color: rgba(29,205,211,.20) !important;
+}
+
+.overlay{
+  background: rgba(3,8,15,.70) !important;
+  backdrop-filter: blur(9px) !important;
+}
+
+/* Cards / rails keep same app color; no brighter accidental surfaces */
+.card,
+.last-read-card,
+.event,
+.preview-cover{
+  background-color: rgba(6,14,26,.88) !important;
+}
+
+/* Book tap feedback */
+.tile,
+.book{
+  transition:
+    transform .14s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    filter .18s ease !important;
+}
+
+.tile:hover,
+.book:hover{
+  filter: brightness(1.04) !important;
+  box-shadow:
+    0 18px 30px rgba(0,0,0,.36),
+    0 0 0 1px rgba(29,205,211,.18),
+    0 0 22px rgba(29,205,211,.14) !important;
+}
+
+.tile:active,
+.book:active{
+  transform: scale(.97) !important;
+  box-shadow:
+    0 14px 24px rgba(0,0,0,.40),
+    0 0 0 1px rgba(29,205,211,.28),
+    0 0 34px rgba(29,205,211,.24) !important;
+}
+
+/* Bottom nav active/hover follows same perimeter rule */
+.nav{
+  transition:
+    background .18s ease,
+    color .18s ease,
+    box-shadow .18s ease !important;
+}
+
+.nav:hover{
+  background: rgba(29,205,211,.055) !important;
+  color:#dffbff !important;
+}
+
+.nav:active{
+  background: rgba(29,205,211,.10) !important;
+}
+
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top">
+  <button class="icon-btn" aria-label="Heim">⌂</button>
+  <div class="header-title"><h1>Bókahilla</h1><p>Bækurnar þínar</p></div>
+  <div class="header-actions"><button class="add-book" id="openAdd" aria-label="Bæta við bók">+</button><button class="child-initials" id="openProfile" aria-label="Kolbeinn Kvasir">KK</button></div>
+</header>
+
+<section class="card featured" id="featuredCard"></section>
+
+<section class="row">
+  <div class="row-head"><div class="row-title">Nýlega lesið <span class="add-mini" id="openAddSmall">+</span></div><button class="see-all">Sjá allt ›</button></div>
+  <div class="rail" id="recentRail"></div>
+</section>
+
+<section class="row">
+  <div class="row-head"><div class="row-title">Á hillunni <span class="add-mini" id="openAddSmall2">+</span></div><button class="see-all">Sjá allt ›</button></div>
+  <div class="rail" id="shelfRail"></div>
+</section>
+</main>
+
+<nav class="bottom"><a class="nav" href="#"><span>▥</span><span>Lesa</span></a><a class="nav active" href="#"><span>▥</span><span>Bókahilla</span></a><a class="nav" href="#"><span>⚙</span><span>Stillingar</span></a></nav>
+
+<div class="overlay" id="addModal">
+  <section class="dialog">
+    <button class="close" id="closeAdd">×</button>
+    <h2>Bæta við bók</h2>
+    <p class="dialog-sub">Local prufa — mynd vistast í browsernum</p>
+    <div class="field"><label>Nafn bókar</label><input id="bookTitle" placeholder="t.d. Drekastormur"></div>
+    <div class="field"><label>Höfundur / flokkur</label><input id="bookAuthor" placeholder="valfrjálst"></div>
+    <div class="field"><label>Staða</label><select id="bookStatus"><option value="shelf">Á hillunni</option><option value="reading">Í lestri</option><option value="finished">Lokið</option></select></div>
+    <div class="field"><label>Heildar blaðsíður</label><input id="bookPages" inputmode="numeric" placeholder="t.d. 120"></div>
+
+    <div class="file-card">
+      <label for="coverInput">Taka / velja mynd af bókakápu</label>
+      <input id="coverInput" type="file" accept="image/*" capture="environment">
+      <div class="hint">Myndin er croppuð í 2:3, þjöppuð og vistuð local.</div>
+    </div>
+
+    <div class="preview-row" id="previewRow" style="display:none">
+      <div class="preview-cover"><img id="previewImg" alt=""></div>
+      <div class="preview-info"><strong>Preview</strong><span id="previewMeta">Engin mynd valin.</span></div>
+    </div>
+
+    <button class="dialog-btn" id="saveBook">Vista bók</button>
+    <button class="dialog-btn secondary" id="closeAdd2">Loka</button>
+    <button class="dialog-btn danger" id="clearBooks">Hreinsa local bækur</button>
+  </section>
+</div>
+
+<div class="overlay" id="journeyModal">
+  <section class="dialog">
+    <button class="close" id="closeJourney">×</button>
+    <h2 id="journeyTitle">Lestrarferðalag</h2>
+    <p class="dialog-sub">Ferðin þín í bókinni</p>
+    <div class="entry" id="journeyEntries"></div>
+    <button class="dialog-btn secondary" id="closeJourney2">Loka</button>
+  </section>
+</div>
+
+<div class="overlay" id="profileModal">
+  <section class="dialog" style="text-align:center">
+    <button class="close" id="closeProfile">×</button>
+    <div class="child-initials" style="width:64px;height:64px;margin:5px auto 12px;font-size:20px">KK</div>
+    <h2>Kolbeinn Kvasir</h2>
+    <p class="dialog-sub">Bókahillan mín</p>
+    <div class="card" style="padding:14px;text-align:left;margin-bottom:14px" id="lastReadCard"></div>
+    <p class="dialog-sub" style="margin-bottom:8px">Deila síðasta lestri með fjölskyldu?</p>
+    <button class="dialog-btn" id="shareLastReading">Deila</button>
+    <button class="dialog-btn secondary" id="closeProfile2">Loka</button>
+    <div class="share-result" id="shareResult">Tilbúið — hér tengjum við push seinna.</div>
+  </section>
+</div>
+
+<script>
+const STORAGE_KEY = "upphatt_bookshelf_local_v1";
+let books = [];
+let currentCover = null;
+let selectedBookId = null;
+
+const defaultBooks = [
+  {id:"demo1",title:"Drekastormur",author:"Rick Riordan",status:"reading",totalPages:120,currentPageFrom:21,currentPageTo:29,progressPercent:58,coverDataUrl:null,c1:"#2b8f91",c2:"#0a2341",note:"Þau fundu hellinn.",createdAt:Date.now()-900000,lastReadAt:Date.now()-400000,journeyEntries:[
+    {date:"28. apríl",pageFrom:21,pageTo:29,note:"Þau fundu hellinn.",reactions:["Amma ❤️","Afi: Hvað var svo í hellinum?"]},
+    {date:"27. apríl",pageFrom:15,pageTo:20,note:"Þau heyrðu undarlegt hljóð í myrkrinu.",reactions:["Mamma ❤️"]},
+    {date:"26. apríl",pageFrom:9,pageTo:14,note:"Drekinn vaknaði.",reactions:["Pabbi ❤️"]}
+  ]},
+  {id:"demo2",title:"Leyndarmál Skógarins",author:"Jón Magnússon",status:"finished",progressPercent:100,coverDataUrl:null,c1:"#23814b",c2:"#0d2b23",createdAt:Date.now()-800000,lastReadAt:Date.now()-500000,journeyEntries:[]},
+  {id:"demo3",title:"Geimferðin Loks",author:"Anna Kristín",status:"shelf",progressPercent:0,coverDataUrl:null,c1:"#7c23df",c2:"#1d1537",createdAt:Date.now()-700000,lastReadAt:null,journeyEntries:[]}
+];
+
+function load(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  books = raw ? JSON.parse(raw) : defaultBooks;
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(books)); }
+
+function esc(str=""){return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));}
+function chipText(b){ if(b.status==="finished") return "Lokið"; if(b.status==="reading") return (b.progressPercent||0)+"%"; return "Á hillu"; }
+function bookCoverHTML(b, big=false){
+  const img = b.coverDataUrl ? `<img src="${b.coverDataUrl}" alt="">` : "";
+  const title = b.coverDataUrl ? "" : `<span class="${big?'book-title':'tile-title'}">${esc(b.title)}</span><span class="${big?'book-author':'tile-author'}">${esc(b.author||"")}</span>`;
+  const mark = big && !b.coverDataUrl ? `<span class="book-mark">📖</span>` : "";
+  const style = `--c1:${b.c1||"#2b8f91"};--c2:${b.c2||"#0a2341"}`;
+  return {img,title,mark,style};
+}
+
+function render(){
+  const reading = [...books].filter(b=>b.status==="reading").sort((a,b)=>(b.lastReadAt||0)-(a.lastReadAt||0))[0] || books[0];
+  const featured = document.getElementById("featuredCard");
+  if(!reading){
+    featured.innerHTML = `<div style="padding:18px"><span class="pill">▥ Bókahilla</span><h2 style="margin:16px 0 8px">Bókahillan er tóm</h2><p style="color:rgba(148,164,180,.78)">Ýttu á + og taktu mynd af fyrstu bókinni.</p></div>`;
+  } else {
+    const c = bookCoverHTML(reading,true);
+    featured.innerHTML = `
+      <div class="featured-head"><span class="pill">▥ ${reading.status==="reading"?"Í lestri":"Á hillunni"}</span><button class="chev" data-open-book="${reading.id}">›</button></div>
+      <div class="feature-grid">
+        <div class="stage"><button class="book" data-open-book="${reading.id}" style="${c.style}">${c.img}${c.title}${c.mark}</button><span class="shelf-light"></span></div>
+        <div class="meta">
+          <h2>${esc(reading.title)}</h2>
+          <div class="meta-row"><span>${reading.currentPageFrom?`bls. ${reading.currentPageFrom}–${reading.currentPageTo}`:"Á hillunni"}</span><strong>${reading.progressPercent||0}% lokið</strong></div>
+          <div class="progress"><span style="width:${reading.progressPercent||0}%"></span></div>
+          <div class="quote"><p>“${esc(reading.note||"Bókin er komin á hilluna.")}”</p><small>– Arnar, 10 ára</small></div>
+        </div>
+      </div>`;
+  }
+  renderRail("recentRail", books.filter(b=>b.lastReadAt).sort((a,b)=>b.lastReadAt-a.lastReadAt));
+  renderRail("shelfRail", books.filter(b=>b.status==="shelf" || !b.lastReadAt).sort((a,b)=>b.createdAt-a.createdAt));
+  renderLastRead();
+  document.querySelectorAll("[data-open-book]").forEach(el=>el.addEventListener("click",()=>openJourney(el.dataset.openBook)));
+}
+function renderRail(id, list){
+  const rail = document.getElementById(id);
+  if(!list.length){ rail.innerHTML = `<div class="empty">Engar bækur hér enn.</div>`; return; }
+  rail.innerHTML = list.map(b=>{
+    const c = bookCoverHTML(b,false);
+    return `<div class="tile-wrap"><button class="tile" data-open-book="${b.id}" style="${c.style}">${c.img}${c.title}</button><span class="chip ${b.status==="finished"?"done":""}">${chipText(b)}</span></div>`;
+  }).join("");
+}
+function renderLastRead(){
+  const b = [...books].filter(b=>b.lastReadAt).sort((a,b)=>b.lastReadAt-a.lastReadAt)[0];
+  const box = document.getElementById("lastReadCard");
+  if(!b){ box.innerHTML = `<div style="color:rgba(148,164,180,.78)">Enginn nýr lestur til að deila enn.</div>`; return; }
+  box.innerHTML = `<div style="color:var(--accent);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Síðasti lestur</div><div style="font-size:17px;font-weight:800;margin-bottom:4px">${esc(b.title)}</div><div style="color:rgba(217,229,239,.62);font-size:13px;margin-bottom:11px">${b.currentPageFrom?`bls. ${b.currentPageFrom}–${b.currentPageTo}`:"Á hillunni"} · ${b.progressPercent||0}% lokið</div><div style="border-left:2px solid rgba(29,205,211,.55);padding-left:10px;font-style:italic">“${esc(b.note||"") }”</div>`;
+}
+
+function openOverlay(id){document.getElementById(id).classList.add("open");document.body.style.overflow="hidden";}
+function closeOverlay(id){document.getElementById(id).classList.remove("open");document.body.style.overflow="";}
+
+function openJourney(id){
+  const b = books.find(x=>x.id===id);
+  if(!b) return;
+  selectedBookId = id;
+  document.getElementById("journeyTitle").textContent = b.title;
+  const entries = b.journeyEntries?.length ? b.journeyEntries : [{date:"Í dag",pageFrom:b.currentPageFrom||"",pageTo:b.currentPageTo||"",note:b.note||"Bókin var sett á hilluna.",reactions:[]}];
+  document.getElementById("journeyEntries").innerHTML = entries.map(e=>`
+    <article class="event"><div class="event-date">${esc(e.date)} ${e.pageFrom?`· bls. ${e.pageFrom}–${e.pageTo}`:""}</div><p>${esc(e.note)}</p><div class="reactions">${(e.reactions||[]).map(r=>`<span class="react">${esc(r)}</span>`).join("")}</div></article>
+  `).join("");
+  openOverlay("journeyModal");
+}
+
+async function compressToDataUrl(file, targetW=300, targetH=450, quality=.78){
+  const img = await new Promise((resolve,reject)=>{
+    const i = new Image();
+    i.onload=()=>resolve(i); i.onerror=reject;
+    i.src = URL.createObjectURL(file);
+  });
+  const sourceRatio = img.width/img.height;
+  const targetRatio = targetW/targetH;
+  let sx=0, sy=0, sw=img.width, sh=img.height;
+  if(sourceRatio > targetRatio){
+    sw = img.height * targetRatio; sx = (img.width - sw)/2;
+  }else{
+    sh = img.width / targetRatio; sy = (img.height - sh)/2;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW; canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+  URL.revokeObjectURL(img.src);
+  return canvas.toDataURL("image/webp", quality);
+}
+
+document.getElementById("openAdd").addEventListener("click",()=>openOverlay("addModal"));
+document.getElementById("openAddSmall").addEventListener("click",()=>openOverlay("addModal"));
+document.getElementById("openAddSmall2").addEventListener("click",()=>openOverlay("addModal"));
+document.getElementById("closeAdd").addEventListener("click",()=>closeOverlay("addModal"));
+document.getElementById("closeAdd2").addEventListener("click",()=>closeOverlay("addModal"));
+document.getElementById("closeJourney").addEventListener("click",()=>closeOverlay("journeyModal"));
+document.getElementById("closeJourney2").addEventListener("click",()=>closeOverlay("journeyModal"));
+document.getElementById("openProfile").addEventListener("click",()=>{document.getElementById("shareResult").classList.remove("show");openOverlay("profileModal")});
+document.getElementById("closeProfile").addEventListener("click",()=>closeOverlay("profileModal"));
+document.getElementById("closeProfile2").addEventListener("click",()=>closeOverlay("profileModal"));
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) closeOverlay(o.id); }));
+
+document.getElementById("coverInput").addEventListener("change", async (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const beforeKB = Math.round(file.size/1024);
+  currentCover = await compressToDataUrl(file,300,450,.78);
+  const afterKB = Math.round((currentCover.length*0.75)/1024);
+  document.getElementById("previewImg").src = currentCover;
+  document.getElementById("previewMeta").textContent = `Upprunalegt: ${beforeKB} KB · Local thumbnail: ~${afterKB} KB · 300×450 WebP`;
+  document.getElementById("previewRow").style.display = "grid";
+});
+
+document.getElementById("saveBook").addEventListener("click",()=>{
+  const title = document.getElementById("bookTitle").value.trim();
+  if(!title){ alert("Settu inn nafn bókar."); return; }
+  const status = document.getElementById("bookStatus").value;
+  const totalPages = Number(document.getElementById("bookPages").value || 0);
+  const now = Date.now();
+  const book = {
+    id:"book_"+now,
+    title,
+    author:document.getElementById("bookAuthor").value.trim(),
+    status,
+    totalPages,
+    currentPageFrom: status==="reading" ? 1 : null,
+    currentPageTo: status==="reading" ? Math.min(10,totalPages||10) : null,
+    progressPercent: status==="finished" ? 100 : status==="reading" ? Math.min(10, Math.round((10/(totalPages||100))*100)) : 0,
+    coverDataUrl:currentCover,
+    createdAt:now,
+    updatedAt:now,
+    lastReadAt: status==="reading" ? now : null,
+    journeyEntries: status==="reading" ? [{date:"Í dag",pageFrom:1,pageTo:Math.min(10,totalPages||10),note:"Bókin er byrjuð.",reactions:[]}] : []
+  };
+  books.unshift(book); save(); render();
+  currentCover=null; document.getElementById("bookTitle").value=""; document.getElementById("bookAuthor").value=""; document.getElementById("bookPages").value=""; document.getElementById("coverInput").value=""; document.getElementById("previewRow").style.display="none";
+  closeOverlay("addModal");
+});
+document.getElementById("clearBooks").addEventListener("click",()=>{
+  if(confirm("Hreinsa allar local bækur og byrja aftur?")){
+    localStorage.removeItem(STORAGE_KEY); load(); render(); closeOverlay("addModal");
+  }
+});
+document.getElementById("shareLastReading").addEventListener("click",()=>{
+  // TODO: connect this to family push later.
+  document.getElementById("shareResult").classList.add("show");
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".overlay.open").forEach(o=>closeOverlay(o.id));});
+
+load(); render();
+</script>
+</body>
+</html>
