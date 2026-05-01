@@ -61,7 +61,7 @@ button,input,select{font:inherit}button{cursor:pointer}
 .preview-row{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center;margin:12px 0 14px}.preview-cover{width:112px;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(122,187,218,.14);position:relative}.preview-cover img{width:100%;height:100%;object-fit:cover}.preview-info{font-size:12px;color:rgba(148,164,180,.8);line-height:1.45}.preview-info strong{display:block;color:#d9e5ef;font-size:13px;margin-bottom:4px}
 .dialog-btn{width:100%;padding:11px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061018;font-weight:800;margin-top:8px}.dialog-btn.secondary{background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.14);color:rgba(217,229,239,.78);box-shadow:none}.dialog-btn.danger{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.28);color:var(--danger)}
 .entry{border-left:2px dotted rgba(29,205,211,.3);padding-left:16px;margin-left:7px}.event{position:relative;background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.12);border-radius:13px;padding:11px 12px;margin-bottom:9px}.event:before{content:"";position:absolute;left:-24px;top:15px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}.event-date{font-size:12px;color:var(--accent);font-weight:750;margin-bottom:4px}.event p{margin:0 0 8px;font-size:14px}.reactions{display:flex;flex-wrap:wrap;gap:6px}.react{font-size:11px;color:rgba(217,229,239,.9);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);padding:5px 8px;border-radius:999px}
-.share-result{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(29,205,211,.08);border:1px solid rgba(29,205,211,.22);color:var(--accent);font-size:13px;font-weight:700;text-align:center}.share-result.show{display:block}
+.share-result,.add-save-result{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(29,205,211,.08);border:1px solid rgba(29,205,211,.22);color:var(--accent);font-size:13px;font-weight:700;text-align:center}.share-result.show,.add-save-result.show{display:block}
 @media(max-width:390px){.app{padding-left:12px;padding-right:12px}.top{grid-template-columns:40px 1fr 88px}.feature-grid{gap:12px}.book{width:112px}.meta h2{font-size:21px}.quote{display:none}.tile-wrap{flex-basis:82px}.tile{height:123px}}
 
 /* ══════════════════════════════════════════════
@@ -817,6 +817,7 @@ button,
 <div class="edit-bar" id="editBar" hidden>
   <span id="editCount">0 bækur valdar</span>
   <div class="edit-bar-actions">
+    <button id="markSelectedReading" class="edit-move" type="button" disabled>Að lesa</button>
     <button id="moveSelectedToShelf" class="edit-move" type="button" disabled>Á hillu</button>
     <button id="markSelectedFinished" class="edit-finish" type="button" disabled>Lokið</button>
     <button id="deleteSelectedBooks" class="edit-danger" type="button" disabled>Eyða</button>
@@ -857,8 +858,9 @@ button,
       <div class="preview-info"><strong>Preview</strong><span id="previewMeta">Engin mynd valin.</span></div>
     </div>
 
-    <button class="dialog-btn" id="saveBook">Vista bók</button>
-    <button class="dialog-btn secondary" id="closeAdd2">Loka</button>
+    <button class="dialog-btn" id="saveBook" type="button">Vista bók</button>
+    <div class="add-save-result" id="addSaveResult" role="status" aria-live="polite">Bókin var vistuð ✓</div>
+    <button class="dialog-btn secondary" id="closeAdd2" type="button">Loka</button>
     <button class="dialog-btn danger" id="clearBooks">Hreinsa local bækur</button>
   </section>
 </div>
@@ -1047,9 +1049,16 @@ async function compressToDataUrl(file, targetW=180, targetH=270, quality=.66){
   return canvas.toDataURL("image/webp", quality);
 }
 
-document.getElementById("openAdd").addEventListener("click",()=>openOverlay("addModal"));
-document.getElementById("openAddSmall").addEventListener("click",()=>openOverlay("addModal"));
-document.getElementById("openAddSmall2").addEventListener("click",()=>openOverlay("addModal"));
+function openAddBookModal(){
+  const result = document.getElementById("addSaveResult");
+  const btn = document.getElementById("saveBook");
+  if(result) result.classList.remove("show");
+  if(btn){ btn.disabled = false; btn.textContent = "Vista bók"; }
+  openOverlay("addModal");
+}
+document.getElementById("openAdd").addEventListener("click", openAddBookModal);
+document.getElementById("openAddSmall").addEventListener("click", openAddBookModal);
+document.getElementById("openAddSmall2").addEventListener("click", openAddBookModal);
 document.getElementById("closeAdd").addEventListener("click",()=>closeOverlay("addModal"));
 document.getElementById("closeAdd2").addEventListener("click",()=>closeOverlay("addModal"));
 document.getElementById("closeJourney").addEventListener("click",()=>closeOverlay("journeyModal"));
@@ -1070,16 +1079,45 @@ document.getElementById("coverInput").addEventListener("change", async (e)=>{
   document.getElementById("previewRow").style.display = "grid";
 });
 
+let isSavingBook = false;
+
+function resetAddBookForm(){
+  currentCover = null;
+  document.getElementById("bookTitle").value = "";
+  document.getElementById("bookAuthor").value = "";
+  document.getElementById("bookStatus").value = "shelf";
+  document.getElementById("bookPages").value = "";
+  document.getElementById("coverInput").value = "";
+  document.getElementById("previewImg").removeAttribute("src");
+  document.getElementById("previewMeta").textContent = "Engin mynd valin.";
+  document.getElementById("previewRow").style.display = "none";
+}
+
 document.getElementById("saveBook").addEventListener("click",()=>{
+  if(isSavingBook) return;
+
+  const saveBtn = document.getElementById("saveBook");
+  const result = document.getElementById("addSaveResult");
   const title = document.getElementById("bookTitle").value.trim();
-  if(!title){ alert("Settu inn nafn bókar."); return; }
+
+  if(!title){
+    alert("Settu inn nafn bókar.");
+    return;
+  }
+
+  isSavingBook = true;
+  if(saveBtn){
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Vista...";
+  }
+  if(result) result.classList.remove("show");
 
   const status = document.getElementById("bookStatus").value;
   const totalPages = Number(document.getElementById("bookPages").value || 0);
   const now = Date.now();
 
   const book = {
-    id:"book_"+now,
+    id:"book_"+now+"_"+Math.random().toString(36).slice(2,7),
     title,
     author:document.getElementById("bookAuthor").value.trim(),
     status,
@@ -1098,22 +1136,47 @@ document.getElementById("saveBook").addEventListener("click",()=>{
 
   if(!save()){
     books.shift();
+    isSavingBook = false;
+    if(saveBtn){
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Vista bók";
+    }
     alert("Geymslan í browsernum er orðin full. Prófaðu að hreinsa local bækur eða nota færri myndir í þessari prufu.");
     return;
   }
 
   render();
-  currentCover=null;
-  document.getElementById("bookTitle").value="";
-  document.getElementById("bookAuthor").value="";
-  document.getElementById("bookPages").value="";
-  document.getElementById("coverInput").value="";
-  document.getElementById("previewRow").style.display="none";
-  closeOverlay("addModal");
+  resetAddBookForm();
+
+  if(result){
+    result.textContent = "Bókin var vistuð ✓";
+    result.classList.add("show");
+  }
+  if(saveBtn) saveBtn.textContent = "Vistað ✓";
+
+  setTimeout(() => {
+    closeOverlay("addModal");
+    if(result) result.classList.remove("show");
+    if(saveBtn){
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Vista bók";
+    }
+    isSavingBook = false;
+  }, 650);
 });
 document.getElementById("clearBooks").addEventListener("click",()=>{
   if(confirm("Hreinsa allar local bækur og byrja aftur?")){
-    localStorage.removeItem(STORAGE_KEY); 
+    localStorage.removeItem(STORAGE_KEY);
+    books = [...defaultBooks];
+    selectedBookIds.clear();
+    setEditMode(false);
+    save();
+    render();
+    resetAddBookForm();
+    closeOverlay("addModal");
+  }
+});
+
 let pendingDeleteBookId = null;
 let longPressTimer = null;
 let longPressTriggered = false;
@@ -1122,14 +1185,17 @@ function openDeleteBookModal(bookId){
   const book = books.find(b => b.id === bookId);
   if(!book) return;
   pendingDeleteBookId = bookId;
-  const nameEl = document.getElementById("deleteBookName");
-  if(nameEl) nameEl.textContent = book.title || "Bók";
-  openOverlay("deleteBookModal");
+  if(editMode){
+    toggleBookSelection(bookId);
+    return;
+  }
+  selectedBookIds = new Set([bookId]);
+  openDeleteSelectedModal();
 }
 
 function closeDeleteBookModal(){
   pendingDeleteBookId = null;
-  closeOverlay("deleteBookModal");
+  closeDeleteSelectedModal();
 }
 
 function attachBookLongPressHandlers(){
@@ -1166,28 +1232,6 @@ function attachBookLongPressHandlers(){
   });
 }
 
-document.getElementById("closeDeleteBook")?.addEventListener("click", closeDeleteBookModal);
-document.getElementById("cancelDeleteBook")?.addEventListener("click", closeDeleteBookModal);
-
-document.getElementById("confirmDeleteBook")?.addEventListener("click", () => {
-  if(!pendingDeleteBookId) return;
-  const before = books.length;
-  books = books.filter(book => book.id !== pendingDeleteBookId);
-
-  if(books.length !== before){
-    if(!save()){
-      alert("Tókst ekki að vista breytinguna í local geymslu.");
-      return;
-    }
-    render();
-  }
-
-  closeDeleteBookModal();
-});
-
-load(); render(); closeOverlay("addModal");
-  }
-});
 document.getElementById("shareLastReading").addEventListener("click",()=>{
   // TODO: connect this to family push later.
   document.getElementById("shareResult").classList.add("show");
@@ -1199,6 +1243,7 @@ function updateEditUI(){
   const editBar = document.getElementById("editBar");
   const editCount = document.getElementById("editCount");
   const deleteBtn = document.getElementById("deleteSelectedBooks");
+  const readingBtn = document.getElementById("markSelectedReading");
   const moveBtn = document.getElementById("moveSelectedToShelf");
   const finishBtn = document.getElementById("markSelectedFinished");
   const toggleBtn = document.getElementById("toggleEditBooks");
@@ -1210,6 +1255,7 @@ function updateEditUI(){
   const count = selectedBookIds.size;
   if(editCount) editCount.textContent = count === 1 ? "1 bók valin" : `${count} bækur valdar`;
   if(deleteBtn) deleteBtn.disabled = count === 0;
+  if(readingBtn) readingBtn.disabled = count === 0;
   if(moveBtn) moveBtn.disabled = count === 0;
   if(finishBtn) finishBtn.disabled = count === 0;
 }
@@ -1226,6 +1272,38 @@ function toggleBookSelection(bookId){
   else selectedBookIds.add(bookId);
   updateEditUI();
   render();
+}
+
+function markSelectedBooksReading(){
+  if(!selectedBookIds.size) return;
+  const now = Date.now();
+
+  books = books.map(book => {
+    if(!selectedBookIds.has(book.id)) return book;
+    const totalPages = Number(book.totalPages || 0);
+    const from = book.currentPageFrom || 1;
+    const to = book.currentPageTo || Math.min(10, totalPages || 10);
+    const percent = totalPages ? Math.min(99, Math.max(1, Math.round((to / totalPages) * 100))) : (book.progressPercent || 1);
+
+    return {
+      ...book,
+      status:"reading",
+      currentPageFrom: from,
+      currentPageTo: to,
+      progressPercent: percent,
+      lastReadAt: book.lastReadAt || now,
+      updatedAt: now,
+      journeyEntries: Array.isArray(book.journeyEntries) ? book.journeyEntries : []
+    };
+  });
+
+  if(!save()){
+    alert("Tókst ekki að vista breytinguna í local geymslu.");
+    return;
+  }
+
+  selectedBookIds.clear();
+  setEditMode(false);
 }
 
 function moveSelectedBooksToShelf(){
@@ -1287,6 +1365,7 @@ function closeDeleteSelectedModal(){
 
 document.getElementById("toggleEditBooks")?.addEventListener("click", () => setEditMode(!editMode));
 document.getElementById("cancelEditBooks")?.addEventListener("click", () => setEditMode(false));
+document.getElementById("markSelectedReading")?.addEventListener("click", markSelectedBooksReading);
 document.getElementById("moveSelectedToShelf")?.addEventListener("click", moveSelectedBooksToShelf);
 document.getElementById("markSelectedFinished")?.addEventListener("click", markSelectedBooksFinished);
 document.getElementById("deleteSelectedBooks")?.addEventListener("click", openDeleteSelectedModal);
