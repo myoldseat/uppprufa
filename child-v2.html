@@ -2029,6 +2029,8 @@
 
         if (activeBook && !previousSelectedId) {
           setSelectedBookById(activeBook.id);
+          if (activeBook.pageFrom && childPageFrom && !childPageFrom.value) childPageFrom.value = activeBook.pageFrom;
+          if (activeBook.pageTo && childPageTo && !childPageTo.value) childPageTo.value = activeBook.pageTo;
         }
 
         updateChildReadingPreview();
