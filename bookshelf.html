@@ -321,61 +321,45 @@ function openAddM(){
   document.getElementById('coverInput').click();
 }
 
-// ── Tesseract.js lazy load ──
-let tesseractLoaded=false;
-let Tess=null;
-async function loadTesseract(){
-  if(tesseractLoaded)return;
-  return new Promise((resolve,reject)=>{
-    const s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-    s.onload=()=>{tesseractLoaded=true;Tess=window.Tesseract;resolve()};
-    s.onerror=()=>{console.warn('Tesseract load failed');resolve()};
-    document.head.appendChild(s);
-  });
-}
-
 async function runOCR(dataUrl){
   const status=document.getElementById('ocrStatus');
   status.textContent='Les af kápu...';
   try{
-    await loadTesseract();
-    if(!Tess){status.textContent='OCR ekki tiltækt.';return{title:'',author:''}}
-    const result=await Tess.recognize(dataUrl,'isl+eng',{logger:m=>{if(m.status==='recognizing text')status.textContent='Les... '+Math.round((m.progress||0)*100)+'%'}});
-    const text=result.data.text||'';
+    // Strip data URL prefix to get raw base64
+    const base64=dataUrl.split(',')[1];
+    const mediaType=dataUrl.split(';')[0].split(':')[1]||'image/jpeg';
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+          {type:'text',text:'This is a photo of a book cover. What is the title and author of this book? Respond ONLY with JSON, no markdown, no backticks: {"title":"...","author":"..."}. If you cannot determine the author, use empty string. Be precise with Icelandic characters (á,é,í,ó,ú,ý,þ,æ,ö,ð).'}
+        ]}]
+      })
+    });
+
+    if(!resp.ok){
+      console.warn('Claude API error:',resp.status);
+      status.textContent='Gat ekki lesið — fylltu sjálf/ur.';
+      return{title:'',author:''};
+    }
+
+    const data=await resp.json();
+    const text=(data.content||[]).map(c=>c.text||'').join('').trim();
+    // Parse JSON from response
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
     status.textContent='Lesið ✓';
-    return parseBookText(text);
+    return{title:parsed.title||'',author:parsed.author||''};
   }catch(e){
     console.warn('OCR error:',e);
     status.textContent='Gat ekki lesið — fylltu sjálf/ur.';
     return{title:'',author:''};
   }
-}
-
-function parseBookText(raw){
-  // Split lines, remove empties and very short fragments
-  const lines=raw.split(/\n/).map(l=>l.trim()).filter(l=>l.length>2);
-  let title='',author='';
-  if(lines.length>=2){
-    // Heuristic: longest line is likely title, second longest or line with capital letters is author
-    const sorted=[...lines].sort((a,b)=>b.length-a.length);
-    title=sorted[0]||'';
-    // Look for author-like line (shorter, often has uppercase name pattern)
-    for(const l of lines){
-      if(l===title)continue;
-      // Author lines often have 2-3 capitalized words
-      const words=l.split(/\s+/);
-      const capWords=words.filter(w=>/^[A-ZÁÉÍÓÚÝÞÆÖÐ]/.test(w));
-      if(capWords.length>=2&&words.length<=5){author=l;break}
-    }
-    if(!author&&sorted[1])author=sorted[1];
-  }else if(lines.length===1){
-    title=lines[0];
-  }
-  // Clean up
-  title=title.replace(/[^\w\s\-áéíóúýþæöðÁÉÍÓÚÝÞÆÖÐ.,!?:]/gi,'').trim().slice(0,80);
-  author=author.replace(/[^\w\s\-áéíóúýþæöðÁÉÍÓÚÝÞÆÖÐ.,]/gi,'').trim().slice(0,60);
-  return{title,author};
 }
 
 // ── Handle image from camera or gallery ──
