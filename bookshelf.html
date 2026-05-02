@@ -13,17 +13,17 @@ html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var
 body{background:radial-gradient(ellipse 600px 340px at 30% 0%,rgba(29,205,211,.07),transparent 60%),radial-gradient(ellipse 400px 280px at 80% 12%,rgba(62,130,173,.05),transparent 55%),var(--bg)}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{color:inherit;text-decoration:none}input,select{font:inherit}
 .app{width:min(100%,430px);min-height:100dvh;margin:0 auto;padding:0 16px;padding-bottom:calc(var(--nav-h) + var(--safe) + 24px);position:relative}
-.header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 6px}
-.header-left{display:flex;align-items:baseline;gap:10px}
-.header-brand{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1;flex-shrink:0}
+.header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:18px 0 6px}
+.header-left{display:contents}
+.header-brand{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1;flex-shrink:0;justify-self:start}
 .header-brand-upp{color:var(--accent)}
 .header-brand-hatt{color:var(--text)}
-.header-title{font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--soft)}
+.header-title{font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--soft);justify-self:center;text-align:center;white-space:nowrap;margin-left:0}
 .header-edit{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:border-color .18s,box-shadow .18s}
 .header-edit:hover,.header-edit:focus-visible{border-color:var(--line-hot);box-shadow:0 0 18px var(--accent-glow);outline:none}
 .header-edit.active{border-color:rgba(29,205,211,.7);box-shadow:0 0 24px rgba(29,205,211,.3)}
 .header-edit svg{width:16px;height:16px;color:var(--soft)}
-.header-right{display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:8px;justify-self:end}
 .header-avatar{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line-hot);background:radial-gradient(circle at 50% 35%,rgba(29,205,211,.18),rgba(8,19,31,.95) 68%);display:grid;place-items:center;transition:border-color .18s,box-shadow .18s}
 .header-avatar:hover,.header-avatar:focus-visible{border-color:rgba(29,205,211,.5);box-shadow:0 0 16px rgba(29,205,211,.2);outline:none}
 .header-avatar span{font-size:11px;font-weight:900;color:#dff8fb;letter-spacing:.3px}
@@ -132,6 +132,20 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .demo-hint{text-align:center;padding:6px 0 14px;font-size:11px;color:var(--soft);font-style:italic}
 .goal-ring-arrow{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--soft);font-size:16px;cursor:pointer;flex-shrink:0;margin-left:auto;transition:border-color .18s,box-shadow .18s}
 .goal-ring-arrow:hover,.goal-ring-arrow:focus-visible{border-color:var(--line-hot);box-shadow:0 0 14px var(--accent-glow);outline:none}
+.goals-strip{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;margin-bottom:14px}
+.goal-mini{min-width:0;min-height:58px;border:1px solid var(--line);background:rgba(12,22,38,.72);border-radius:16px;padding:8px 9px;display:flex;align-items:center;gap:10px;color:var(--text);text-align:left;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.22),0 0 22px rgba(29,205,211,.035),inset 0 1px 0 rgba(255,255,255,.025);transition:border-color .18s,box-shadow .18s,transform .15s}
+.goal-mini:active{transform:scale(.985);border-color:var(--line-hot);box-shadow:0 10px 26px rgba(0,0,0,.28),0 0 20px rgba(29,205,211,.14)}
+.goal-mini-ring{width:46px;height:46px;flex:0 0 46px;filter:drop-shadow(0 0 8px rgba(29,205,211,.20))}
+.goal-mini-ring .ring-bg{stroke:rgba(29,205,211,.12)}
+.goal-mini-ring .ring-fill{stroke:var(--accent);transition:stroke-dashoffset .55s ease,stroke .25s ease;filter:drop-shadow(0 0 7px rgba(29,205,211,.45))}
+.goal-mini-ring.done{filter:drop-shadow(0 0 10px rgba(255,184,48,.26))}.goal-mini-ring.done .ring-fill{stroke:#FFB830;filter:drop-shadow(0 0 7px rgba(255,184,48,.50))}
+.goal-mini-ring text{font-size:9px;font-weight:900;fill:var(--text);letter-spacing:-.2px}
+.goal-mini-copy{min-width:0;display:block}.goal-mini-title{display:block;color:var(--text);font-size:12px;font-weight:900;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.goal-mini-sub{display:block;font-size:9.5px;color:var(--soft);font-weight:700;line-height:1.15;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.goal-mini-pct{display:block;font-size:9px;color:var(--accent);font-weight:900;margin-top:3px}.goal-mini.done .goal-mini-pct{color:#FFB830}
+.goal-mini-placeholder{grid-column:span 1;min-height:58px;justify-content:center;text-align:center;border-style:dashed;background:rgba(12,22,38,.55);color:var(--soft)}
+.achievement-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px}.achievement-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--text)}.achievement-count{font-size:10px;color:var(--accent);font-weight:800}.achievement-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}.achievement-badge{border:1px solid rgba(29,205,211,.18);background:rgba(29,205,211,.045);border-radius:14px;padding:10px 6px;text-align:center;min-height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center}.achievement-badge-icon{font-size:22px;margin-bottom:5px}.achievement-badge-title{font-size:10px;font-weight:900;line-height:1.1;color:var(--text)}.achievement-badge-sub{font-size:9px;color:var(--soft);margin-top:4px;line-height:1.15}.achievement-empty{border:1px dashed rgba(29,205,211,.18);border-radius:14px;padding:12px;color:var(--soft);font-size:12px;text-align:center;margin-bottom:14px}
+.goal-current-list{display:grid;gap:8px;margin-bottom:8px}.goal-current-row{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;background:rgba(12,22,38,.72);box-shadow:0 0 22px rgba(29,205,211,.035)}.goal-current-ring{width:52px;height:52px;flex:0 0 52px;filter:drop-shadow(0 0 8px rgba(29,205,211,.20))}.goal-current-ring .ring-bg{stroke:rgba(29,205,211,.12)}.goal-current-ring .ring-fill{stroke:var(--accent);filter:drop-shadow(0 0 7px rgba(29,205,211,.45))}.goal-current-ring.done{filter:drop-shadow(0 0 10px rgba(255,184,48,.28))}.goal-current-ring.done .ring-fill{stroke:#FFB830;filter:drop-shadow(0 0 7px rgba(255,184,48,.50))}.goal-current-ring text{font-size:10px;font-weight:900;fill:var(--text);letter-spacing:-.3px}.goal-current-delete{margin-left:auto;color:rgba(255,107,107,.75);font-size:11px;font-weight:900;padding:6px 8px;border-radius:99px;border:1px solid rgba(255,107,107,.18);background:rgba(255,107,107,.05)}
+@media(max-width:420px){.achievement-grid{grid-template-columns:1fr 1fr}.goal-mini{padding:7px 7px;gap:7px}.goal-mini-ring{width:42px;height:42px;flex-basis:42px}.goal-mini-title{font-size:12px}.goal-mini-sub{font-size:9px}.goal-mini-pct{font-size:8.5px}}
+
 .goal-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .goal-type-card{border:1.5px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;background:var(--accent-dim);cursor:pointer;transition:border-color .18s,box-shadow .18s,background .18s}
 .goal-type-card:hover{border-color:var(--line-hot)}
@@ -301,7 +315,9 @@ let demoDismissed=false;
 const DEMO_KEY='upphatt_bookshelf_demo_dismissed';
 
 // ── Goal system ──
-let currentGoal=null; // {type,target,period,createdAt}
+let currentGoals=[]; // up to two active goals: [{type,target,period,createdAt}]
+let achievements=[]; // completed goal badges
+const MAX_GOALS=2;
 let sessions=[];
 let sessionsUnsub=null;
 const GOAL_TYPES={
@@ -315,23 +331,53 @@ const PERIOD_LABELS_SHORT={week:'á viku',month:'á mánuði'};
 
 function goalDocRef(){return doc(db,'goals',FID+'_'+CK)}
 
+function normalizeGoalsFromDoc(d){
+  if(!d)return[];
+  if(Array.isArray(d.goals))return d.goals.slice(0,MAX_GOALS);
+  if(d.type)return[{type:d.type,target:d.target,period:d.period||'week',createdAt:d.createdAt||Date.now()}];
+  return[];
+}
+
 async function loadGoal(){
-  if(previewMode){currentGoal={type:'books',target:5,period:'month',createdAt:Date.now()};return}
-  try{const snap=await getDoc(goalDocRef());if(snap.exists()){currentGoal=snap.data()}else{currentGoal=null}}catch(e){console.warn('Goal load failed:',e);currentGoal=null}
+  if(previewMode){
+    currentGoals=[
+      {type:'days',target:5,period:'week',createdAt:Date.now()},
+      {type:'pages',target:100,period:'week',createdAt:Date.now()}
+    ];
+    achievements=[];
+    return;
+  }
+  try{
+    const snap=await getDoc(goalDocRef());
+    if(snap.exists()){
+      const d=snap.data();
+      currentGoals=normalizeGoalsFromDoc(d);
+      achievements=Array.isArray(d.achievements)?d.achievements:[];
+    }else{
+      currentGoals=[];achievements=[];
+    }
+  }catch(e){console.warn('Goal load failed:',e);currentGoals=[];achievements=[]}
+}
+
+async function persistGoals(){
+  if(previewMode){render();return}
+  try{
+    await setDoc(goalDocRef(),{goals:currentGoals,achievements,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()},{merge:true});
+  }catch(e){console.error('Goal persist failed:',e)}
+  render();
 }
 
 async function saveGoal(g){
-  currentGoal=g;
-  if(previewMode){render();return}
-  try{await setDoc(goalDocRef(),{...g,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()})}catch(e){console.error('Goal save failed:',e)}
-  render();
+  const existingIndex=currentGoals.findIndex(x=>x.type===g.type&&x.period===g.period);
+  if(existingIndex>=0){currentGoals[existingIndex]={...currentGoals[existingIndex],...g}}
+  else if(currentGoals.length>=MAX_GOALS){currentGoals[currentGoals.length-1]=g}
+  else{currentGoals.push(g)}
+  await persistGoals();
 }
 
-async function deleteGoal(){
-  currentGoal=null;
-  if(previewMode){render();return}
-  try{await deleteDoc(goalDocRef())}catch(e){console.warn('Goal delete failed:',e)}
-  render();
+async function deleteGoal(index=null){
+  if(index===null)currentGoals=[];else currentGoals.splice(index,1);
+  await persistGoals();
 }
 
 function startSessionsListener(){
@@ -348,9 +394,15 @@ function getPeriodStart(period){
   const d=new Date(now.getFullYear(),now.getMonth(),1);return d.getTime();
 }
 
-function getGoalProgress(){
-  if(!currentGoal)return{done:0,target:5,pct:0};
-  const g=currentGoal;const start=getPeriodStart(g.period);const target=g.target||1;
+function getPeriodKey(period){
+  const start=new Date(getPeriodStart(period));
+  if(period==='week')return start.getFullYear()+'-W'+Math.ceil((((start-new Date(start.getFullYear(),0,1))/86400000)+1)/7);
+  return start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0');
+}
+
+function getGoalProgress(g=currentGoals[0]){
+  if(!g)return{done:0,target:5,pct:0};
+  const start=getPeriodStart(g.period);const target=g.target||1;
   let done=0;
   if(g.type==='books'){
     done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).length;
@@ -366,6 +418,22 @@ function getGoalProgress(){
     done=daySet.size;
   }
   return{done,target,pct:Math.min(100,Math.round((done/target)*100))};
+}
+
+function achievementKey(g){return g.type+'_'+g.period+'_'+g.target+'_'+getPeriodKey(g.period)}
+function achievementLabel(g){const info=GOAL_TYPES[g.type];return g.target+' '+info.unit+' '+PERIOD_LABELS_SHORT[g.period]}
+function achievementDate(){try{return new Intl.DateTimeFormat('is-IS',{day:'numeric',month:'short'}).format(new Date())}catch(e){return new Date().toISOString().slice(0,10)}}
+async function checkAchievements(){
+  let changed=false;
+  currentGoals.forEach(g=>{
+    const p=getGoalProgress(g);const key=achievementKey(g);
+    if(p.pct>=100&&!achievements.some(a=>a.key===key)){
+      const info=GOAL_TYPES[g.type];
+      achievements.unshift({key,type:g.type,target:g.target,period:g.period,done:p.done,label:achievementLabel(g),icon:info.icon,achievedAt:Date.now(),dateLabel:achievementDate()});
+      changed=true;
+    }
+  });
+  if(changed){achievements=achievements.slice(0,24);if(!previewMode){try{await setDoc(goalDocRef(),{achievements,goals:currentGoals,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()},{merge:true})}catch(e){console.warn('Achievement save failed:',e)}}}
 }
 
 // ── Celebration system ──
@@ -429,7 +497,7 @@ function celebrateBook(bookId){
 
       // Update the ring label text too
       const countEl=ringWrap.querySelector('.goal-ring-count');
-      const info=currentGoal?GOAL_TYPES[currentGoal.type]:null;
+      const info=currentGoals[0]?GOAL_TYPES[currentGoals[0].type]:null;
       const unit=info?info.unit:'bókum';
       if(countEl)countEl.textContent=done+' af '+target+' '+unit;
     }
@@ -452,7 +520,7 @@ function celebrateBook(bookId){
         if(fc){fc.style.position='relative';fc.appendChild(toast)}
       }
       const {done:d2,target:t2,pct:p2}=getGoalProgress();
-      const info2=currentGoal?GOAL_TYPES[currentGoal.type]:null;
+      const info2=currentGoals[0]?GOAL_TYPES[currentGoals[0].type]:null;
       const unit2=info2?info2.unit:'bókum';
       toast.textContent=p2>=100?'🏆 Markmið náð!':'🎉 '+d2+' af '+t2+' '+unit2+' — haltu áfram!';
       requestAnimationFrame(()=>toast.classList.add('show'));
@@ -535,20 +603,26 @@ function covHTML(b){const u=cc[b.id]||b.coverBase64;if(u)return'<img src="'+u+'"
 function covS(b){return'--c1:'+(b.c1||'#2b8f91')+';--c2:'+(b.c2||'#0a2341')}
 function latestNote(b){if(b?.journeyEntries?.length){const e=b.journeyEntries[0];if(e?.note)return e.note}return b?.note||'Bókin er komin á hilluna.'}
 
+function progressRingSVG(done,target,pct,icon,ringClass='goal-mini-ring',size=48,r=19){
+  const circ=2*Math.PI*r;
+  const offset=circ-(Math.min(100,Math.max(0,pct||0))/100)*circ;
+  const doneCls=(pct>=100?' done':'');
+  const center=size/2;
+  const text=(done+'/'+target).length<=5?done+'/'+target:Math.round(pct||0)+'%';
+  return '<svg class="'+ringClass+doneCls+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true"><circle class="ring-bg" cx="'+center+'" cy="'+center+'" r="'+r+'" fill="none" stroke-width="5"/><circle class="ring-fill" cx="'+center+'" cy="'+center+'" r="'+r+'" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 '+center+' '+center+')"/><text x="'+center+'" y="'+(center+3)+'" text-anchor="middle">'+text+'</text></svg>';
+}
+
 function goalRingHTML(){
-  const g=currentGoal;
-  if(!g){
-    const r=19;const circ=2*Math.PI*r;
-    return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4" stroke-dasharray="4 4"/><text x="24" y="26" text-anchor="middle" fill="var(--soft)" font-size="16">🎯</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Ekkert markmið</span><span class="goal-ring-count" style="font-size:14px">Settu þér markmið!</span>Ýttu á örina →</div><button class="goal-ring-arrow" id="openGoalModal" aria-label="Markmið">›</button></div>';
+  if(!currentGoals.length){
+    return'<div class="goals-strip"><button class="goal-mini goal-mini-placeholder" id="openGoalModal"><span class="goal-mini-copy"><span class="goal-mini-title">Settu markmið</span><span class="goal-mini-sub">Allt að 2 virk</span></span></button><button class="goal-ring-arrow" id="openGoalModal2" aria-label="Markmið">›</button></div>';
   }
-  const info=GOAL_TYPES[g.type];
-  const {done,target,pct}=getGoalProgress();
-  const r=19;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
-  const periodLabel=PERIOD_LABELS[g.period];
-  const unit=info.unit;
-  const countText=done+' af '+target+' '+unit;
-  const statusText=pct>=100?'Þú náðir markmiðinu! 🎉':'Haltu áfram!';
-  return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="'+(pct>=100?'#FFB830':'var(--accent)')+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset .6s ease"/><text x="24" y="26" text-anchor="middle" fill="var(--text)" font-size="11" font-weight="800">'+done+'/'+target+'</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Markmið '+periodLabel+'</span><span class="goal-ring-count">'+countText+'</span>'+statusText+'</div><button class="goal-ring-arrow" id="openGoalModal" aria-label="Markmið">›</button></div>';
+  const cards=currentGoals.slice(0,MAX_GOALS).map((g,i)=>{
+    const info=GOAL_TYPES[g.type];const p=getGoalProgress(g);
+    const doneCls=p.pct>=100?' done':'';
+    return'<button class="goal-mini'+doneCls+'" data-open-goals="1" data-goal-index="'+i+'">'+progressRingSVG(p.done,p.target,p.pct,info.icon)+'<span class="goal-mini-copy"><span class="goal-mini-title">'+info.name+'</span><span class="goal-mini-sub">'+info.unit+' '+PERIOD_LABELS_SHORT[g.period]+'</span><span class="goal-mini-pct">'+(p.pct>=100?'Náð!':p.pct+'% lokið')+'</span></span></button>';
+  }).join('');
+  const add=currentGoals.length<MAX_GOALS?'<button class="goal-mini goal-mini-placeholder" data-open-goals="1"><span class="goal-mini-copy"><span class="goal-mini-title">+ Markmið</span><span class="goal-mini-sub">Bæta við</span></span></button>':'';
+  return'<div class="goals-strip">'+cards+add+'<button class="goal-ring-arrow" id="openGoalModal" aria-label="Markmið">›</button></div>';
 }
 
 function render(){
@@ -561,6 +635,7 @@ function render(){
   const finished=books.filter(b=>b.status==='finished'&&celebrated.has(b.id));
   const hero=reading[0]||sorted[0];
   const fc=document.getElementById('featuredCard');
+  checkAchievements();
   if(!hero||!books.length){
     fc.className='';fc.innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-title">Bókahillan er tóm</div><div class="empty-sub">Ýttu á <strong>Bók</strong> neðst og bættu fyrstu bókinni við!</div></div>';
   }else{
@@ -580,7 +655,7 @@ function render(){
     if(b&&isPending(b)){e.preventDefault();e.stopPropagation();celebrateBook(id);return}
     openJourney(id);
   }));
-  const goalBtn=document.getElementById('openGoalModal');if(goalBtn)goalBtn.addEventListener('click',e=>{e.stopPropagation();openGoalModal()});
+  document.querySelectorAll('#openGoalModal,#openGoalModal2,[data-open-goals]').forEach(goalBtn=>goalBtn.addEventListener('click',e=>{e.stopPropagation();openGoalModal()}));
   attachLP();
 }
 function rGrid(sid,gid,cid,list){
@@ -729,7 +804,7 @@ document.getElementById('saveBook').addEventListener('click',async()=>{
 let goalSelType='books',goalSelPeriod='week';
 
 function openGoalModal(){
-  const g=currentGoal;
+  const g=currentGoals[0];
   goalSelType=g?.type||'books';
   goalSelPeriod=g?.period||'week';
   renderGoalCurrent();
@@ -739,13 +814,14 @@ function openGoalModal(){
 
 function renderGoalCurrent(){
   const wrap=document.getElementById('goalCurrentWrap');
-  if(!currentGoal){wrap.innerHTML='';return}
-  const g=currentGoal;const info=GOAL_TYPES[g.type];
-  const {done,target,pct}=getGoalProgress();
-  const r=21;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
-  const ringColor=pct>=100?'#FFB830':'var(--accent)';
-  wrap.innerHTML='<div class="goal-current"><svg class="goal-current-ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="26" cy="26" r="'+r+'" fill="none" stroke="'+ringColor+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 26 26)"/><text x="26" y="28" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="800">'+info.icon+'</text></svg><div class="goal-current-info"><div class="goal-current-title">'+done+' af '+target+' '+info.unit+'</div><div class="goal-current-sub">'+info.name+' '+PERIOD_LABELS_SHORT[g.period]+'</div><div class="goal-current-pct">'+(pct>=100?'Markmið náð! 🎉':pct+'% lokið')+'</div></div></div><button class="goal-delete" id="deleteGoalBtn">Eyða markmiði</button><div class="goal-divider"></div>';
-  document.getElementById('deleteGoalBtn')?.addEventListener('click',async()=>{if(confirm('Eyða markmiði?')){await deleteGoal();closeOv('goalModal')}});
+  const active=currentGoals.map((g,i)=>{
+    const info=GOAL_TYPES[g.type];const p=getGoalProgress(g);const r=21;const circ=2*Math.PI*r;const offset=circ-(p.pct/100)*circ;const ringColor=p.pct>=100?'#FFB830':'var(--accent)';
+    return'<div class="goal-current-row">'+progressRingSVG(p.done,p.target,p.pct,info.icon,'goal-current-ring',52,21)+'<div class="goal-current-info"><div class="goal-current-title">'+p.done+' af '+p.target+' '+info.unit+'</div><div class="goal-current-sub">'+info.name+' '+PERIOD_LABELS_SHORT[g.period]+'</div><div class="goal-current-pct">'+(p.pct>=100?'Markmið náð! 🎉':p.pct+'% lokið')+'</div></div><button class="goal-current-delete" data-delete-goal="'+i+'">Eyða</button></div>';
+  }).join('');
+  const ach=achievements.slice(0,9);
+  const achHTML=ach.length?'<div class="achievement-grid">'+ach.map(a=>'<div class="achievement-badge"><div class="achievement-badge-icon">'+(a.icon||'🏆')+'</div><div class="achievement-badge-title">'+esc(a.label||achievementLabel(a))+'</div><div class="achievement-badge-sub">Náð '+esc(a.dateLabel||'')+'</div></div>').join('')+'</div>':'<div class="achievement-empty">Engin verðlaun enn — þau birtast hér þegar markmið næst.</div>';
+  wrap.innerHTML=(currentGoals.length?'<div class="goal-current-list">'+active+'</div>':'')+'<div class="achievement-head"><div class="achievement-title">Verðlaunasafn</div><div class="achievement-count">'+achievements.length+' náð</div></div>'+achHTML+'<div class="goal-divider"></div>';
+  wrap.querySelectorAll('[data-delete-goal]').forEach(btn=>btn.addEventListener('click',async()=>{if(confirm('Eyða markmiði?')){await deleteGoal(Number(btn.dataset.deleteGoal));renderGoalCurrent();renderGoalEditor()}}));
 }
 
 function renderGoalEditor(){
@@ -765,7 +841,8 @@ function renderGoalEditor(){
     el.classList.add('selected');
   }));
   // Pre-fill from current goal if type matches
-  if(currentGoal&&currentGoal.type===goalSelType){input.value=currentGoal.target}
+  const existing=currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod);
+  if(existing){input.value=existing.target}
 }
 
 // Type card clicks
@@ -790,7 +867,8 @@ document.getElementById('saveGoalBtn').addEventListener('click',async()=>{
   const resultEl=document.getElementById('goalSaveResult');
   const btn=document.getElementById('saveGoalBtn');
   btn.disabled=true;btn.textContent='Vista...';
-  await saveGoal({type:goalSelType,target,period:goalSelPeriod,createdAt:currentGoal?.createdAt||Date.now()});
+  await saveGoal({type:goalSelType,target,period:goalSelPeriod,createdAt:(currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod)?.createdAt)||Date.now()});
+  renderGoalCurrent();
   resultEl.textContent='Markmið vistað ✓';resultEl.style.display='block';
   btn.textContent='Vista markmið';btn.disabled=false;
   setTimeout(()=>{resultEl.style.display='none';closeOv('goalModal')},1200);
@@ -838,7 +916,8 @@ document.getElementById('confirmDeleteBooks').addEventListener('click',async()=>
 
 if(previewMode){
   // Preview mode — show demo books, no Firestore
-  currentGoal={type:'books',target:5,period:'month',createdAt:Date.now()};
+  currentGoals=[{type:'days',target:5,period:'week',createdAt:Date.now()},{type:'pages',target:100,period:'week',createdAt:Date.now()}];
+  achievements=[];
   books=[...demoBooks];render();
 }else{
   loadGoal().then(()=>{startListener();startSessionsListener()});
