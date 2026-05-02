@@ -315,7 +315,7 @@ let demoDismissed=false;
 const DEMO_KEY='upphatt_bookshelf_demo_dismissed';
 
 // ── Goal system ──
-let currentGoals=[]; // up to two active goals: [{type,target,period,startAt,createdAt}]
+let currentGoals=[]; // up to two active goals: [{type,target,period,createdAt}]
 let achievements=[]; // completed goal badges
 const MAX_GOALS=2;
 let sessions=[];
@@ -330,129 +330,48 @@ const PERIOD_LABELS={week:'vikunnar',month:'mánaðarins'};
 const PERIOD_LABELS_SHORT={week:'á viku',month:'á mánuði'};
 
 function goalDocRef(){return doc(db,'goals',FID+'_'+CK)}
-function goalStorageKey(){return 'upphatt_goals_'+FID+'_'+CK}
-function goalTime(v){
-  if(!v)return 0;
-  if(typeof v==='number')return v;
-  if(v.toMillis)return v.toMillis();
-  if(v.seconds)return v.seconds*1000;
-  const n=Number(v);
-  return Number.isFinite(n)?n:0;
-}
-function loadGoalsLocal(){
-  try{
-    const raw=localStorage.getItem(goalStorageKey());
-    if(!raw)return null;
-    const d=JSON.parse(raw);
-    return {
-      goals:normalizeGoalsFromDoc(d),
-      achievements:Array.isArray(d.achievements)?d.achievements:[]
-    };
-  }catch(e){return null}
-}
-function saveGoalsLocal(){
-  try{
-    localStorage.setItem(goalStorageKey(),JSON.stringify({
-      goals:currentGoals,
-      achievements,
-      savedAt:Date.now()
-    }));
-  }catch(e){}
-}
 
-function normalizeGoal(g){
-  const now=Date.now();
-  const startAt=goalTime(g.startAt)||goalTime(g.createdAt)||now;
-  return {
-    type:g.type||'days',
-    target:Number(g.target)||1,
-    period:g.period||'week',
-    startAt,
-    createdAt:goalTime(g.createdAt)||startAt
-  };
-}
 function normalizeGoalsFromDoc(d){
   if(!d)return[];
-  if(Array.isArray(d.goals))return d.goals.slice(0,MAX_GOALS).map(normalizeGoal);
-  if(d.type)return[normalizeGoal(d)];
+  if(Array.isArray(d.goals))return d.goals.slice(0,MAX_GOALS);
+  if(d.type)return[{type:d.type,target:d.target,period:d.period||'week',createdAt:d.createdAt||Date.now()}];
   return[];
 }
 
 async function loadGoal(){
-  const local=loadGoalsLocal();
-
   if(previewMode){
-    if(local){
-      currentGoals=local.goals;
-      achievements=local.achievements;
-    }else{
-      const now=Date.now();
-      currentGoals=[
-        {type:'days',target:5,period:'week',startAt:now,createdAt:now},
-        {type:'pages',target:100,period:'week',startAt:now,createdAt:now}
-      ];
-      achievements=[];
-      saveGoalsLocal();
-    }
+    currentGoals=[
+      {type:'days',target:5,period:'week',createdAt:Date.now()},
+      {type:'pages',target:100,period:'week',createdAt:Date.now()}
+    ];
+    achievements=[];
     return;
   }
-
   try{
     const snap=await getDoc(goalDocRef());
     if(snap.exists()){
       const d=snap.data();
       currentGoals=normalizeGoalsFromDoc(d);
       achievements=Array.isArray(d.achievements)?d.achievements:[];
-      saveGoalsLocal();
-    }else if(local){
-      currentGoals=local.goals;
-      achievements=local.achievements;
     }else{
-      currentGoals=[];
-      achievements=[];
+      currentGoals=[];achievements=[];
     }
-  }catch(e){
-    console.warn('Goal load failed, using local fallback:',e);
-    if(local){
-      currentGoals=local.goals;
-      achievements=local.achievements;
-    }else{
-      currentGoals=[];
-      achievements=[];
-    }
-  }
+  }catch(e){console.warn('Goal load failed:',e);currentGoals=[];achievements=[]}
 }
 
 async function persistGoals(){
-  saveGoalsLocal();
   if(previewMode){render();return}
   try{
     await setDoc(goalDocRef(),{goals:currentGoals,achievements,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()},{merge:true});
-  }catch(e){console.error('Goal persist failed, kept local copy:',e)}
+  }catch(e){console.error('Goal persist failed:',e)}
   render();
 }
 
 async function saveGoal(g){
-  const now=Date.now();
   const existingIndex=currentGoals.findIndex(x=>x.type===g.type&&x.period===g.period);
-  const normalized=normalizeGoal({
-    ...g,
-    startAt:g.startAt||now,
-    createdAt:g.createdAt||g.startAt||now
-  });
-
-  if(existingIndex>=0){
-    currentGoals[existingIndex]=normalizeGoal({
-      ...currentGoals[existingIndex],
-      ...g,
-      startAt:currentGoals[existingIndex].startAt||g.startAt||now,
-      createdAt:currentGoals[existingIndex].createdAt||g.createdAt||now
-    });
-  }else if(currentGoals.length>=MAX_GOALS){
-    currentGoals[currentGoals.length-1]=normalized;
-  }else{
-    currentGoals.push(normalized);
-  }
+  if(existingIndex>=0){currentGoals[existingIndex]={...currentGoals[existingIndex],...g}}
+  else if(currentGoals.length>=MAX_GOALS){currentGoals[currentGoals.length-1]=g}
+  else{currentGoals.push(g)}
   await persistGoals();
 }
 
@@ -483,10 +402,7 @@ function getPeriodKey(period){
 
 function getGoalProgress(g=currentGoals[0]){
   if(!g)return{done:0,target:5,pct:0};
-  const periodStart=getPeriodStart(g.period);
-  const goalStart=goalTime(g.startAt)||goalTime(g.createdAt)||periodStart;
-  const start=Math.max(periodStart,goalStart);
-  const target=g.target||1;
+  const start=getPeriodStart(g.period);const target=g.target||1;
   let done=0;
   if(g.type==='books'){
     done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).length;
@@ -517,14 +433,7 @@ async function checkAchievements(){
       changed=true;
     }
   });
-  if(changed){
-    achievements=achievements.slice(0,24);
-    saveGoalsLocal();
-    if(!previewMode){
-      try{await setDoc(goalDocRef(),{achievements,goals:currentGoals,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()},{merge:true})}
-      catch(e){console.warn('Achievement save failed, kept local copy:',e)}
-    }
-  }
+  if(changed){achievements=achievements.slice(0,24);if(!previewMode){try{await setDoc(goalDocRef(),{achievements,goals:currentGoals,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()},{merge:true})}catch(e){console.warn('Achievement save failed:',e)}}}
 }
 
 // ── Celebration system ──
@@ -958,14 +867,7 @@ document.getElementById('saveGoalBtn').addEventListener('click',async()=>{
   const resultEl=document.getElementById('goalSaveResult');
   const btn=document.getElementById('saveGoalBtn');
   btn.disabled=true;btn.textContent='Vista...';
-  await const existingGoal=currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod);
-  saveGoal({
-    type:goalSelType,
-    target,
-    period:goalSelPeriod,
-    startAt:existingGoal?.startAt||Date.now(),
-    createdAt:existingGoal?.createdAt||existingGoal?.startAt||Date.now()
-  });
+  await saveGoal({type:goalSelType,target,period:goalSelPeriod,createdAt:(currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod)?.createdAt)||Date.now()});
   renderGoalCurrent();
   resultEl.textContent='Markmið vistað ✓';resultEl.style.display='block';
   btn.textContent='Vista markmið';btn.disabled=false;
@@ -1013,11 +915,10 @@ document.getElementById('cancelDeleteBooks').addEventListener('click',()=>closeO
 document.getElementById('confirmDeleteBooks').addEventListener('click',async()=>{if(!selIds.size)return;try{for(const id of selIds)await delBook(id)}catch(e){alert('Villa.')}selIds.clear();closeOv('deleteBooksModal');setEM(false)});
 
 if(previewMode){
-  // Preview mode — show demo books and persist goals locally
-  loadGoal().then(()=>{
-    books=[...demoBooks];
-    render();
-  });
+  // Preview mode — show demo books, no Firestore
+  currentGoals=[{type:'days',target:5,period:'week',createdAt:Date.now()},{type:'pages',target:100,period:'week',createdAt:Date.now()}];
+  achievements=[];
+  books=[...demoBooks];render();
 }else{
   loadGoal().then(()=>{startListener();startSessionsListener()});
 }
