@@ -562,74 +562,32 @@
 /* ══════════════════════════════════════════════
    Floating child actions — bookshelf + reading setup
    ══════════════════════════════════════════════ */
-.child-floating-actions {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(18px + env(safe-area-inset-bottom));
-  z-index: 60;
-  pointer-events: none;
+/* ── Bottom Nav Bar ── */
+.child-bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: min(430px, 100vw);
+  height: calc(68px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(6,14,26,.96);
+  border-top: 1px solid rgba(29,205,211,.14);
+  backdrop-filter: blur(16px);
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  z-index: 200;
 }
-
-.child-float-btn {
-  position: absolute;
-  bottom: 0;
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  border: 1px solid rgba(29, 205, 211, 0.28);
-  background: rgba(6, 14, 26, 0.78);
-  color: #1dcdd3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  box-shadow:
-    0 0 0 1px rgba(29, 205, 211, 0.06),
-    0 0 18px rgba(29, 205, 211, 0.18),
-    0 12px 34px rgba(0, 0, 0, 0.34);
-  cursor: pointer;
-  pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    transform 160ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background 180ms ease,
-    color 180ms ease;
+.child-nav-tab {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px;
+  color: rgba(148,164,180,.7); font-size: 11px; font-weight: 700;
+  position: relative; text-decoration: none;
+  border: 0; background: none; font-family: inherit; cursor: pointer;
 }
-
-.child-float-btn.left {
-  left: calc(18px + env(safe-area-inset-left));
-}
-
-.child-float-btn.right {
-  right: calc(18px + env(safe-area-inset-right));
-}
-
-.child-float-btn svg {
-  width: 21px;
-  height: 21px;
-  stroke: currentColor;
-}
-
-.child-float-btn:hover,
-.child-float-btn:focus-visible {
-  outline: none;
-  border-color: rgba(29, 205, 211, 0.62);
-  background: rgba(8, 22, 37, 0.92);
-  box-shadow:
-    0 0 0 2px rgba(29, 205, 211, 0.10),
-    0 0 22px rgba(29, 205, 211, 0.34),
-    0 14px 38px rgba(0, 0, 0, 0.38);
-}
-
-.child-float-btn:active {
-  transform: scale(0.94);
-  border-color: rgba(29, 205, 211, 0.78);
-  box-shadow:
-    0 0 0 3px rgba(29, 205, 211, 0.14),
-    0 0 30px rgba(29, 205, 211, 0.46);
+.child-nav-tab svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+.child-nav-tab.active { color: #1dcdd3; }
+.child-nav-tab.active::after {
+  content: ""; position: absolute; bottom: 4px;
+  width: 28px; height: 3px; border-radius: 99px;
+  background: #1dcdd3;
+  box-shadow: 0 0 10px rgba(29,205,211,.4);
 }
 
 .child-action-overlay {
@@ -848,106 +806,10 @@
 }
 
 @media (max-width: 720px) {
-  .child-float-btn {
-    width: 44px;
-    height: 44px;
-  }
-
-  .child-float-btn.left {
-    left: calc(16px + env(safe-area-inset-left));
-  }
-
-  .child-float-btn.right {
-    right: calc(16px + env(safe-area-inset-right));
-  }
-
   .child-action-modal {
     border-radius: 20px;
   }
 }
-
-  
-    /* FINAL FIX: ensure floating buttons exist visually above the child page */
-    .child-floating-actions {
-      position: fixed !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
-      width: 100vw !important;
-      height: 0 !important;
-      z-index: 9999 !important;
-      pointer-events: none !important;
-    }
-    .child-float-btn {
-      position: fixed !important;
-      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
-      z-index: 10000 !important;
-      pointer-events: auto !important;
-    }
-    .child-float-btn svg,
-    .child-float-btn svg path {
-      stroke: currentColor !important;
-    }
-    @media (min-width: 721px) {
-      .child-floating-actions { bottom: 28px !important; }
-      .child-float-btn {
-        bottom: 28px !important;
-        width: 40px !important;
-        height: 40px !important;
-      }
-      .child-float-btn.left { left: 28px !important; }
-      .child-float-btn.right { right: 28px !important; }
-      .child-float-btn svg { width: 18px !important; height: 18px !important; }
-    }
-
-  
-    /* FINAL SIMPLE LINK FIX: bookshelf is a real anchor */
-    a.child-float-btn {
-      text-decoration: none !important;
-    }
-    a.child-float-btn:visited {
-      color: #1dcdd3 !important;
-    }
-
-  
-    /* FINAL NAV VERSION: floating bookshelf is a real link */
-    a.child-float-btn {
-      text-decoration: none !important;
-    }
-    a.child-float-btn:visited {
-      color: #1dcdd3 !important;
-    }
-    .child-floating-actions {
-      position: fixed !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
-      width: 100vw !important;
-      height: 0 !important;
-      z-index: 9999 !important;
-      pointer-events: none !important;
-    }
-    .child-float-btn {
-      position: fixed !important;
-      bottom: calc(94px + env(safe-area-inset-bottom)) !important;
-      z-index: 10000 !important;
-      pointer-events: auto !important;
-    }
-    .child-float-btn svg,
-    .child-float-btn svg path {
-      stroke: currentColor !important;
-    }
-    @media (min-width: 721px) {
-      .child-floating-actions { bottom: 28px !important; }
-      .child-float-btn {
-        bottom: 28px !important;
-        width: 40px !important;
-        height: 40px !important;
-      }
-      .child-float-btn.left { left: 28px !important; }
-      .child-float-btn.right { right: 28px !important; }
-      .child-float-btn svg { width: 18px !important; height: 18px !important; }
-    }
 
   
 /* ══════════════════════════════════════════════
@@ -1400,20 +1262,20 @@
     <span id="recording-dependency" class="dependency-node" aria-hidden="true">recording active</span>
     <div id="listen-toast" class="toast" role="status" aria-live="polite">Einhver hlustaði í dag</div>
 
-    <div class="child-floating-actions" aria-label="Flýtiaðgerðir">
-      <a id="child-bookshelf-float" class="child-float-btn left" href="bookshelf.html" aria-label="Bókahilla">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 5.5V19M9.5 4.5V20M15 5.5V19M19 7V19" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4.2 19.5H20" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </a>
-      <button id="child-reading-settings-float" class="child-float-btn right" type="button" aria-label="Velja bók og blaðsíður">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke-width="1.7"/>
-          <path d="M19 12a7 7 0 0 0-.1-1.1l2-1.5-2-3.4-2.4 1a7.6 7.6 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.9c-.7.3-1.3.6-1.9 1.1l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.1l-2 1.5 2 3.4 2.4-1c.6.5 1.2.8 1.9 1.1l.3 2.9h4.6l.3-2.9c.7-.3 1.3-.6 1.9-1.1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1.1Z" stroke-width="1.15"/>
-        </svg>
+    <nav class="child-bottom-nav" aria-label="Aðalvalmynd">
+      <button class="child-nav-tab active" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.5v13.2c0 .4.4.7.8.5 2.1-.9 4.4-.8 6.2.4.3.2.7 0 .7-.4V7.1c0-.5-.2-.9-.6-1.1-2-1.1-4.6-1.2-6.8-.2-.2.1-.3.3-.3.5Z"/><path d="M19.5 5.5v13.2c0 .4-.4.7-.8.5-2.1-.9-4.4-.8-6.2.4-.3.2-.7 0-.7-.4V7.1c0-.5.2-.9.6-1.1 2-1.1 4.6-1.2 6.8-.2.2.1.3.3.3.5Z"/></svg>
+        Lesa
       </button>
-    </div>
+      <a href="bookshelf-v3.html" class="child-nav-tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Hillan
+      </a>
+      <button id="child-reading-settings-float" class="child-nav-tab" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/><path d="M12 8v8M8 12h8" stroke-width="1.6"/></svg>
+        Bók
+      </button>
+    </nav>
 
   </main>
 
@@ -1955,29 +1817,58 @@
       }
 
 
-      function readBookshelfBooksForChildModal() {
-        try {
-          var rawBooks = localStorage.getItem("upphatt_bookshelf_local_v1");
-          var parsedBooks = rawBooks ? JSON.parse(rawBooks) : [];
-          if (!Array.isArray(parsedBooks)) return [];
+      // ── Firestore book loading for child book picker ──
+      var firestoreBooks = [];
+      var firestoreBooksLoaded = false;
 
-          return parsedBooks
-            .filter(function (book) {
-              return book && book.id && book.title && book.status === "reading";
-            })
-            .map(function (book) {
-              return {
-                id: String(book.id),
-                title: String(book.title),
-                status: book.status || "shelf",
-                progressPercent: Number(book.progressPercent || 0),
-                pageFrom: book.currentPageFrom || "",
-                pageTo: book.currentPageTo || ""
-              };
+      function loadBooksFromFirestore() {
+        if (!childSession || !childSession.familyId || !childSession.childKey) return;
+        try {
+          var dbScript = document.createElement("script");
+          dbScript.type = "module";
+          dbScript.textContent = `
+            import{initializeApp}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
+            import{getFirestore,collection,onSnapshot,query,where}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+            const app=initializeApp({apiKey:'AIzaSyAgTY3Uxd9_ZxixjqLj-sH8V3OhFAzg6DU',authDomain:'lesum-22e85.firebaseapp.com',projectId:'lesum-22e85',storageBucket:'lesum-22e85.firebasestorage.app',messagingSenderId:'204392598388',appId:'1:204392598388:web:2dbbe3f476cd78d2ffba21'});
+            const db=getFirestore(app);
+            const q=query(collection(db,'books'),where('familyId','==',"${childSession.familyId}"),where('childKey','==',"${childSession.childKey}"));
+            onSnapshot(q,snap=>{
+              window._firestoreBooks=snap.docs.map(d=>({id:d.id,...d.data()}));
+              window._firestoreBooksLoaded=true;
+              if(window._onFirestoreBooksReady) window._onFirestoreBooksReady();
             });
-        } catch (e) {
-          return [];
+          `;
+          document.head.appendChild(dbScript);
+        } catch(e) { console.warn("Firestore book load failed:", e); }
+      }
+
+      loadBooksFromFirestore();
+
+      function readBookshelfBooksForChildModal() {
+        var allBooks = window._firestoreBooks || [];
+        if (!allBooks.length) {
+          // Fallback: try localStorage for backwards compat
+          try {
+            var rawBooks = localStorage.getItem("upphatt_bookshelf_local_v1");
+            var parsedBooks = rawBooks ? JSON.parse(rawBooks) : [];
+            if (Array.isArray(parsedBooks)) allBooks = parsedBooks;
+          } catch(e) {}
         }
+        return allBooks
+          .filter(function(book) {
+            return book && book.id && book.title && book.status === "reading";
+          })
+          .map(function(book) {
+            return {
+              id: String(book.id),
+              title: String(book.title),
+              status: book.status || "shelf",
+              progressPercent: Number(book.progressPercent || 0),
+              totalPages: Number(book.totalPages || 0),
+              pageFrom: book.currentPageFrom || "",
+              pageTo: book.currentPageTo || ""
+            };
+          });
       }
 
       function populateChildBookListFromBookshelf() {
@@ -2466,11 +2357,10 @@
       function updateBookshelfBookAfterReading(note, endPage) {
         try {
           var setup = getChildReadingSetup();
-          var rawBooks = localStorage.getItem("upphatt_bookshelf_local_v1");
-          var books = rawBooks ? JSON.parse(rawBooks) : [];
-          if (!Array.isArray(books) || !setup || !setup.bookId) return false;
+          if (!setup || !setup.bookId) return false;
 
-          var book = books.find(function (item) {
+          var allBooks = window._firestoreBooks || [];
+          var book = allBooks.find(function(item) {
             return item && String(item.id) === String(setup.bookId);
           });
           if (!book) return false;
@@ -2479,27 +2369,32 @@
           var finalPage = Number(endPage || 0);
           var totalPages = Number(book.totalPages || 0);
           var now = Date.now();
+          var pct = totalPages && finalPage ? Math.min(100, Math.max(0, Math.round((finalPage / totalPages) * 100))) : (book.progressPercent || 0);
 
-          book.status = "reading";
-          book.currentPageFrom = startPage || book.currentPageFrom || null;
-          book.currentPageTo = finalPage || book.currentPageTo || null;
-          if (totalPages && finalPage) {
-            book.progressPercent = Math.min(100, Math.max(0, Math.round((finalPage / totalPages) * 100)));
-          }
-          book.lastReadAt = now;
-          book.updatedAt = now;
-          book.note = note || book.note || "";
-
-          if (!Array.isArray(book.journeyEntries)) book.journeyEntries = [];
-          book.journeyEntries.unshift({
-            date: "Í dag",
-            pageFrom: startPage || "",
-            pageTo: finalPage || "",
-            note: note || "",
-            reactions: []
-          });
-
-          localStorage.setItem("upphatt_bookshelf_local_v1", JSON.stringify(books));
+          // Update via Firestore module
+          var updateScript = document.createElement("script");
+          updateScript.type = "module";
+          updateScript.textContent = `
+            import{getFirestore,doc,updateDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+            import{initializeApp}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
+            const app=initializeApp({apiKey:'AIzaSyAgTY3Uxd9_ZxixjqLj-sH8V3OhFAzg6DU',authDomain:'lesum-22e85.firebaseapp.com',projectId:'lesum-22e85',storageBucket:'lesum-22e85.firebasestorage.app',messagingSenderId:'204392598388',appId:'1:204392598388:web:2dbbe3f476cd78d2ffba21'});
+            const db=getFirestore(app);
+            const bookRef=doc(db,'books','${setup.bookId}');
+            const entries=${JSON.stringify(book.journeyEntries||[])};
+            entries.unshift({date:"Í dag",pageFrom:${startPage}||"",pageTo:${finalPage}||"",note:${JSON.stringify(note||"")},reactions:[]});
+            updateDoc(bookRef,{
+              status:${pct>=100?'"finished"':'"reading"'},
+              currentPageFrom:${startPage}||null,
+              currentPageTo:${finalPage}||null,
+              progressPercent:${pct},
+              lastReadAt:${now},
+              note:${JSON.stringify(note||"")},
+              journeyEntries:entries,
+              updatedAt:serverTimestamp()
+            }).then(()=>console.log("Book updated in Firestore"))
+              .catch(e=>console.warn("Book update failed:",e));
+          `;
+          document.head.appendChild(updateScript);
           return true;
         } catch (e) {
           console.warn("Failed updating bookshelf book after reading:", e);

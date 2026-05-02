@@ -14,11 +14,11 @@ body{background:radial-gradient(ellipse 600px 340px at 30% 0%,rgba(29,205,211,.0
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{color:inherit;text-decoration:none}input,select{font:inherit}
 .app{width:min(100%,430px);min-height:100dvh;margin:0 auto;padding:0 16px;padding-bottom:calc(var(--nav-h) + var(--safe) + 24px);position:relative}
 .header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 6px}
-.header-left{display:flex;flex-direction:column;gap:2px}
-.header-brand{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1}
+.header-left{display:flex;align-items:baseline;gap:10px}
+.header-brand{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1;flex-shrink:0}
 .header-brand-upp{color:var(--accent)}
 .header-brand-hatt{color:var(--text)}
-.header-title{font-family:var(--serif);font-size:26px;font-weight:400;letter-spacing:-.5px;line-height:1.1}
+.header-title{font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--soft)}
 .header-edit{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:border-color .18s,box-shadow .18s}
 .header-edit:hover,.header-edit:focus-visible{border-color:var(--line-hot);box-shadow:0 0 18px var(--accent-glow);outline:none}
 .header-edit.active{border-color:rgba(29,205,211,.7);box-shadow:0 0 24px rgba(29,205,211,.3)}
@@ -37,8 +37,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .featured{margin:14px 0 22px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3),0 0 40px rgba(29,205,211,.04)}
 .featured::before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,rgba(29,205,211,0),rgba(29,205,211,.45),rgba(29,205,211,0))}
 .featured-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:9px;border:1px solid rgba(29,205,211,.22);background:rgba(29,205,211,.06);color:var(--accent);font-size:12px;font-weight:800;margin-bottom:12px}
-.featured-grid{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:start}
-.featured-cover{width:130px;aspect-ratio:2/3;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(140deg,var(--c1,#2b8f91),var(--c2,#0a2341));box-shadow:0 16px 32px rgba(0,0,0,.35),0 0 24px rgba(29,205,211,.1);transform:perspective(600px) rotateY(-4deg);cursor:pointer}
+.featured-grid{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+.featured-cover{width:150px;aspect-ratio:2/3;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(140deg,var(--c1,#2b8f91),var(--c2,#0a2341));box-shadow:0 16px 32px rgba(0,0,0,.35),0 0 24px rgba(29,205,211,.1);transform:perspective(600px) rotateY(-4deg);cursor:pointer}
 .featured-cover img{width:100%;height:100%;object-fit:cover;display:block}
 .featured-cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:14px;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.08),transparent);border-right:1px solid rgba(255,255,255,.06);pointer-events:none}
 .featured-cover-title{position:absolute;left:14px;right:8px;top:36px;z-index:2;font-size:13px;font-weight:800;letter-spacing:-.3px;line-height:1.05;color:#eaf3fb;text-shadow:0 2px 10px rgba(0,0,0,.4)}
@@ -56,10 +56,17 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .section-title{font-family:var(--serif);font-size:19px;letter-spacing:-.2px}
 .section-count{font-size:11px;font-weight:700;color:var(--soft);background:var(--accent-dim);padding:3px 9px;border-radius:99px;border:1px solid var(--line)}
-.book-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.book-rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.book-rail::-webkit-scrollbar{display:none}
+.book-rail .book-card{flex:0 0 120px;scroll-snap-align:start}
 .book-card{position:relative;border-radius:12px;overflow:hidden;background:var(--card);border:1px solid var(--line);transition:transform .15s,box-shadow .2s;cursor:pointer}
 .book-card:active{transform:scale(.97);box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 20px var(--accent-glow)}
 .book-card.selected{border-color:rgba(29,205,211,.6);box-shadow:0 0 0 2px rgba(29,205,211,.2),0 0 20px rgba(29,205,211,.15)}
+.goal-ring{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.goal-ring svg{width:48px;height:48px;flex-shrink:0}
+.goal-ring-text{font-size:12px;color:var(--soft);line-height:1.3}
+.goal-ring-count{font-size:18px;font-weight:800;color:var(--text);display:block}
+.goal-ring-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--accent);display:block;margin-bottom:1px}
 .book-cover{width:100%;aspect-ratio:2/3;position:relative;background:linear-gradient(140deg,var(--c1,#2b8f91),var(--c2,#0a2341));overflow:hidden}
 .book-cover img{width:100%;height:100%;object-fit:cover;display:block}
 .book-cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:9px;background:linear-gradient(90deg,rgba(0,0,0,.3),rgba(255,255,255,.06),transparent);pointer-events:none}
@@ -123,7 +130,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .featured{animation:fadeUp .4s ease both}.section{animation:fadeUp .4s ease both}
 .book-demo-badge{position:absolute;top:6px;right:6px;z-index:3;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);backdrop-filter:blur(4px)}
 .demo-hint{text-align:center;padding:6px 0 14px;font-size:11px;color:var(--soft);font-style:italic}
-@media(min-width:700px){.app{width:min(100%,760px);padding:0 28px;padding-bottom:calc(var(--nav-h) + var(--safe) + 100px)}.bottom-nav{width:min(760px,100vw)}.featured-grid{grid-template-columns:130px 1fr;gap:18px}.featured-cover{width:130px}}
+@media(min-width:700px){.app{width:min(100%,760px);padding:0 28px;padding-bottom:calc(var(--nav-h) + var(--safe) + 30px)}.bottom-nav{width:min(760px,100vw)}.featured-grid{grid-template-columns:170px 1fr;gap:20px}.featured-cover{width:170px}.book-rail .book-card{flex:0 0 140px}}
 </style>
 </head>
 <body>
@@ -137,9 +144,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 </header>
 <div class="edit-bar" id="editBar" hidden><span id="editCount">0 valdar</span><div class="edit-bar-actions"><button id="markSelectedReading" class="edit-move" disabled>Að lesa</button><button id="moveSelectedToShelf" class="edit-move" disabled>Á hillu</button><button id="markSelectedFinished" class="edit-finish" disabled>Lokið</button><button id="deleteSelectedBooks" class="edit-danger" disabled>Eyða</button><button id="cancelEditBooks" class="edit-cancel">Hætta við</button></div></div>
 <section id="featuredCard"></section>
-<section class="section" id="readingSection" style="display:none"><div class="section-head"><h2 class="section-title">Að lesa</h2><span class="section-count" id="readingCount">0</span></div><div class="book-grid" id="readingGrid"></div></section>
-<section class="section" id="shelfSection" style="display:none"><div class="section-head"><h2 class="section-title">Á hillunni</h2><span class="section-count" id="shelfCount">0</span></div><div class="book-grid" id="shelfGrid"></div></section>
-<section class="section" id="finishedSection" style="display:none"><div class="section-head"><h2 class="section-title">Lokið</h2><span class="section-count" id="finishedCount">0</span></div><div class="book-grid" id="finishedGrid"></div></section>
+<section class="section" id="readingSection" style="display:none"><div class="section-head"><h2 class="section-title">Að lesa</h2><span class="section-count" id="readingCount">0</span></div><div class="book-rail" id="readingGrid"></div></section>
+<section class="section" id="shelfSection" style="display:none"><div class="section-head"><h2 class="section-title">Á hillunni</h2><span class="section-count" id="shelfCount">0</span></div><div class="book-rail" id="shelfGrid"></div></section>
+<section class="section" id="finishedSection" style="display:none"><div class="section-head"><h2 class="section-title">Lokið</h2><span class="section-count" id="finishedCount">0</span></div><div class="book-rail" id="finishedGrid"></div></section>
 </main>
 <!-- Hidden file input — triggered by Bók tab -->
 <input id="coverInput" type="file" accept="image/*" style="display:none">
@@ -176,9 +183,28 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 </div>
 
 <button class="dialog-btn secondary" id="closeAdd2" style="margin-top:6px">Loka</button>
-<button class="dialog-btn danger" id="clearBooks" style="margin-top:4px">Hreinsa allar bækur</button>
 </section></div>
-<div class="overlay" id="journeyModal"><section class="dialog"><button class="close" id="closeJourney">×</button><h2 id="journeyTitle">Lestrarferðalag</h2><p class="dialog-sub">Ferðin þín í bókinni</p><div class="entry" id="journeyEntries"></div><button class="dialog-btn secondary" id="closeJourney2">Loka</button></section></div>
+<div class="overlay" id="journeyModal"><section class="dialog">
+<button class="close" id="closeJourney">×</button>
+<h2 id="journeyTitle">Lestrarferðalag</h2>
+<p class="dialog-sub" id="journeySub">Ferðin þín í bókinni</p>
+<div id="journeyPageUpdate" style="display:none;margin-bottom:16px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<div style="flex:1">
+<label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);display:block;margin-bottom:4px">Ég er á blaðsíðu</label>
+<input id="journeyPageInput" inputmode="numeric" placeholder="t.d. 45" style="width:100%;background:rgba(7,18,33,.96);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;color:var(--text);outline:none">
+</div>
+<div style="text-align:center;padding-top:16px">
+<span style="font-size:11px;color:var(--soft)">af</span>
+<span id="journeyTotalPages" style="font-size:16px;font-weight:800;color:var(--text);display:block"></span>
+</div>
+</div>
+<button class="dialog-btn" id="journeyUpdateBtn" style="margin-top:0">Uppfæra</button>
+<div id="journeyUpdateResult" style="display:none;margin-top:6px;text-align:center;font-size:12px;font-weight:700;color:var(--accent)"></div>
+</div>
+<div class="entry" id="journeyEntries"></div>
+<button class="dialog-btn secondary" id="closeJourney2">Loka</button>
+</section></div>
 <div class="overlay" id="profileModal"><section class="dialog" style="text-align:center"><button class="close" id="closeProfile">×</button><div class="child-initials" id="profileInitials" style="width:64px;height:64px;margin:5px auto 12px;font-size:20px">KK</div><h2 id="profileName">Barn</h2><p class="dialog-sub">Bókahillan mín</p><div class="card" style="padding:14px;text-align:left;margin-bottom:14px" id="lastReadCard"></div><p class="dialog-sub" style="margin-bottom:8px">Deila síðasta lestri?</p><button class="dialog-btn" id="shareLastReading">Deila</button><button class="dialog-btn secondary" id="closeProfile2">Loka</button><div class="share-result" id="shareResult">Tilbúið — tengjum push seinna.</div></section></div>
 <div class="overlay" id="deleteBooksModal"><section class="dialog delete-warning"><button class="close" id="closeDeleteBooks">×</button><div class="delete-warning-icon">!</div><h2>Eyða bókum?</h2><p class="delete-warning-copy">Þetta eyðir öllu.<span class="delete-book-name" id="deleteBooksName"></span></p><p class="delete-warning-copy">Ertu viss?</p><button class="dialog-btn delete-confirm" id="confirmDeleteBooks">Eyða</button><button class="dialog-btn secondary" id="cancelDeleteBooks">Hætta við</button></section></div>
 <script type="module">
@@ -266,6 +292,12 @@ function covHTML(b){const u=cc[b.id]||b.coverBase64;if(u)return'<img src="'+u+'"
 function covS(b){return'--c1:'+(b.c1||'#2b8f91')+';--c2:'+(b.c2||'#0a2341')}
 function latestNote(b){if(b?.journeyEntries?.length){const e=b.journeyEntries[0];if(e?.note)return e.note}return b?.note||'Bókin er komin á hilluna.'}
 
+function goalRingHTML(finished,total){
+  const goal=5;const done=finished;const pct=Math.min(100,Math.round((done/goal)*100));
+  const r=19;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
+  return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset .6s ease"/><text x="24" y="26" text-anchor="middle" fill="var(--text)" font-size="11" font-weight="800">'+done+'/'+goal+'</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Markmið mánaðarins</span><span class="goal-ring-count">'+done+' af '+goal+' bókum</span>'+(pct>=100?'Þú náðir markmiðinu!':'Haltu áfram!')+'</div></div>';
+}
+
 function render(){
   const sorted=[...books].sort((a,b)=>ts(b,'lastReadAt')-ts(a,'lastReadAt'));
   const reading=sorted.filter(b=>b.status==='reading');
@@ -274,11 +306,11 @@ function render(){
   const hero=reading[0]||sorted[0];
   const fc=document.getElementById('featuredCard');
   if(!hero||!books.length){
-    fc.className='';fc.innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-title">Bókahillan er tóm</div><div class="empty-sub">Ýttu á <strong>Bæta við bók</strong> og taktu mynd af fyrstu bókinni!</div></div>';
+    fc.className='';fc.innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-title">Bókahillan er tóm</div><div class="empty-sub">Ýttu á <strong>Bók</strong> neðst og bættu fyrstu bókinni við!</div></div>';
   }else{
     const u=cc[hero.id]||hero.coverBase64;const ci=u?'<img src="'+u+'" alt="">':'<span class="featured-cover-title">'+esc(hero.title)+'</span><span class="featured-cover-author">'+esc(hero.author||'')+'</span>';
     fc.className='featured';
-    fc.innerHTML='<div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><button class="featured-arrow" data-open-book="'+hero.id+'">›</button><div class="featured-grid"><div class="featured-cover" style="'+covS(hero)+'" data-open-book="'+hero.id+'">'+ci+'</div><div class="featured-meta"><div class="featured-title">'+esc(hero.title)+'</div><div class="featured-author">'+esc(hero.author||'')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><div class="featured-quote">"'+esc(latestNote(hero))+'"</div></div></div>';
+    fc.innerHTML=goalRingHTML(finished.length,books.length)+'<div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><button class="featured-arrow" data-open-book="'+hero.id+'">›</button><div class="featured-grid"><div class="featured-cover" style="'+covS(hero)+'" data-open-book="'+hero.id+'">'+ci+'</div><div class="featured-meta"><div class="featured-title">'+esc(hero.title)+'</div><div class="featured-author">'+esc(hero.author||'')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><div class="featured-quote">"'+esc(latestNote(hero))+'"</div></div></div>';
   }
   rGrid('readingSection','readingGrid','readingCount',reading);
   rGrid('shelfSection','shelfGrid','shelfCount',shelf);
@@ -304,10 +336,52 @@ function closeOv(id){document.getElementById(id).classList.remove('open');docume
 function openJourney(id){
   const b=books.find(x=>x.id===id);if(!b)return;selBookId=id;
   document.getElementById('journeyTitle').textContent=b.title;
+  const pageUpdate=document.getElementById('journeyPageUpdate');
+  const pageInput=document.getElementById('journeyPageInput');
+  const totalEl=document.getElementById('journeyTotalPages');
+  const resultEl=document.getElementById('journeyUpdateResult');
+  resultEl.style.display='none';
+
+  if(b.status==='reading'){
+    pageUpdate.style.display='';
+    pageInput.value=b.currentPageTo||'';
+    totalEl.textContent=b.totalPages||'?';
+    document.getElementById('journeySub').textContent='bls. '+(b.currentPageTo||0)+' af '+(b.totalPages||'?')+' · '+(b.progressPercent||0)+'% lokið';
+  }else{
+    pageUpdate.style.display='none';
+    document.getElementById('journeySub').textContent=b.status==='finished'?'Lokið!':'Á hillunni';
+  }
+
   const ent=b.journeyEntries?.length?b.journeyEntries:[{date:'Í dag',pageFrom:b.currentPageFrom||'',pageTo:b.currentPageTo||'',note:b.note||'Bókin var sett á hilluna.',reactions:[]}];
   document.getElementById('journeyEntries').innerHTML=ent.map(e=>'<article class="event"><div class="event-date">'+esc(e.date)+(e.pageFrom?' · bls. '+e.pageFrom+'–'+e.pageTo:'')+'</div><p>'+esc(e.note)+'</p><div class="reactions">'+(e.reactions||[]).map(r=>'<span class="react">'+esc(r)+'</span>').join('')+'</div></article>').join('');
   openOv('journeyModal');
 }
+
+document.getElementById('journeyUpdateBtn').addEventListener('click',async()=>{
+  const b=books.find(x=>x.id===selBookId);if(!b)return;
+  const newPage=Number(document.getElementById('journeyPageInput').value);
+  const resultEl=document.getElementById('journeyUpdateResult');
+  if(!newPage||newPage<1){resultEl.textContent='Sláðu inn blaðsíðu.';resultEl.style.display='block';return}
+  const total=Number(b.totalPages)||newPage;
+  const pct=Math.min(100,Math.round((newPage/total)*100));
+  const status=pct>=100?'finished':'reading';
+  const updates={currentPageTo:newPage,progressPercent:pct,status,lastReadAt:Date.now()};
+
+  try{
+    if(b._demo){
+      Object.assign(b,updates);render();
+    }else if(previewMode){
+      Object.assign(b,updates);render();
+    }else{
+      await updBook(b.id,updates);
+    }
+    resultEl.textContent=pct>=100?'Lokið! 🎉':'Uppfært — '+pct+'% lokið ✓';
+    resultEl.style.display='block';
+    document.getElementById('journeySub').textContent='bls. '+newPage+' af '+total+' · '+pct+'% lokið';
+  }catch(e){
+    console.error(e);resultEl.textContent='Villa — reyndu aftur.';resultEl.style.display='block';
+  }
+});
 
 async function compress(file,tw=180,th=270,q=.50){
   const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(file)});
@@ -395,7 +469,6 @@ document.getElementById('closeProfile2').addEventListener('click',()=>closeOv('p
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){if(o.id==='addModal')setReady();closeOv(o.id)}}));
 document.getElementById('shareLastReading').addEventListener('click',()=>document.getElementById('shareResult').classList.add('show'));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>closeOv(o.id))});
-document.getElementById('clearBooks').addEventListener('click',async()=>{if(!confirm('Hreinsa allar bækur?'))return;try{for(const b of books)await delBook(b.id);selIds.clear();setEM(false);resetF();closeOv('addModal')}catch(e){alert('Villa.')}});
 
 function updEUI(){const bar=document.getElementById('editBar'),cnt=document.getElementById('editCount'),tog=document.getElementById('toggleEditBooks');if(bar)bar.hidden=!editMode;if(tog)tog.classList.toggle('active',editMode);const c=selIds.size;if(cnt)cnt.textContent=c===1?'1 valin':c+' valdar';['deleteSelectedBooks','markSelectedReading','moveSelectedToShelf','markSelectedFinished'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=c===0})}
 function setEM(v){editMode=Boolean(v);if(!editMode)selIds.clear();updEUI();render()}
