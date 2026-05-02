@@ -130,6 +130,45 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .featured{animation:fadeUp .4s ease both}.section{animation:fadeUp .4s ease both}
 .book-demo-badge{position:absolute;top:6px;right:6px;z-index:3;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);backdrop-filter:blur(4px)}
 .demo-hint{text-align:center;padding:6px 0 14px;font-size:11px;color:var(--soft);font-style:italic}
+.goal-ring-arrow{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--soft);font-size:16px;cursor:pointer;flex-shrink:0;margin-left:auto;transition:border-color .18s,box-shadow .18s}
+.goal-ring-arrow:hover,.goal-ring-arrow:focus-visible{border-color:var(--line-hot);box-shadow:0 0 14px var(--accent-glow);outline:none}
+.goal-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.goal-type-card{border:1.5px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;background:var(--accent-dim);cursor:pointer;transition:border-color .18s,box-shadow .18s,background .18s}
+.goal-type-card:hover{border-color:var(--line-hot)}
+.goal-type-card.selected{border-color:rgba(29,205,211,.7);box-shadow:0 0 18px rgba(29,205,211,.2);background:rgba(29,205,211,.12)}
+.goal-type-icon{font-size:24px;margin-bottom:4px}
+.goal-type-name{font-size:12px;font-weight:800;color:var(--text)}
+.goal-type-desc{font-size:10px;color:var(--soft);margin-top:2px}
+.goal-period-toggle{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:14px}
+.goal-period-btn{flex:1;padding:10px;font-size:13px;font-weight:800;background:var(--accent-dim);color:var(--soft);border:none;cursor:pointer;transition:background .15s,color .15s}
+.goal-period-btn.selected{background:rgba(29,205,211,.18);color:var(--accent)}
+.goal-current{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;background:rgba(29,205,211,.04)}
+.goal-current-ring{width:52px;height:52px;flex-shrink:0}
+.goal-current-info{flex:1}
+.goal-current-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px}
+.goal-current-sub{font-size:12px;color:var(--soft)}
+.goal-current-pct{font-size:13px;font-weight:800;color:var(--accent);margin-top:3px}
+.goal-divider{height:1px;background:var(--line);margin:14px 0}
+.goal-delete{font-size:12px;color:rgba(255,107,107,.7);font-weight:700;cursor:pointer;background:none;border:none;padding:6px 0;margin-top:4px}
+.goal-delete:hover{color:var(--danger)}
+.goal-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.goal-preset{padding:5px 12px;border-radius:99px;border:1px solid var(--line);background:var(--accent-dim);color:var(--soft);font-size:12px;font-weight:700;cursor:pointer;transition:border-color .15s,color .15s}
+.goal-preset:hover,.goal-preset.selected{border-color:var(--line-hot);color:var(--accent)}
+.book-celebrate{border-color:rgba(255,184,48,.5)!important;animation:celebrate-breathe 2s ease-in-out infinite}
+@keyframes celebrate-breathe{0%,100%{box-shadow:0 0 8px rgba(255,184,48,.15),0 0 20px rgba(255,184,48,.08)}50%{box-shadow:0 0 16px rgba(255,184,48,.35),0 0 36px rgba(255,184,48,.15)}}
+.celebrate-badge{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-radius:0}
+.celebrate-badge-icon{font-size:28px;margin-bottom:4px}
+.celebrate-badge-text{font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.celebrate-flash{animation:celebrate-flash-pulse .6s ease-out 1!important;border-color:rgba(255,184,48,.8)!important}
+@keyframes celebrate-flash-pulse{0%{box-shadow:0 0 0 rgba(255,184,48,0);transform:scale(1)}30%{box-shadow:0 0 28px rgba(255,184,48,.5),0 0 50px rgba(255,184,48,.2);transform:scale(1.04)}100%{box-shadow:0 0 12px rgba(255,184,48,.2);transform:scale(1)}}
+.celebrate-move{transition:transform .7s cubic-bezier(.4,0,.2,1),opacity .7s cubic-bezier(.4,0,.2,1)!important;transform:scale(.35) translateY(60px)!important;opacity:0!important;pointer-events:none}
+.celebrate-toast{position:absolute;left:16px;right:16px;top:0;z-index:5;text-align:center;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,184,48,.3);background:rgba(255,184,48,.1);color:#FFB830;font-size:13px;font-weight:800;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.celebrate-toast.show{opacity:1;transform:translateY(0)}
+.goal-ring-celebrating circle:last-of-type{transition:stroke-dashoffset 2s cubic-bezier(.34,1.56,.64,1)!important}
+@keyframes ring-glow{0%{filter:drop-shadow(0 0 4px rgba(29,205,211,.2))}50%{filter:drop-shadow(0 0 16px rgba(29,205,211,.6)) drop-shadow(0 0 30px rgba(29,205,211,.3))}100%{filter:drop-shadow(0 0 4px rgba(29,205,211,.2))}}
+@keyframes ring-glow-gold{0%{filter:drop-shadow(0 0 4px rgba(255,184,48,.2))}50%{filter:drop-shadow(0 0 18px rgba(255,184,48,.7)) drop-shadow(0 0 34px rgba(255,184,48,.3))}100%{filter:drop-shadow(0 0 4px rgba(255,184,48,.2))}}
+.goal-ring-glow svg{animation:ring-glow .8s ease-in-out 1}
+.goal-ring-glow-gold svg{animation:ring-glow-gold 1.2s ease-in-out 1}
 @media(min-width:700px){.app{width:min(100%,760px);padding:0 28px;padding-bottom:calc(var(--nav-h) + var(--safe) + 30px)}.bottom-nav{width:min(760px,100vw)}.featured-grid{grid-template-columns:170px 1fr;gap:20px}.featured-cover{width:170px}.book-rail .book-card{flex:0 0 140px}}
 </style>
 </head>
@@ -207,9 +246,41 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 </section></div>
 <div class="overlay" id="profileModal"><section class="dialog" style="text-align:center"><button class="close" id="closeProfile">×</button><div class="child-initials" id="profileInitials" style="width:64px;height:64px;margin:5px auto 12px;font-size:20px">KK</div><h2 id="profileName">Barn</h2><p class="dialog-sub">Bókahillan mín</p><div class="card" style="padding:14px;text-align:left;margin-bottom:14px" id="lastReadCard"></div><p class="dialog-sub" style="margin-bottom:8px">Deila síðasta lestri?</p><button class="dialog-btn" id="shareLastReading">Deila</button><button class="dialog-btn secondary" id="closeProfile2">Loka</button><div class="share-result" id="shareResult">Tilbúið — tengjum push seinna.</div></section></div>
 <div class="overlay" id="deleteBooksModal"><section class="dialog delete-warning"><button class="close" id="closeDeleteBooks">×</button><div class="delete-warning-icon">!</div><h2>Eyða bókum?</h2><p class="delete-warning-copy">Þetta eyðir öllu.<span class="delete-book-name" id="deleteBooksName"></span></p><p class="delete-warning-copy">Ertu viss?</p><button class="dialog-btn delete-confirm" id="confirmDeleteBooks">Eyða</button><button class="dialog-btn secondary" id="cancelDeleteBooks">Hætta við</button></section></div>
+<div class="overlay" id="goalModal"><section class="dialog">
+<button class="close" id="closeGoal">×</button>
+<h2>Markmið</h2>
+<p class="dialog-sub">Settu þér markmið og fylgstu með</p>
+
+<div id="goalCurrentWrap"></div>
+
+<div id="goalEditor">
+<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);margin-bottom:8px">Tegund</div>
+<div class="goal-type-grid" id="goalTypeGrid">
+<button class="goal-type-card selected" data-goal-type="books"><div class="goal-type-icon">📚</div><div class="goal-type-name">Bækur</div><div class="goal-type-desc">Kláraðar bækur</div></button>
+<button class="goal-type-card" data-goal-type="pages"><div class="goal-type-icon">📄</div><div class="goal-type-name">Blaðsíður</div><div class="goal-type-desc">Lesnar blaðsíður</div></button>
+<button class="goal-type-card" data-goal-type="minutes"><div class="goal-type-icon">⏱</div><div class="goal-type-name">Mínútur</div><div class="goal-type-desc">Lestartími</div></button>
+<button class="goal-type-card" data-goal-type="days"><div class="goal-type-icon">🔥</div><div class="goal-type-name">Dagar</div><div class="goal-type-desc">Dagar í röð</div></button>
+</div>
+
+<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);margin-bottom:8px">Tímabil</div>
+<div class="goal-period-toggle" id="goalPeriodToggle">
+<button class="goal-period-btn selected" data-goal-period="week">Á viku</button>
+<button class="goal-period-btn" data-goal-period="month">Á mánuði</button>
+</div>
+
+<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);margin-bottom:8px" id="goalTargetLabel">Hversu margar bækur?</div>
+<div class="goal-presets" id="goalPresets"></div>
+<div class="field"><input id="goalTargetInput" inputmode="numeric" placeholder="t.d. 5" style="text-align:center;font-size:18px;font-weight:800"></div>
+
+<button class="dialog-btn" id="saveGoalBtn">Vista markmið</button>
+<div id="goalSaveResult" style="display:none;margin-top:8px;text-align:center;font-size:12px;font-weight:700;color:var(--accent)"></div>
+</div>
+
+<button class="dialog-btn secondary" id="closeGoal2" style="margin-top:8px">Loka</button>
+</section></div>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
-import{getFirestore,collection,addDoc,doc,deleteDoc,onSnapshot,query,where,serverTimestamp,updateDoc}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,doc,deleteDoc,getDoc,setDoc,onSnapshot,query,where,serverTimestamp,updateDoc}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 const app=initializeApp({apiKey:'AIzaSyAgTY3Uxd9_ZxixjqLj-sH8V3OhFAzg6DU',authDomain:'lesum-22e85.firebaseapp.com',projectId:'lesum-22e85',storageBucket:'lesum-22e85.firebasestorage.app',messagingSenderId:'204392598388',appId:'1:204392598388:web:2dbbe3f476cd78d2ffba21'});
 const db=getFirestore(app);
 
@@ -228,6 +299,178 @@ async function delC(id){try{const x=await odb();if(x)x.transaction(IDS,'readwrit
 let books=[],cc={},curCov=null,curCovHQ=null,selBookId=null,editMode=false,selIds=new Set(),saving=false,unsub=null;
 let demoDismissed=false;
 const DEMO_KEY='upphatt_bookshelf_demo_dismissed';
+
+// ── Goal system ──
+let currentGoal=null; // {type,target,period,createdAt}
+let sessions=[];
+let sessionsUnsub=null;
+const GOAL_TYPES={
+  books:  {icon:'📚',name:'Bækur',   desc:'Kláraðar bækur',   unit:'bækur',   unitSingle:'bók',    labelQ:'Hversu margar bækur?',   presets:[2,3,5,8,10]},
+  pages:  {icon:'📄',name:'Blaðsíður',desc:'Lesnar blaðsíður', unit:'bls.',    unitSingle:'bls.',   labelQ:'Hversu margar blaðsíður?',presets:[50,100,200,500,1000]},
+  minutes:{icon:'⏱', name:'Mínútur', desc:'Lestartími',        unit:'mín.',    unitSingle:'mín.',   labelQ:'Hversu margar mínútur?',  presets:[30,60,120,300,500]},
+  days:   {icon:'🔥', name:'Dagar',   desc:'Dagar sem lesið er',unit:'dagar',  unitSingle:'dagur',  labelQ:'Hversu marga daga?',      presets:[3,5,7,14,21]}
+};
+const PERIOD_LABELS={week:'vikunnar',month:'mánaðarins'};
+const PERIOD_LABELS_SHORT={week:'á viku',month:'á mánuði'};
+
+function goalDocRef(){return doc(db,'goals',FID+'_'+CK)}
+
+async function loadGoal(){
+  if(previewMode){currentGoal={type:'books',target:5,period:'month',createdAt:Date.now()};return}
+  try{const snap=await getDoc(goalDocRef());if(snap.exists()){currentGoal=snap.data()}else{currentGoal=null}}catch(e){console.warn('Goal load failed:',e);currentGoal=null}
+}
+
+async function saveGoal(g){
+  currentGoal=g;
+  if(previewMode){render();return}
+  try{await setDoc(goalDocRef(),{...g,familyId:FID,childKey:CK,childName:CN,updatedAt:serverTimestamp()})}catch(e){console.error('Goal save failed:',e)}
+  render();
+}
+
+async function deleteGoal(){
+  currentGoal=null;
+  if(previewMode){render();return}
+  try{await deleteDoc(goalDocRef())}catch(e){console.warn('Goal delete failed:',e)}
+  render();
+}
+
+function startSessionsListener(){
+  if(!FID||!CK||previewMode)return;
+  try{
+    const q2=query(collection(db,'sessions'),where('familyId','==',FID),where('childKey','==',CK));
+    sessionsUnsub=onSnapshot(q2,snap=>{sessions=snap.docs.map(d=>({id:d.id,...d.data()}));render()},e=>console.warn('Sessions listener:',e));
+  }catch(e){console.warn('Sessions query failed:',e)}
+}
+
+function getPeriodStart(period){
+  const now=new Date();
+  if(period==='week'){const d=new Date(now);const day=d.getDay();const diff=day===0?6:day-1;d.setDate(d.getDate()-diff);d.setHours(0,0,0,0);return d.getTime()}
+  const d=new Date(now.getFullYear(),now.getMonth(),1);return d.getTime();
+}
+
+function getGoalProgress(){
+  if(!currentGoal)return{done:0,target:5,pct:0};
+  const g=currentGoal;const start=getPeriodStart(g.period);const target=g.target||1;
+  let done=0;
+  if(g.type==='books'){
+    done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).length;
+  }else if(g.type==='pages'){
+    done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).reduce((s,b)=>s+(Number(b.totalPages)||0),0);
+  }else if(g.type==='minutes'){
+    done=Math.floor(sessions.filter(s=>{const t=s.timestamp||ts(s,'createdAt');return t>=start&&(s.seconds||0)>=60}).reduce((s,x)=>s+(x.seconds||0),0)/60);
+  }else if(g.type==='days'){
+    const daySet=new Set();
+    sessions.filter(s=>{const t=s.timestamp||ts(s,'createdAt');return t>=start&&(s.seconds||0)>=60}).forEach(s=>{
+      const d=s.date||new Date(s.timestamp||ts(s,'createdAt')).toISOString().slice(0,10);daySet.add(d);
+    });
+    done=daySet.size;
+  }
+  return{done,target,pct:Math.min(100,Math.round((done/target)*100))};
+}
+
+// ── Celebration system ──
+const CELEB_KEY='upphatt_celebrated_'+CK;
+function getCelebrated(){try{return new Set(JSON.parse(localStorage.getItem(CELEB_KEY)||'[]'))}catch(e){return new Set()}}
+function markCelebrated(id){const s=getCelebrated();s.add(id);try{localStorage.setItem(CELEB_KEY,JSON.stringify([...s]))}catch(e){}}
+function isPending(b){return b.status==='finished'&&!getCelebrated().has(b.id)}
+
+function playMilestoneSound(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();const now=ctx.currentTime;
+    [[523,0],[659,.1],[784,.2],[1047,.35],[1047,.55]].forEach(([f,dl])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='triangle';
+      g.gain.setValueAtTime(.3,now+dl);g.gain.exponentialRampToValueAtTime(.001,now+dl+.5);
+      o.start(now+dl);o.stop(now+dl+.6);
+    });
+  }catch(e){}
+}
+
+let celebrating=false;
+function celebrateBook(bookId){
+  if(celebrating)return;celebrating=true;
+  const card=document.querySelector('.book-celebrate[data-open-book="'+bookId+'"]');
+  const ringWrap=document.querySelector('.goal-ring');
+
+  // ── Phase 1: Gold flash on the card (the "moment") ──
+  // 0ms — card pulses gold, child feels "this is done"
+  if(card){
+    card.classList.remove('celebrate-breathe');
+    card.classList.add('celebrate-flash');
+  }
+
+  // ── Phase 2: Book slides away toward "Lokið" ──
+  // 600ms — after flash lands, card shrinks + slides down + fades
+  setTimeout(()=>{
+    if(card)card.classList.add('celebrate-move');
+  },600);
+
+  // ── Phase 3: Pause — let the move land ──
+  // 1400ms — card is gone, brief stillness before ring starts
+
+  // ── Phase 4: Ring slowly fills ──
+  // 1600ms — mark celebrated, calculate new progress, animate ring
+  setTimeout(()=>{
+    markCelebrated(bookId);
+    const {done,target,pct}=getGoalProgress();
+    const isGoalComplete=pct>=100;
+
+    if(ringWrap){
+      const svg=ringWrap.querySelector('svg');
+      const circle=svg?.querySelectorAll('circle')[1];
+      const text=svg?.querySelector('text');
+      if(circle){
+        const r=19;const circ=2*Math.PI*r;const newOffset=circ-(pct/100)*circ;
+        ringWrap.classList.add('goal-ring-celebrating');
+        circle.setAttribute('stroke-dashoffset',newOffset);
+        if(isGoalComplete)circle.setAttribute('stroke','#FFB830');
+        if(text)text.textContent=done+'/'+target;
+      }
+
+      // Update the ring label text too
+      const countEl=ringWrap.querySelector('.goal-ring-count');
+      const info=currentGoal?GOAL_TYPES[currentGoal.type]:null;
+      const unit=info?info.unit:'bókum';
+      if(countEl)countEl.textContent=done+' af '+target+' '+unit;
+    }
+
+    // ── Phase 5: Ring blink + sound ──
+    // 3600ms (1600 + 2000 ring fill) — ring finishes filling, blink + ding
+    const isGoalComplete2=pct>=100;
+    setTimeout(()=>{
+      playMilestoneSound();
+      if(ringWrap)ringWrap.classList.add(isGoalComplete2?'goal-ring-glow-gold':'goal-ring-glow');
+    },2000);
+
+    // ── Phase 6: Toast + final glow ──
+    // 4200ms — toast slides up, everything glows together
+    setTimeout(()=>{
+      let toast=document.querySelector('.celebrate-toast');
+      if(!toast){
+        toast=document.createElement('div');toast.className='celebrate-toast';
+        const fc=document.getElementById('featuredCard');
+        if(fc){fc.style.position='relative';fc.appendChild(toast)}
+      }
+      const {done:d2,target:t2,pct:p2}=getGoalProgress();
+      const info2=currentGoal?GOAL_TYPES[currentGoal.type]:null;
+      const unit2=info2?info2.unit:'bókum';
+      toast.textContent=p2>=100?'🏆 Markmið náð!':'🎉 '+d2+' af '+t2+' '+unit2+' — haltu áfram!';
+      requestAnimationFrame(()=>toast.classList.add('show'));
+
+      // ── Phase 7: Cleanup ──
+      // 7200ms — toast fades, full re-render with book in "Lokið"
+      setTimeout(()=>{
+        toast.classList.remove('show');
+        setTimeout(()=>{
+          toast.remove();
+          if(ringWrap)ringWrap.classList.remove('goal-ring-celebrating','goal-ring-glow','goal-ring-glow-gold');
+          celebrating=false;
+          render();
+        },500);
+      },3000);
+    },2600);
+  },1600);
+}
 
 const demoBooks=[
   {id:'demo_1',title:'Drekastormur',author:'Rick Riordan',status:'reading',totalPages:120,currentPageFrom:21,currentPageTo:29,progressPercent:58,coverBase64:null,c1:'#2b8f91',c2:'#0a2341',note:'Þau fundu hellinn.',lastReadAt:Date.now()-400000,createdAt:Date.now()-900000,journeyEntries:[
@@ -286,23 +529,36 @@ async function delBook(id){
 }
 
 function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function chipT(b){if(b.status==='finished')return'Lokið ✓';if(b.status==='reading')return(b.progressPercent||0)+'%';return'Á hillu'}
-function chipCls(b){return b.status==='finished'?'done':''}
+function chipT(b){if(isPending(b))return'Lokið — ýttu!';if(b.status==='finished')return'Lokið ✓';if(b.status==='reading')return(b.progressPercent||0)+'%';return'Á hillu'}
+function chipCls(b){return(b.status==='finished')?'done':''}
 function covHTML(b){const u=cc[b.id]||b.coverBase64;if(u)return'<img src="'+u+'" alt="">';return'<span class="book-cover-title">'+esc(b.title)+'</span><span class="book-cover-author">'+esc(b.author||'')+'</span>'}
 function covS(b){return'--c1:'+(b.c1||'#2b8f91')+';--c2:'+(b.c2||'#0a2341')}
 function latestNote(b){if(b?.journeyEntries?.length){const e=b.journeyEntries[0];if(e?.note)return e.note}return b?.note||'Bókin er komin á hilluna.'}
 
-function goalRingHTML(finished,total){
-  const goal=5;const done=finished;const pct=Math.min(100,Math.round((done/goal)*100));
+function goalRingHTML(){
+  const g=currentGoal;
+  if(!g){
+    const r=19;const circ=2*Math.PI*r;
+    return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4" stroke-dasharray="4 4"/><text x="24" y="26" text-anchor="middle" fill="var(--soft)" font-size="16">🎯</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Ekkert markmið</span><span class="goal-ring-count" style="font-size:14px">Settu þér markmið!</span>Ýttu á örina →</div><button class="goal-ring-arrow" id="openGoalModal" aria-label="Markmið">›</button></div>';
+  }
+  const info=GOAL_TYPES[g.type];
+  const {done,target,pct}=getGoalProgress();
   const r=19;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
-  return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset .6s ease"/><text x="24" y="26" text-anchor="middle" fill="var(--text)" font-size="11" font-weight="800">'+done+'/'+goal+'</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Markmið mánaðarins</span><span class="goal-ring-count">'+done+' af '+goal+' bókum</span>'+(pct>=100?'Þú náðir markmiðinu!':'Haltu áfram!')+'</div></div>';
+  const periodLabel=PERIOD_LABELS[g.period];
+  const unit=info.unit;
+  const countText=done+' af '+target+' '+unit;
+  const statusText=pct>=100?'Þú náðir markmiðinu! 🎉':'Haltu áfram!';
+  return'<div class="goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="24" cy="24" r="'+r+'" fill="none" stroke="'+(pct>=100?'#FFB830':'var(--accent)')+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset .6s ease"/><text x="24" y="26" text-anchor="middle" fill="var(--text)" font-size="11" font-weight="800">'+done+'/'+target+'</text></svg><div class="goal-ring-text"><span class="goal-ring-label">Markmið '+periodLabel+'</span><span class="goal-ring-count">'+countText+'</span>'+statusText+'</div><button class="goal-ring-arrow" id="openGoalModal" aria-label="Markmið">›</button></div>';
 }
 
 function render(){
+  if(celebrating)return; // Don't re-render during celebration animation
+  const celebrated=getCelebrated();
   const sorted=[...books].sort((a,b)=>ts(b,'lastReadAt')-ts(a,'lastReadAt'));
-  const reading=sorted.filter(b=>b.status==='reading');
+  const pending=sorted.filter(b=>b.status==='finished'&&!celebrated.has(b.id));
+  const reading=[...sorted.filter(b=>b.status==='reading'),...pending];
   const shelf=books.filter(b=>b.status==='shelf');
-  const finished=books.filter(b=>b.status==='finished');
+  const finished=books.filter(b=>b.status==='finished'&&celebrated.has(b.id));
   const hero=reading[0]||sorted[0];
   const fc=document.getElementById('featuredCard');
   if(!hero||!books.length){
@@ -310,19 +566,33 @@ function render(){
   }else{
     const u=cc[hero.id]||hero.coverBase64;const ci=u?'<img src="'+u+'" alt="">':'<span class="featured-cover-title">'+esc(hero.title)+'</span><span class="featured-cover-author">'+esc(hero.author||'')+'</span>';
     fc.className='featured';
-    fc.innerHTML=goalRingHTML(finished.length,books.length)+'<div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><button class="featured-arrow" data-open-book="'+hero.id+'">›</button><div class="featured-grid"><div class="featured-cover" style="'+covS(hero)+'" data-open-book="'+hero.id+'">'+ci+'</div><div class="featured-meta"><div class="featured-title">'+esc(hero.title)+'</div><div class="featured-author">'+esc(hero.author||'')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><div class="featured-quote">"'+esc(latestNote(hero))+'"</div></div></div>';
+    fc.innerHTML=goalRingHTML()+'<div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><button class="featured-arrow" data-open-book="'+hero.id+'">›</button><div class="featured-grid"><div class="featured-cover" style="'+covS(hero)+'" data-open-book="'+hero.id+'">'+ci+'</div><div class="featured-meta"><div class="featured-title">'+esc(hero.title)+'</div><div class="featured-author">'+esc(hero.author||'')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><div class="featured-quote">"'+esc(latestNote(hero))+'"</div></div></div>';
   }
   rGrid('readingSection','readingGrid','readingCount',reading);
   rGrid('shelfSection','shelfGrid','shelfCount',shelf);
   rGrid('finishedSection','finishedGrid','finishedCount',finished);
-  document.querySelectorAll('[data-open-book]').forEach(el=>el.addEventListener('click',e=>{const id=el.dataset.openBook;if(editMode){e.preventDefault();e.stopPropagation();toggleSel(id);return}openJourney(id)}));
+  // Wire up click handlers
+  document.querySelectorAll('[data-open-book]').forEach(el=>el.addEventListener('click',e=>{
+    const id=el.dataset.openBook;
+    if(editMode){e.preventDefault();e.stopPropagation();toggleSel(id);return}
+    // Check if this is a pending celebration book
+    const b=books.find(x=>x.id===id);
+    if(b&&isPending(b)){e.preventDefault();e.stopPropagation();celebrateBook(id);return}
+    openJourney(id);
+  }));
+  const goalBtn=document.getElementById('openGoalModal');if(goalBtn)goalBtn.addEventListener('click',e=>{e.stopPropagation();openGoalModal()});
   attachLP();
 }
 function rGrid(sid,gid,cid,list){
   const s=document.getElementById(sid),g=document.getElementById(gid),c=document.getElementById(cid);
   if(!list.length){s.style.display='none';return}s.style.display='';c.textContent=list.length;
   const hasDemo=list.some(b=>b._demo);
-  g.innerHTML=list.map(b=>'<div class="book-card'+(selIds.has(b.id)?' selected':'')+'" data-open-book="'+b.id+'"><div class="book-cover" style="'+covS(b)+'">'+covHTML(b)+(b._demo?'<span class="book-demo-badge">Dæmi</span>':'')+'</div><div class="book-info"><div class="book-name">'+esc(b.title)+'</div><div class="book-author">'+esc(b.author||'')+'</div><span class="book-chip '+chipCls(b)+'">'+chipT(b)+'</span></div></div>').join('')+(hasDemo?'<div class="demo-hint" style="grid-column:1/-1">Þetta eru dæmi — haltu inni til að eyða</div>':'');
+  g.innerHTML=list.map(b=>{
+    const pend=isPending(b);
+    const badge=pend?'<div class="celebrate-badge"><div class="celebrate-badge-icon">✓</div><div class="celebrate-badge-text">Lokið!</div></div>':'';
+    const demo=b._demo?'<span class="book-demo-badge">Dæmi</span>':'';
+    return'<div class="book-card'+(selIds.has(b.id)?' selected':'')+(pend?' book-celebrate':'')+'" data-open-book="'+b.id+'"><div class="book-cover" style="'+covS(b)+'">'+covHTML(b)+demo+badge+'</div><div class="book-info"><div class="book-name">'+esc(b.title)+'</div><div class="book-author">'+esc(b.author||'')+'</div><span class="book-chip '+chipCls(b)+'">'+chipT(b)+'</span></div></div>';
+  }).join('')+(hasDemo?'<div class="demo-hint" style="grid-column:1/-1">Þetta eru dæmi — haltu inni til að eyða</div>':'');
 }
 function renderLR(){
   const b=[...books].filter(b=>ts(b,'lastReadAt')>0).sort((a,b)=>ts(b,'lastReadAt')-ts(a,'lastReadAt'))[0];
@@ -455,6 +725,80 @@ document.getElementById('saveBook').addEventListener('click',async()=>{
   }catch(e){console.error(e);saving=false;if(btn){btn.disabled=false;btn.textContent='Vista bók'}alert('Villa — reyndu aftur.')}
 });
 
+// ── Goal modal ──
+let goalSelType='books',goalSelPeriod='week';
+
+function openGoalModal(){
+  const g=currentGoal;
+  goalSelType=g?.type||'books';
+  goalSelPeriod=g?.period||'week';
+  renderGoalCurrent();
+  renderGoalEditor();
+  openOv('goalModal');
+}
+
+function renderGoalCurrent(){
+  const wrap=document.getElementById('goalCurrentWrap');
+  if(!currentGoal){wrap.innerHTML='';return}
+  const g=currentGoal;const info=GOAL_TYPES[g.type];
+  const {done,target,pct}=getGoalProgress();
+  const r=21;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
+  const ringColor=pct>=100?'#FFB830':'var(--accent)';
+  wrap.innerHTML='<div class="goal-current"><svg class="goal-current-ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="'+r+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle cx="26" cy="26" r="'+r+'" fill="none" stroke="'+ringColor+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 26 26)"/><text x="26" y="28" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="800">'+info.icon+'</text></svg><div class="goal-current-info"><div class="goal-current-title">'+done+' af '+target+' '+info.unit+'</div><div class="goal-current-sub">'+info.name+' '+PERIOD_LABELS_SHORT[g.period]+'</div><div class="goal-current-pct">'+(pct>=100?'Markmið náð! 🎉':pct+'% lokið')+'</div></div></div><button class="goal-delete" id="deleteGoalBtn">Eyða markmiði</button><div class="goal-divider"></div>';
+  document.getElementById('deleteGoalBtn')?.addEventListener('click',async()=>{if(confirm('Eyða markmiði?')){await deleteGoal();closeOv('goalModal')}});
+}
+
+function renderGoalEditor(){
+  // Type cards
+  document.querySelectorAll('[data-goal-type]').forEach(el=>{el.classList.toggle('selected',el.dataset.goalType===goalSelType)});
+  // Period buttons
+  document.querySelectorAll('[data-goal-period]').forEach(el=>{el.classList.toggle('selected',el.dataset.goalPeriod===goalSelPeriod)});
+  // Target label & presets
+  const info=GOAL_TYPES[goalSelType];
+  document.getElementById('goalTargetLabel').textContent=info.labelQ;
+  const presetWrap=document.getElementById('goalPresets');
+  const input=document.getElementById('goalTargetInput');
+  presetWrap.innerHTML=info.presets.map(p=>'<button class="goal-preset'+(input.value==String(p)?' selected':'')+'" data-preset="'+p+'">'+p+'</button>').join('');
+  presetWrap.querySelectorAll('[data-preset]').forEach(el=>el.addEventListener('click',()=>{
+    input.value=el.dataset.preset;
+    presetWrap.querySelectorAll('.goal-preset').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');
+  }));
+  // Pre-fill from current goal if type matches
+  if(currentGoal&&currentGoal.type===goalSelType){input.value=currentGoal.target}
+}
+
+// Type card clicks
+document.getElementById('goalTypeGrid').addEventListener('click',e=>{
+  const card=e.target.closest('[data-goal-type]');if(!card)return;
+  goalSelType=card.dataset.goalType;
+  document.getElementById('goalTargetInput').value='';
+  renderGoalEditor();
+});
+
+// Period toggle clicks
+document.getElementById('goalPeriodToggle').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-goal-period]');if(!btn)return;
+  goalSelPeriod=btn.dataset.goalPeriod;
+  renderGoalEditor();
+});
+
+// Save goal
+document.getElementById('saveGoalBtn').addEventListener('click',async()=>{
+  const target=Number(document.getElementById('goalTargetInput').value);
+  if(!target||target<1){alert('Settu inn tölu.');return}
+  const resultEl=document.getElementById('goalSaveResult');
+  const btn=document.getElementById('saveGoalBtn');
+  btn.disabled=true;btn.textContent='Vista...';
+  await saveGoal({type:goalSelType,target,period:goalSelPeriod,createdAt:currentGoal?.createdAt||Date.now()});
+  resultEl.textContent='Markmið vistað ✓';resultEl.style.display='block';
+  btn.textContent='Vista markmið';btn.disabled=false;
+  setTimeout(()=>{resultEl.style.display='none';closeOv('goalModal')},1200);
+});
+
+document.getElementById('closeGoal').addEventListener('click',()=>closeOv('goalModal'));
+document.getElementById('closeGoal2').addEventListener('click',()=>closeOv('goalModal'));
+
 document.getElementById('openAdd').addEventListener('click',openAddM);
 document.getElementById('closeAdd').addEventListener('click',()=>{resetF();closeOv('addModal')});
 document.getElementById('closeAdd2').addEventListener('click',()=>{resetF();closeOv('addModal')});
@@ -494,9 +838,10 @@ document.getElementById('confirmDeleteBooks').addEventListener('click',async()=>
 
 if(previewMode){
   // Preview mode — show demo books, no Firestore
+  currentGoal={type:'books',target:5,period:'month',createdAt:Date.now()};
   books=[...demoBooks];render();
 }else{
-  startListener();
+  loadGoal().then(()=>{startListener();startSessionsListener()});
 }
 </script>
 </body>
