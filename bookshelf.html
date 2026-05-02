@@ -315,7 +315,7 @@ let demoDismissed=false;
 const DEMO_KEY='upphatt_bookshelf_demo_dismissed';
 
 // ── Goal system ──
-let currentGoals=[]; // up to two active goals: [{type,target,period,createdAt}]
+let currentGoals=[]; // up to two active goals: [{type,target,period,startAt,createdAt}]
 let achievements=[]; // completed goal badges
 const MAX_GOALS=2;
 let sessions=[];
@@ -331,18 +331,30 @@ const PERIOD_LABELS_SHORT={week:'á viku',month:'á mánuði'};
 
 function goalDocRef(){return doc(db,'goals',FID+'_'+CK)}
 
+function normalizeGoal(g){
+  const now=Date.now();
+  const startAt=Number(g.startAt||g.createdAt||now);
+  return {
+    type:g.type||'days',
+    target:Number(g.target)||1,
+    period:g.period||'week',
+    startAt,
+    createdAt:g.createdAt||startAt
+  };
+}
+
 function normalizeGoalsFromDoc(d){
   if(!d)return[];
-  if(Array.isArray(d.goals))return d.goals.slice(0,MAX_GOALS);
-  if(d.type)return[{type:d.type,target:d.target,period:d.period||'week',createdAt:d.createdAt||Date.now()}];
+  if(Array.isArray(d.goals))return d.goals.slice(0,MAX_GOALS).map(normalizeGoal);
+  if(d.type)return[normalizeGoal(d)];
   return[];
 }
 
 async function loadGoal(){
   if(previewMode){
     currentGoals=[
-      {type:'days',target:5,period:'week',createdAt:Date.now()},
-      {type:'pages',target:100,period:'week',createdAt:Date.now()}
+      {type:'days',target:5,period:'week',startAt:Date.now(),createdAt:Date.now()},
+      {type:'pages',target:100,period:'week',startAt:Date.now(),createdAt:Date.now()}
     ];
     achievements=[];
     return;
@@ -368,10 +380,26 @@ async function persistGoals(){
 }
 
 async function saveGoal(g){
+  const now=Date.now();
   const existingIndex=currentGoals.findIndex(x=>x.type===g.type&&x.period===g.period);
-  if(existingIndex>=0){currentGoals[existingIndex]={...currentGoals[existingIndex],...g}}
-  else if(currentGoals.length>=MAX_GOALS){currentGoals[currentGoals.length-1]=g}
-  else{currentGoals.push(g)}
+  const normalized=normalizeGoal({
+    ...g,
+    startAt:g.startAt||now,
+    createdAt:g.createdAt||g.startAt||now
+  });
+
+  if(existingIndex>=0){
+    currentGoals[existingIndex]=normalizeGoal({
+      ...currentGoals[existingIndex],
+      ...g,
+      startAt:currentGoals[existingIndex].startAt||g.startAt||now,
+      createdAt:currentGoals[existingIndex].createdAt||g.createdAt||now
+    });
+  }else if(currentGoals.length>=MAX_GOALS){
+    currentGoals[currentGoals.length-1]=normalized;
+  }else{
+    currentGoals.push(normalized);
+  }
   await persistGoals();
 }
 
@@ -402,7 +430,10 @@ function getPeriodKey(period){
 
 function getGoalProgress(g=currentGoals[0]){
   if(!g)return{done:0,target:5,pct:0};
-  const start=getPeriodStart(g.period);const target=g.target||1;
+  const periodStart=getPeriodStart(g.period);
+  const goalStart=Number(g.startAt||g.createdAt||periodStart);
+  const start=Math.max(periodStart,goalStart);
+  const target=g.target||1;
   let done=0;
   if(g.type==='books'){
     done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).length;
@@ -867,7 +898,14 @@ document.getElementById('saveGoalBtn').addEventListener('click',async()=>{
   const resultEl=document.getElementById('goalSaveResult');
   const btn=document.getElementById('saveGoalBtn');
   btn.disabled=true;btn.textContent='Vista...';
-  await saveGoal({type:goalSelType,target,period:goalSelPeriod,createdAt:(currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod)?.createdAt)||Date.now()});
+  await const existingGoal=currentGoals.find(x=>x.type===goalSelType&&x.period===goalSelPeriod);
+  saveGoal({
+    type:goalSelType,
+    target,
+    period:goalSelPeriod,
+    startAt:existingGoal?.startAt||Date.now(),
+    createdAt:existingGoal?.createdAt||existingGoal?.startAt||Date.now()
+  });
   renderGoalCurrent();
   resultEl.textContent='Markmið vistað ✓';resultEl.style.display='block';
   btn.textContent='Vista markmið';btn.disabled=false;
