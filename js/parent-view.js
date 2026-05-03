@@ -388,15 +388,13 @@ export function openJourneyModal(bookId) {
   const modal = document.getElementById('journey-modal');
   if (!modal) return;
   _renderJourneyModal(bookId);
-  modal.style.display = 'grid';
-  document.body.style.overflow = 'hidden';
+  modal.style.display = 'flex';
 }
 
 export function closeJourneyModal(e) {
   if (e && e.target && e.target !== document.getElementById('journey-modal') && !e.target.closest('.rg-popup-close')) return;
   const modal = document.getElementById('journey-modal');
   if (modal) modal.style.display = 'none';
-  document.body.style.overflow = '';
   _jmBookId = null;
 }
 
@@ -1023,15 +1021,13 @@ export function openAccountModal() {
   if (themeIcon)  themeIcon.textContent  = isDark ? '☀️' : '🌙';
   if (themeLabel) themeLabel.textContent = isDark ? 'Ljóst' : 'Dökkt';
 
-  modal.style.display = 'grid';
-  document.body.style.overflow = 'hidden';
+  modal.style.display = 'flex';
 }
 
 export function closeAccountModal(e) {
   if (e && e.target && e.target !== document.getElementById('account-modal') && !e.target.closest('.rg-popup-close')) return;
   const modal = document.getElementById('account-modal');
   if (modal) modal.style.display = 'none';
-  document.body.style.overflow = '';
 }
 
 // Expose to window for inline onclick handlers
