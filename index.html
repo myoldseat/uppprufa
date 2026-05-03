@@ -11,6 +11,27 @@
 <link rel="icon" type="image/png" href="icon-teale.png">
 <link rel="apple-touch-icon" href="icon-teale.png">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* ── Now Reading card ── */
+.ph-stat-card-wide{display:flex;flex-direction:column;justify-content:center;min-height:80px}
+.ph-nr-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--button-top,#1dcdd3);margin-bottom:4px}
+.ph-nr-title{font-size:14px;font-weight:800;color:#d9e5ef;line-height:1.15;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph-nr-author{font-size:11px;color:#7a8fa0;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph-nr-progress{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ph-nr-bar{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.ph-nr-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#1dcdd3,#18bcc2);box-shadow:0 0 8px rgba(29,205,211,.3);transition:width .4s ease}
+.ph-nr-pct{font-size:11px;font-weight:800;color:#1dcdd3;min-width:28px;text-align:right}
+.ph-nr-meta{font-size:10px;color:#7a8fa0}
+.ph-nr-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 0}
+.ph-nr-empty-text{font-size:11px;color:#7a8fa0}
+
+/* ── Bookshelf link card ── */
+.ph-bs-link{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:4px 0;min-height:60px}
+.ph-bs-text{flex:1;min-width:0}
+.ph-bs-title{font-size:13px;font-weight:800;color:#d9e5ef}
+.ph-bs-count{font-size:11px;color:#7a8fa0;margin-top:1px}
+.ph-bs-arrow{font-size:20px;color:#7a8fa0;flex-shrink:0}
+</style>
 </head>
 <body>
 
@@ -182,9 +203,9 @@
       </div>
     </div>
     <div class="ph-stats-row">
-      <div class="ph-stat-card"><div class="ph-stat-val" id="ph-stat-mins">0</div><div class="ph-stat-lbl">Mínútur</div></div>
+      <div class="ph-stat-card ph-stat-card-wide" id="ph-now-reading"></div>
       <div class="ph-stat-card"><div class="ph-stat-val" id="ph-stat-sessions">0</div><div class="ph-stat-lbl">Lotur</div></div>
-      <div class="ph-stat-card"><div class="ph-stat-val" id="ph-stat-clips">0</div><div class="ph-stat-lbl">Klippingar</div></div>
+      <div class="ph-stat-card ph-stat-card-wide" id="ph-bookshelf-link"></div>
     </div>
     <div class="ph-tabs">
       <button class="ph-tab ph-tab-active" id="ph-tab-activity" onclick="switchTab('activity')">
