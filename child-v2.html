@@ -1313,6 +1313,35 @@
       var FROZEN_FADE_MS = 24 * 60 * 60 * 1000;
       var CONNECTION_LIFETIME_MS = FROZEN_FULL_BRIGHT_MS + FROZEN_FADE_MS;
       var isRecording = false;
+
+      // ── Screen Wake Lock — keeps screen on while recording ──
+      var _wakeLock = null;
+
+      async function requestWakeLock() {
+        if (!('wakeLock' in navigator)) return;
+        try {
+          _wakeLock = await navigator.wakeLock.request('screen');
+          _wakeLock.addEventListener('release', function() {
+            if (isRecording) requestWakeLock();
+          });
+        } catch (e) {
+          console.warn('Wake Lock villa:', e.name, e.message);
+        }
+      }
+
+      function releaseWakeLock() {
+        if (_wakeLock && _wakeLock.released === false) {
+          _wakeLock.release().catch(function() {});
+        }
+        _wakeLock = null;
+      }
+
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && isRecording) {
+          requestWakeLock();
+        }
+      });
+
       var glowLevel = 0;
       var smoothedInput = 0;
 
@@ -2301,6 +2330,7 @@
           scheduleSnippetCaptures();
 
           isRecording = true;
+          requestWakeLock();
           playMicCue("on");
           updateHelperVisibility();
           stopSettleLoop();
@@ -2313,6 +2343,7 @@
         var elapsedSeconds = recordingStartedAt ? Math.floor((Date.now() - recordingStartedAt) / 1000) : 0;
         playMicCue("off");
         isRecording = false;
+        releaseWakeLock();
         clearSnippetTimers();
         cleanupAudio();
         startSettleLoop();
