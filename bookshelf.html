@@ -176,8 +176,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .celebrate-flash{animation:celebrate-flash-pulse .6s ease-out 1!important;border-color:rgba(255,184,48,.8)!important}
 @keyframes celebrate-flash-pulse{0%{box-shadow:0 0 0 rgba(255,184,48,0);transform:scale(1)}30%{box-shadow:0 0 28px rgba(255,184,48,.5),0 0 50px rgba(255,184,48,.2);transform:scale(1.04)}100%{box-shadow:0 0 12px rgba(255,184,48,.2);transform:scale(1)}}
 .celebrate-move{transition:transform .7s cubic-bezier(.4,0,.2,1),opacity .7s cubic-bezier(.4,0,.2,1)!important;transform:scale(.35) translateY(60px)!important;opacity:0!important;pointer-events:none}
-.celebrate-toast{position:absolute;left:16px;right:16px;top:0;z-index:5;text-align:center;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,184,48,.3);background:rgba(255,184,48,.1);color:#FFB830;font-size:13px;font-weight:800;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
-.celebrate-toast.show{opacity:1;transform:translateY(0)}
+
 .goal-ring-celebrating circle:last-of-type{transition:stroke-dashoffset 2s cubic-bezier(.34,1.56,.64,1)!important}
 @keyframes ring-glow{0%{filter:drop-shadow(0 0 4px rgba(29,205,211,.2))}50%{filter:drop-shadow(0 0 16px rgba(29,205,211,.6)) drop-shadow(0 0 30px rgba(29,205,211,.3))}100%{filter:drop-shadow(0 0 4px rgba(29,205,211,.2))}}
 @keyframes ring-glow-gold{0%{filter:drop-shadow(0 0 4px rgba(255,184,48,.2))}50%{filter:drop-shadow(0 0 18px rgba(255,184,48,.7)) drop-shadow(0 0 34px rgba(255,184,48,.3))}100%{filter:drop-shadow(0 0 4px rgba(255,184,48,.2))}}
@@ -294,15 +293,24 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 </section></div>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js';
-import{getFirestore,collection,addDoc,doc,deleteDoc,getDoc,setDoc,onSnapshot,query,where,serverTimestamp,updateDoc}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,doc,deleteDoc,setDoc,onSnapshot,query,where,serverTimestamp,updateDoc}from'https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js';
 const app=initializeApp({apiKey:'AIzaSyAgTY3Uxd9_ZxixjqLj-sH8V3OhFAzg6DU',authDomain:'lesum-22e85.firebaseapp.com',projectId:'lesum-22e85',storageBucket:'lesum-22e85.firebasestorage.app',messagingSenderId:'204392598388',appId:'1:204392598388:web:2dbbe3f476cd78d2ffba21'});
 const db=getFirestore(app);
 
 function getChildSession(){try{const r=localStorage.getItem('upphatt_child');if(!r)return null;const d=JSON.parse(r);return d&&d.familyId&&d.childKey&&d.childName?d:null}catch(e){return null}}
-const CS=getChildSession();
+function getViewerSession(){try{const p=new URLSearchParams(window.location.search);const fid=p.get('family'),ck=p.get('child');if(fid&&ck)return{familyId:fid,childKey:ck,childName:ck,_viewer:true};return null}catch(e){return null}}
+const CS=getChildSession()||getViewerSession();
+const viewerMode=!!CS?._viewer;
 const previewMode=!CS;
 const FID=CS?.familyId||'PREVIEW',CK=CS?.childKey||'preview',CN=CS?.childName||'Lesandi';
 {const ini=CN.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);document.getElementById('navAvatar').textContent=ini;document.getElementById('profileInitials').textContent=ini;document.getElementById('profileName').textContent=CN}
+
+// ── Viewer mode: hide edit/add/delete UI ──
+if(viewerMode){
+  const editBtn=document.getElementById('toggleEditBooks');if(editBtn)editBtn.style.display='none';
+  const addBtn=document.getElementById('openAdd');if(addBtn)addBtn.style.display='none';
+  document.querySelector('.header-title').textContent='Bókasafn '+CN;
+}
 
 const IDB='upphatt_covers',IDS='covers';let _idb=null;
 function odb(){return new Promise(r=>{if(_idb){r(_idb);return}const q=indexedDB.open(IDB,1);q.onupgradeneeded=()=>q.result.createObjectStore(IDS);q.onsuccess=()=>{_idb=q.result;r(_idb)};q.onerror=()=>r(null)})}
@@ -320,6 +328,7 @@ let achievements=[]; // completed goal badges
 const MAX_GOALS=2;
 let sessions=[];
 let sessionsUnsub=null;
+let goalsUnsub=null;
 const GOAL_TYPES={
   books:  {icon:'📚',name:'Bækur',   desc:'Kláraðar bækur',   unit:'bækur',   unitSingle:'bók',    labelQ:'Hversu margar bækur?',   presets:[2,3,5,8,10]},
   pages:  {icon:'📄',name:'Blaðsíður',desc:'Lesnar blaðsíður', unit:'bls.',    unitSingle:'bls.',   labelQ:'Hversu margar blaðsíður?',presets:[50,100,200,500,1000]},
@@ -348,7 +357,7 @@ function normalizeGoalsFromDoc(d){
   return[];
 }
 
-async function loadGoal(){
+function loadGoal(){
   if(previewMode){
     currentGoals=[
       {type:'days',target:5,period:'week',createdAt:Date.now()},
@@ -357,24 +366,28 @@ async function loadGoal(){
     achievements=[];
     return;
   }
+  // Load from localStorage cache immediately
+  const local=loadGoalsLocal();
+  currentGoals=local.goals;
+  achievements=local.achievements;
+}
+
+function startGoalsListener(){
+  if(!FID||!CK||previewMode)return;
+  if(goalsUnsub)goalsUnsub();
   try{
-    const snap=await getDoc(goalDocRef());
-    if(snap.exists()){
-      const d=snap.data();
-      currentGoals=normalizeGoalsFromDoc(d);
-      achievements=Array.isArray(d.achievements)?d.achievements:[];
+    goalsUnsub=onSnapshot(goalDocRef(),snap=>{
+      if(snap.exists()){
+        const d=snap.data();
+        currentGoals=normalizeGoalsFromDoc(d);
+        achievements=Array.isArray(d.achievements)?d.achievements:[];
+      }
       saveGoalsLocal();
-    }else{
-      const local=loadGoalsLocal();
-      currentGoals=local.goals;
-      achievements=local.achievements;
-    }
-  }catch(e){
-    console.warn('Goal load failed:',e);
-    const local=loadGoalsLocal();
-    currentGoals=local.goals;
-    achievements=local.achievements;
-  }
+      render();
+    },e=>{
+      console.warn('Goals listener error:',e);
+    });
+  }catch(e){console.warn('Goals listener failed:',e)}
 }
 
 async function persistGoals(){
@@ -421,7 +434,7 @@ function getPeriodKey(period){
 
 function getGoalProgress(g=currentGoals[0]){
   if(!g)return{done:0,target:5,pct:0};
-  const start=getPeriodStart(g.period);const target=g.target||1;
+  const start=Math.max(getPeriodStart(g.period),g.createdAt||0);const target=g.target||1;
   let done=0;
   if(g.type==='books'){
     done=books.filter(b=>b.status==='finished'&&ts(b,'lastReadAt')>=start).length;
@@ -533,33 +546,13 @@ function celebrateBook(bookId){
       if(ringWrap)ringWrap.classList.add(isGoalComplete2?'goal-ring-glow-gold':'goal-ring-glow');
     },2000);
 
-    // ── Phase 6: Toast + final glow ──
-    // 4200ms — toast slides up, everything glows together
+    // ── Phase 6: Cleanup ──
+    // 4600ms — after ring glow lands, clean up and re-render
     setTimeout(()=>{
-      let toast=document.querySelector('.celebrate-toast');
-      if(!toast){
-        toast=document.createElement('div');toast.className='celebrate-toast';
-        const fc=document.getElementById('featuredCard');
-        if(fc){fc.style.position='relative';fc.appendChild(toast)}
-      }
-      const {done:d2,target:t2,pct:p2}=getGoalProgress();
-      const info2=currentGoals[0]?GOAL_TYPES[currentGoals[0].type]:null;
-      const unit2=info2?info2.unit:'bókum';
-      toast.textContent=p2>=100?'🏆 Markmið náð!':'🎉 '+d2+' af '+t2+' '+unit2+' — haltu áfram!';
-      requestAnimationFrame(()=>toast.classList.add('show'));
-
-      // ── Phase 7: Cleanup ──
-      // 7200ms — toast fades, full re-render with book in "Lokið"
-      setTimeout(()=>{
-        toast.classList.remove('show');
-        setTimeout(()=>{
-          toast.remove();
-          if(ringWrap)ringWrap.classList.remove('goal-ring-celebrating','goal-ring-glow','goal-ring-glow-gold');
-          celebrating=false;
-          render();
-        },500);
-      },3000);
-    },2600);
+      if(ringWrap)ringWrap.classList.remove('goal-ring-celebrating','goal-ring-glow','goal-ring-glow-gold');
+      celebrating=false;
+      render();
+    },3000);
   },1600);
 }
 
@@ -943,7 +936,8 @@ if(previewMode){
   achievements=[];
   books=[...demoBooks];render();
 }else{
-  loadGoal().then(()=>{startListener();startSessionsListener()});
+  loadGoal();render();
+  startListener();startSessionsListener();startGoalsListener();
 }
 </script>
 </body>
