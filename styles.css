@@ -1149,14 +1149,15 @@ audio { width: 100%; border-radius: 8px }
    ACCOUNT MODAL
 ════════════════════════════════════════ */
 .acc-card {
-  background: var(--ph-tile);
-  border: 1px solid var(--ph-tile-border);
+  background: #0c1626;
+  border: 1px solid rgba(29,205,211,0.25);
   border-radius: 20px;
   width: min(360px, 92vw);
   padding: 24px 20px 20px;
   position: relative;
   overflow: hidden;
   animation: slideUp 0.22s ease;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
 }
 .acc-header {
   display: flex;
@@ -1340,8 +1341,8 @@ audio { width: 100%; border-radius: 8px }
    JOURNEY FULL MODAL
 ════════════════════════════════════════ */
 .jm-card {
-  background: var(--ph-tile);
-  border: 1px solid var(--ph-tile-border);
+  background: #0c1626;
+  border: 1px solid rgba(29,205,211,0.25);
   border-radius: 20px;
   width: min(420px, 94vw);
   max-height: 85vh;
@@ -1350,6 +1351,7 @@ audio { width: 100%; border-radius: 8px }
   overflow: hidden;
   position: relative;
   animation: slideUp 0.22s ease;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
 }
 .jm-header {
   display: flex;
