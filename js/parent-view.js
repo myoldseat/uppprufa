@@ -367,6 +367,9 @@ function renderJourneyCard() {
   const hero = _getReadingBook();
 
   if (!hero || !hero.journeyEntries?.length) {
+    el.onclick = null;
+    el.style.cursor = 'default';
+    el.removeAttribute('data-book-id');
     el.innerHTML = `
       <div class="ph-jn-empty">
         <div class="ph-jn-label">Lestrarferðalag</div>
