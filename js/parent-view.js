@@ -594,8 +594,8 @@ function renderBookshelfLink() {
     ? `bookshelf.html?family=${encodeURIComponent(S.familyId)}&child=${encodeURIComponent(childKey)}&parent=1`
     : 'bookshelf.html';
 
-  // Get up to 3 covers for fan display
-  const covers = doneBooks
+  // Get up to 3 covers for fan display — any book with a cover
+  const covers = childBooks
     .filter(b => b.imagePath)
     .slice(0, 3)
     .map(b => b.imagePath);
