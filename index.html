@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#07101e">
+<style>
+  html, body {
+    background-color: #07101e !important;
+    background: #07101e !important;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+  }
+</style>
 <meta name="apple-mobile-web-app-title" content="Upphátt">
 <title>Upphátt</title>
 <link rel="icon" type="image/png" href="icon-teale.png">
@@ -413,10 +421,31 @@
       <button class="rg-popup-close jm-close" onclick="event.stopPropagation();closeJourneyModal()" aria-label="Loka">✕</button>
     </div>
     <div class="jm-feed" id="jm-feed"></div>
-    <div class="jm-compose">
-      <input class="ph-jn-input jm-input" id="jm-input" placeholder="Skrifa hvatningu..." maxlength="80">
-      <button class="ph-jn-send" id="jm-send" title="Senda">↑</button>
+    <div class="jm-compose" style="flex-direction:column;gap:8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 2px">
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('❤️')">❤️</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('🌟')">🌟</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('👏')">👏</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('🎉')">🎉</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('🔥')">🔥</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('💪')">💪</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('😍')">😍</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('🤩')">🤩</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('📖')">📖</button>
+        <button class="jm-emoji-btn" onclick="jmInsertEmoji('🥰')">🥰</button>
+      </div>
+      <div style="display:flex;gap:8px;width:100%">
+        <input class="ph-jn-input jm-input" id="jm-input" placeholder="Skrifa hvatningu..." maxlength="80" style="flex:1">
+        <button class="ph-jn-send" id="jm-send" title="Senda">↑</button>
+      </div>
     </div>
+    <style>
+      .jm-emoji-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 8px;font-size:18px;cursor:pointer;transition:background 0.15s,transform 0.1s;line-height:1}
+      .jm-emoji-btn:active{transform:scale(0.9);background:rgba(29,205,211,0.15)}
+    </style>
+    <script>
+      function jmInsertEmoji(emoji){const input=document.getElementById('jm-input');if(!input)return;const pos=input.selectionStart||input.value.length;input.value=input.value.slice(0,pos)+emoji+input.value.slice(pos);input.focus();input.selectionStart=input.selectionEnd=pos+emoji.length}
+    </script>
     <div class="ph-jn-sent" id="jm-sent">Sent ✓</div>
   </div>
 </div>
