@@ -551,11 +551,11 @@ function renderGoalsCard() {
     <div class="ph-goals-label">Markmið</div>
     <div class="ph-goals-rings">
       <div class="ph-goals-ring-wrap">
-        ${_svgRing(pagePct, 44, 5)}
+        ${_svgRing(pagePct, 32, 4.5)}
         <div class="ph-goals-ring-pct">${pagePct}%</div>
       </div>
       <div class="ph-goals-ring-wrap">
-        ${_svgRing(bookPct, 44, 5)}
+        ${_svgRing(bookPct, 32, 4.5)}
         <div class="ph-goals-ring-pct">${bookPct}%</div>
       </div>
     </div>
