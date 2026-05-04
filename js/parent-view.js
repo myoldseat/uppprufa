@@ -591,7 +591,7 @@ function renderBookshelfLink() {
 
   const childKey = _phSelectedKey && _phSelectedKey !== 'all' ? _phSelectedKey : '';
   const bookshelfUrl = childKey
-    ? `bookshelf.html?family=${encodeURIComponent(S.familyId)}&child=${encodeURIComponent(childKey)}`
+    ? `bookshelf.html?family=${encodeURIComponent(S.familyId)}&child=${encodeURIComponent(childKey)}&parent=1`
     : 'bookshelf.html';
 
   // Get up to 3 covers for fan display
