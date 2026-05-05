@@ -214,26 +214,30 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .goal-mini-title{font-size:11px;font-weight:800;color:rgba(217,229,239,.88);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .goal-mini-sub,.goal-mini-pct{display:none!important}
 .goal-mini-line{height:4px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;max-width:100%}
-.goal-mini-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 9px rgba(29,205,211,.35)}
+.goal-mini-fill{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 10px rgba(29,205,211,.50)}
 .goals-strip-chevron{width:22px;height:22px;display:grid;place-items:center;color:rgba(217,229,239,.55);font-size:22px;font-weight:700;line-height:1}
 .goal-mini-placeholder{display:grid;grid-template-columns:22px minmax(0,1fr);border:0;border-style:none;background:transparent;color:var(--soft);justify-content:start;text-align:left;min-height:0}
-.book-hero-card{border:1px solid rgba(29,205,211,.20);background:rgba(7,16,30,.78);border-radius:18px;padding:14px;position:relative;overflow:hidden;box-shadow:0 18px 44px rgba(0,0,0,.30),0 0 36px rgba(29,205,211,.035)}
+.book-hero-card{border:1px solid rgba(29,205,211,.20);background:rgba(7,16,30,.78);border-radius:18px;padding:14px;position:relative;overflow:hidden;box-shadow:0 18px 44px rgba(0,0,0,.30),0 0 36px rgba(29,205,211,.035);cursor:pointer;transition:transform .15s ease,border-color .18s ease,box-shadow .18s ease}
+.book-hero-card:active{transform:scale(.992);border-color:rgba(29,205,211,.34);box-shadow:0 14px 34px rgba(0,0,0,.34),0 0 30px rgba(29,205,211,.08)}
 .book-hero-card::before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,rgba(29,205,211,0),rgba(29,205,211,.34),rgba(29,205,211,0))}
 .book-hero-main{display:grid;grid-template-columns:148px 1fr;gap:14px;align-items:start}
 .book-hero-card .featured-cover{width:148px;border-radius:11px;transform:none;box-shadow:0 16px 32px rgba(0,0,0,.32),0 0 20px rgba(29,205,211,.08)}
 .book-hero-card .featured-meta{gap:8px;padding-top:0;min-width:0}
 .book-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.progress-row{display:flex;align-items:center;gap:8px;margin-top:-1px}
+.progress-row .progress-bar{flex:1;min-width:0}
+.progress-row .featured-pct{flex:0 0 auto;white-space:nowrap;line-height:1}
 .book-hero-card .featured-title{font-size:26px;line-height:1.02;color:#eef6ff;margin-top:0}
 .book-hero-card .featured-badge{margin:0;width:max-content;padding:4px 8px;border-radius:999px;font-size:10px;line-height:1}
 .book-hero-card .featured-stats{font-size:12px;color:rgba(217,229,239,.62)}
-.book-hero-card .featured-pct{font-size:13px;color:var(--accent)}
+.book-hero-card .featured-pct{font-size:13px;color:var(--accent);font-weight:900}
 .book-hero-card .progress-bar{height:4px;background:rgba(255,255,255,.07)}
 .reading-moment{display:grid;gap:5px;margin-top:4px}
 .moment-label{display:flex;align-items:center;gap:6px;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:-.1px}
 .book-hero-card .featured-quote{border:0;background:transparent;padding:0;font-size:12px;color:rgba(217,229,239,.70);line-height:1.25;font-family:Georgia,'Times New Roman',serif;font-style:italic}
 .reaction-block{display:grid;gap:6px;margin-top:3px}
 .book-hero-card .featured-reaction{font-size:11px;line-height:1.35;color:rgba(217,229,239,.72);padding:8px 9px;border-radius:9px;background:rgba(255,255,255,.035);border:1px solid rgba(122,187,218,.08);margin-top:0}
-.book-hero-card .featured-gold{margin-top:12px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;background:rgba(29,205,211,.055);border:1px solid rgba(29,205,211,.12)}
+.book-hero-card .featured-gold{margin-top:6px;display:block;padding:9px 10px;border-radius:11px;background:rgba(29,205,211,.055);border:1px solid rgba(29,205,211,.12)}
 .book-hero-card .featured-gold-top{display:flex;align-items:center;gap:8px;min-width:0}
 .book-hero-card .featured-gold-label{font-size:11px;font-weight:900;color:var(--accent)}
 .book-hero-card .featured-gold-saver{font-size:9.5px;color:rgba(217,229,239,.55)}
@@ -792,9 +796,7 @@ function _getHeroGoldMoment(hero) {
     + '<div class="featured-gold-top">'
     + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'
     + '<div class="featured-gold-info"><span class="featured-gold-label">Varðveitt upptaka</span><span class="featured-gold-saver">' + esc(data.saver) + ' geymdi lesturinn þinn</span></div>'
-    + '<button class="featured-gold-play" onclick="event.stopPropagation();_playHeroGold()" type="button">► Hlusta</button>'
     + '</div>'
-    + '<div class="featured-gold-player" id="hero-gm-player"></div>'
     + '</div>';
 }
 
@@ -861,7 +863,7 @@ function goalRingHTML(){
     const p=getGoalProgress(g);
     const pct=Math.max(0,Math.min(100,p.pct||0));
     const title=(p.done||0)+'/'+(p.target||g.target||0)+' '+info.unit;
-    return '<div class="goal-mini" data-goal-index="'+i+'"><span class="goal-mini-icon">'+info.icon+'</span><span class="goal-mini-copy"><span class="goal-mini-title">'+esc(title)+'</span><span class="goal-mini-line"><span class="goal-mini-fill" style="width:'+pct+'%"></span></span></span></div>';
+    return '<div class="goal-mini" data-goal-index="'+i+'"><span class="goal-mini-icon">'+info.icon+'</span><span class="goal-mini-copy"><span class="goal-mini-title">'+esc(title)+'</span><span class="goal-mini-line"><span class="goal-mini-fill" style="width:'+pct+'%;min-width:'+(pct>0?'10px':'0')+'"></span></span></span></div>';
   };
   let items=currentGoals.slice(0,2).map(itemHTML).join('');
   if(currentGoals.length===1){
@@ -893,7 +895,7 @@ function render(){
     const lastReaction = _getLastReaction(hero);
     // Gold moment check
     const goldMoment = _getHeroGoldMoment(hero);
-    fc.innerHTML=goalRingHTML()+'<div class="book-hero-card"><div class="book-hero-main"><div class="featured-cover" style="'+covS(hero)+'" data-open-book="'+hero.id+'">'+ci+'</div><div class="featured-meta"><div class="book-title-row"><div class="featured-title">'+esc(hero.title)+'</div><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><div class="reading-moment"><div class="moment-label"></div><div class="featured-quote">\u201C'+esc(latestNote(hero))+'\u201D</div></div><div class="reaction-block"><div class="moment-label"></div>'+lastReaction+'</div></div></div>'+goldMoment+'</div>';
+    fc.innerHTML=goalRingHTML()+'<div class="book-hero-card" data-open-book="'+hero.id+'"><div class="book-hero-main"><div class="featured-cover" style="'+covS(hero)+'">'+ci+'</div><div class="featured-meta"><div class="book-title-row"><div class="featured-title">'+esc(hero.title)+'</div></div><div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span></div><div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="reading-moment"><div class="moment-label"></div><div class="featured-quote">\u201C'+esc(latestNote(hero))+'\u201D</div></div><div class="reaction-block"><div class="moment-label"></div>'+lastReaction+'</div>'+goldMoment+'</div></div></div>';
   }
   rGrid('readingSection','readingGrid','readingCount',reading);
   rGrid('shelfSection','shelfGrid','shelfCount',shelf);
@@ -1152,7 +1154,7 @@ function renderGoalOverview(){
     const info=GOAL_TYPES[g.type]||GOAL_TYPES.books;
     const p=getGoalProgress(g);
     const pct=Math.max(0,Math.min(100,p.pct||0));
-    return '<div class="goal-overview-row"><div class="goal-overview-icon-pill">'+info.icon+'</div><div class="goal-overview-info"><div class="goal-overview-title">Lesa '+esc(String(p.target||g.target||0))+' '+esc(info.unit)+'</div><div class="goal-overview-sub">'+esc(String(p.done||0))+'/'+esc(String(p.target||g.target||0))+' lokið</div><div class="goal-overview-bar"><div class="goal-overview-fill" style="width:'+pct+'%"></div></div><div class="goal-overview-msg">'+esc(goalOverviewMessage(p,g,info))+'</div></div>'+goalOverviewPercentRingSVG(p.pct)+'</div>';
+    return '<div class="goal-overview-row"><div class="goal-overview-icon-pill">'+info.icon+'</div><div class="goal-overview-info"><div class="goal-overview-title">Lesa '+esc(String(p.target||g.target||0))+' '+esc(info.unit)+'</div><div class="goal-overview-sub">'+esc(String(p.done||0))+'/'+esc(String(p.target||g.target||0))+' lokið</div><div class="goal-overview-bar"><div class="goal-overview-fill" style="width:'+pct+'%;min-width:'+(pct>0?'10px':'0')+'"></div></div><div class="goal-overview-msg">'+esc(goalOverviewMessage(p,g,info))+'</div></div>'+goalOverviewPercentRingSVG(p.pct)+'</div>';
   }).join('');
 }
 function openGoalOverviewModal(){
