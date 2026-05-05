@@ -114,6 +114,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 .event::before{content:"";position:absolute;left:-22px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .event-date{font-size:11px;color:var(--accent);font-weight:800;margin-bottom:3px}
 .event p{margin:0 0 6px;font-size:13px;line-height:1.35}
+.event-quote{font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:14px!important;line-height:1.45!important;color:var(--fg)}
 .reactions{display:flex;flex-wrap:wrap;gap:5px}
 .react{font-size:10px;color:rgba(217,229,239,.85);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);padding:4px 7px;border-radius:99px}
 .add-save-result,.share-result{display:none;margin-top:8px;padding:10px;border-radius:10px;background:rgba(29,205,211,.08);border:1px solid rgba(29,205,211,.2);color:var(--accent);font-size:12px;font-weight:700;text-align:center}
@@ -720,7 +721,7 @@ function openJourney(id){
   }
 
   const ent=b.journeyEntries?.length?b.journeyEntries:[{date:'Í dag',pageFrom:b.currentPageFrom||'',pageTo:b.currentPageTo||'',note:b.note||'Bókin var sett á hilluna.',reactions:[]}];
-  document.getElementById('journeyEntries').innerHTML=ent.map(e=>'<article class="event"><div class="event-date">'+esc(e.date)+(e.pageFrom?' · bls. '+e.pageFrom+'–'+e.pageTo:'')+'</div><p>'+esc(e.note)+'</p><div class="reactions">'+(e.reactions||[]).map(r=>'<span class="react">'+esc(r)+'</span>').join('')+'</div></article>').join('');
+  document.getElementById('journeyEntries').innerHTML=ent.map(e=>{const meta=esc(e.date)+(e.pageFrom?' · bls. '+e.pageFrom+'–'+e.pageTo:'');return'<article class="event"><div class="event-date">'+meta+'</div>'+(e.note?'<p class="event-quote">\u201C'+esc(e.note)+'\u201D</p>':'')+'<div class="reactions">'+(e.reactions||[]).map(r=>'<span class="react">'+esc(r)+'</span>').join('')+'</div></article>'}).join('');
   openOv('journeyModal');
 }
 

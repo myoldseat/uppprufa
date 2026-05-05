@@ -1084,7 +1084,12 @@ audio { width: 100%; border-radius: 8px }
 
 
 /* ── Now Reading ── */
-.ph-nr-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--ph-accent);margin-bottom:4px}
+.ph-nr-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--ph-accent);margin-bottom:8px}
+.ph-nr-row{display:flex;gap:10px;align-items:flex-start}
+.ph-nr-cover{width:48px;height:68px;object-fit:cover;border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,0.35);flex-shrink:0}
+.ph-nr-cover-ph{width:48px;height:68px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.35)}
+.ph-nr-cover-ph span{font-size:18px;font-weight:800;color:rgba(255,255,255,0.5);font-family:Georgia,serif}
+.ph-nr-info{flex:1;min-width:0}
 .ph-nr-title{font-size:14px;font-weight:800;color:var(--ph-text);line-height:1.15;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ph-nr-author{font-size:11px;color:var(--ph-soft);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ph-nr-progress{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -1353,11 +1358,36 @@ audio { width: 100%; border-radius: 8px }
 }
 .jm-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   padding: 20px 20px 14px;
   border-bottom: 1px solid var(--ph-tile-border);
   flex-shrink: 0;
+}
+.jm-header > div:nth-child(2) { flex: 1; min-width: 0; }
+.jm-cover-img {
+  width: 44px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+.jm-cover-placeholder {
+  width: 44px;
+  height: 62px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.jm-cover-placeholder span {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.5);
+  font-family: Georgia, serif;
 }
 .jm-label {
   font-size: 10px;
@@ -1399,8 +1429,10 @@ audio { width: 100%; border-radius: 8px }
   letter-spacing: 0.3px;
 }
 .jm-entry-note {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
   color: var(--ph-text);
   line-height: 1.55;
   margin-bottom: 8px;
@@ -1408,17 +1440,15 @@ audio { width: 100%; border-radius: 8px }
 .jm-reactions-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 .jm-reaction {
-  font-size: 15px;
-  color: rgba(217,229,239,0.85);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 8px 14px;
-  border-radius: 20px;
-  display: inline-block;
-  width: fit-content;
+  font-size: 14px;
+  color: rgba(217,229,239,0.7);
+  background: none;
+  border: none;
+  padding: 2px 0;
+  display: block;
 }
 .jm-compose {
   display: flex;
@@ -1432,6 +1462,11 @@ audio { width: 100%; border-radius: 8px }
   flex: 1;
   font-size: 15px !important;
   padding: 10px 14px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(29,205,211,0.2) !important;
+}
+.jm-input::placeholder {
+  color: rgba(148,164,180,0.55) !important;
 }
 .jm-empty {
   font-size: 13px;
