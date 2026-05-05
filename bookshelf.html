@@ -268,6 +268,41 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}a{colo
 @media(max-width:420px){.book-hero-main{grid-template-columns:132px 1fr;gap:12px}.book-hero-card .featured-cover{width:132px}.book-hero-card{padding:12px}.book-hero-card .featured-title{font-size:24px}.goals-strip{padding:9px 10px}.goals-strip-items{gap:12px}.goal-overview-dialog{width:min(94vw,400px)}}
 @media(min-width:700px){.book-hero-main{grid-template-columns:170px 1fr;gap:20px}.book-hero-card .featured-cover{width:170px}}
 
+
+/* === Journey comment readability + delete comments === */
+#journeyEntries .event{padding:12px 12px;margin-bottom:10px;border-radius:14px;background:rgba(255,255,255,.035);border-color:rgba(29,205,211,.12)}
+#journeyEntries .event-date{font-size:12px;line-height:1.25;margin-bottom:6px}
+#journeyEntries .event-quote{font-size:16px!important;line-height:1.35!important;margin-bottom:10px;color:rgba(238,246,255,.92)!important}
+#journeyEntries .reactions{display:grid;gap:8px;margin-top:8px}
+#journeyEntries .react{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:9px;padding:9px 10px;border-radius:13px;font-size:13.5px;line-height:1.35;color:rgba(238,246,255,.88);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.075)}
+#journeyEntries .react-text{flex:1;min-width:0;overflow-wrap:anywhere}
+#journeyEntries .react-delete{width:24px;height:24px;flex:0 0 24px;border-radius:999px;border:1px solid rgba(255,107,107,.24);background:rgba(255,107,107,.08);color:rgba(255,145,145,.9);display:grid;place-items:center;font-size:15px;font-weight:900;line-height:1;cursor:pointer;opacity:.78}
+#journeyEntries .react-delete:active{transform:scale(.94);opacity:1;background:rgba(255,107,107,.16)}
+@media(max-width:420px){#journeyEntries .react{font-size:13px;padding:8px 9px}#journeyEntries .event-quote{font-size:15px!important}}
+
+
+
+/* === Final hero/audio refinements: pill above cover + custom gold player === */
+.hero-cover-stack{display:grid;gap:8px;align-content:start;justify-items:start;min-width:0}
+.hero-cover-stack .featured-badge{margin:0;justify-self:start}
+.book-hero-card .featured-cover{grid-column:auto;grid-row:auto}
+.book-hero-card .featured-meta{display:flex;flex-direction:column;min-width:0}
+.book-hero-card .featured-badge{margin:0;width:max-content;padding:4px 8px;border-radius:999px;font-size:10px;line-height:1}
+.hero-gold-card{width:100%;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;color:inherit;font:inherit}
+.book-hero-card .featured-gold.hero-gold-card{margin-top:8px;display:block;padding:9px 10px;border-radius:11px;background:rgba(29,205,211,.055);border:1px solid rgba(29,205,211,.14);transition:border-color .16s ease,box-shadow .16s ease,background .16s ease,transform .12s ease}
+.book-hero-card .featured-gold.hero-gold-card:active{transform:scale(.985);border-color:rgba(29,205,211,.34);background:rgba(29,205,211,.075)}
+.book-hero-card .featured-gold.hero-gold-card.is-playing{border-color:rgba(29,205,211,.42);box-shadow:0 0 18px rgba(29,205,211,.12)}
+.hero-gold-state{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;flex:0 0 28px;color:#061018;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:11px;font-weight:900;line-height:1;box-shadow:0 0 16px rgba(29,205,211,.25)}
+.hero-gold-progress{height:3px;margin-top:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.hero-gold-progress span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 10px rgba(29,205,211,.45);transition:width .12s linear}
+@media(max-width:420px){
+  .book-hero-main{grid-template-columns:132px minmax(0,1fr);gap:12px;align-items:start}
+  .hero-cover-stack{gap:7px}
+  .hero-cover-stack .featured-badge{font-size:10px;padding:4px 8px}
+  .book-hero-card .featured-gold.hero-gold-card{margin-top:8px;padding:9px}
+  .hero-gold-state{width:26px;height:26px;flex-basis:26px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -792,39 +827,87 @@ function _getHeroGoldMoment(hero) {
   const data=_getGoldMomentData(hero);
   if(!data)return '';
   _cacheHeroGoldMoment(data);
-  return '<div class="featured-gold" id="hero-gm-card">'
+  return '<button class="featured-gold hero-gold-card" id="hero-gm-card" type="button" onclick="event.stopPropagation();window._toggleHeroGold()">'
     + '<div class="featured-gold-top">'
     + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'
     + '<div class="featured-gold-info"><span class="featured-gold-label">Varðveitt upptaka</span><span class="featured-gold-saver">' + esc(data.saver) + ' geymdi lesturinn þinn</span></div>'
+    + '<span class="hero-gold-state" id="hero-gm-state">▶</span>'
     + '</div>'
-    + '</div>';
+    + '<div class="hero-gold-progress"><span id="hero-gm-progress"></span></div>'
+    + '</button>';
 }
 
-async function _playHeroGold() {
-  const btn = document.querySelector('.featured-gold-play');
-  const player = document.getElementById('hero-gm-player');
-  if (!player) return;
-  try {
+let heroGoldAudio=null;
+let heroGoldTimer=null;
+let heroGoldUrl=null;
+let heroGoldClipPath=null;
+
+async function _toggleHeroGold(){
+  const card=document.getElementById('hero-gm-card');
+  const state=document.getElementById('hero-gm-state');
+  const fill=document.getElementById('hero-gm-progress');
+  try{
     const hero=books.find(b=>b.status==='reading')||[...books].sort((a,b)=>ts(b,'lastReadAt')-ts(a,'lastReadAt'))[0];
     const data=_getGoldMomentData(hero);
-    if (!data?.clipPath) return;
+    if(!data?.clipPath)return;
     _cacheHeroGoldMoment(data);
-    if (btn) { btn.disabled = true; btn.textContent = 'Hleð...'; }
-    const url = await _getCachedAudioUrl(data.clipPath);
-    if (!url) { player.innerHTML = '<div style="font-size:11px;color:#ff6b6b;margin-top:4px">Ekki tókst</div>'; return; }
-    player.innerHTML = '<audio controls preload="auto" src="' + url + '" style="width:100%;margin-top:6px;border-radius:8px;height:36px"></audio>';
-    const audio = player.querySelector('audio');
-    if (audio) {
-      audio.play().catch(function(){});
-      audio.addEventListener('ended', function() {
-        if (btn) { btn.disabled = false; btn.textContent = '► Hlusta'; }
+
+    if(heroGoldClipPath!==data.clipPath){
+      if(heroGoldAudio){heroGoldAudio.pause();heroGoldAudio=null;}
+      clearInterval(heroGoldTimer);
+      heroGoldTimer=null;
+      heroGoldUrl=null;
+      heroGoldClipPath=data.clipPath;
+      if(fill)fill.style.width='0%';
+    }
+
+    if(!heroGoldUrl){
+      if(state)state.textContent='…';
+      heroGoldUrl=await _getCachedAudioUrl(data.clipPath);
+    }
+    if(!heroGoldUrl){
+      if(state)state.textContent='!';
+      return;
+    }
+
+    if(!heroGoldAudio){
+      heroGoldAudio=new Audio(heroGoldUrl);
+      heroGoldAudio.preload='auto';
+      heroGoldAudio.addEventListener('play',()=>{
+        if(state)state.textContent='❚❚';
+        if(card)card.classList.add('is-playing');
+        clearInterval(heroGoldTimer);
+        heroGoldTimer=setInterval(()=>{
+          if(!fill||!heroGoldAudio||!heroGoldAudio.duration)return;
+          fill.style.width=Math.min(100,(heroGoldAudio.currentTime/heroGoldAudio.duration)*100)+'%';
+        },120);
+      });
+      heroGoldAudio.addEventListener('pause',()=>{
+        if(state)state.textContent='▶';
+        if(card)card.classList.remove('is-playing');
+        clearInterval(heroGoldTimer);
+      });
+      heroGoldAudio.addEventListener('ended',()=>{
+        if(state)state.textContent='▶';
+        if(card)card.classList.remove('is-playing');
+        if(fill)fill.style.width='0%';
+        clearInterval(heroGoldTimer);
+        if(heroGoldAudio)heroGoldAudio.currentTime=0;
       });
     }
-  } catch (e) {
-    if (btn) { btn.disabled = false; btn.textContent = '► Hlusta'; }
+
+    if(heroGoldAudio.paused){
+      await heroGoldAudio.play();
+    }else{
+      heroGoldAudio.pause();
+    }
+  }catch(e){
+    if(state)state.textContent='!';
+    if(card)card.classList.remove('is-playing');
   }
 }
-window._playHeroGold = _playHeroGold;
+window._toggleHeroGold=_toggleHeroGold;
+window._playHeroGold=_toggleHeroGold;
 
 async function _playJourneyGold(clipPath,playerId,btnId){
   const player=document.getElementById(playerId);
@@ -895,7 +978,7 @@ function render(){
     const lastReaction = _getLastReaction(hero);
     // Gold moment check
     const goldMoment = _getHeroGoldMoment(hero);
-    fc.innerHTML=goalRingHTML()+'<div class="book-hero-card" data-open-book="'+hero.id+'"><div class="book-hero-main"><div class="featured-cover" style="'+covS(hero)+'">'+ci+'</div><div class="featured-meta"><div class="book-title-row"><div class="featured-title">'+esc(hero.title)+'</div></div><div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span></div><div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="reading-moment"><div class="moment-label"></div><div class="featured-quote">\u201C'+esc(latestNote(hero))+'\u201D</div></div><div class="reaction-block"><div class="moment-label"></div>'+lastReaction+'</div>'+goldMoment+'</div></div></div>';
+    fc.innerHTML=goalRingHTML()+'<div class="book-hero-card" data-open-book="'+hero.id+'"><div class="book-hero-main"><div class="hero-cover-stack"><div class="featured-badge">⚡ '+(hero.status==='reading'?'Að lesa':'Á hillunni')+'</div><div class="featured-cover" style="'+covS(hero)+'">'+ci+'</div></div><div class="featured-meta"><div class="book-title-row"><div class="featured-title">'+esc(hero.title)+'</div></div><div class="featured-stats"><span>'+(hero.currentPageFrom?'bls. '+hero.currentPageFrom+'–'+hero.currentPageTo:'Á hillunni')+'</span></div><div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:'+(hero.progressPercent||0)+'%"></div></div><span class="featured-pct">'+(hero.progressPercent||0)+'%</span></div><div class="reading-moment"><div class="moment-label"></div><div class="featured-quote">\u201C'+esc(latestNote(hero))+'\u201D</div></div><div class="reaction-block"><div class="moment-label"></div>'+lastReaction+'</div>'+goldMoment+'</div></div></div>';
   }
   rGrid('readingSection','readingGrid','readingCount',reading);
   rGrid('shelfSection','shelfGrid','shelfCount',shelf);
@@ -959,9 +1042,23 @@ function openJourney(id){
       const bid='journey-gm-btn-'+i;
       return '<article class="event"><div class="event-date">'+meta+'</div><p class="event-quote">'+esc(e.text||((e.savedBy||'Foreldri')+' geymdi lesturinn þinn'))+'</p><button class="featured-gold-play" id="'+bid+'" onclick="event.stopPropagation();_playJourneyGold(\''+esc(e.clipPath)+'\',\''+pid+'\',\''+bid+'\')" type="button">► Hlusta</button><div class="featured-gold-player" id="'+pid+'"></div></article>';
     }
-    return'<article class="event"><div class="event-date">'+meta+'</div>'+(e.note?'<p class="event-quote">\u201C'+esc(e.note)+'\u201D</p>':'')+'<div class="reactions">'+(e.reactions||[]).map(r=>'<span class="react">'+esc(r)+'</span>').join('')+'</div></article>'
+    return'<article class="event"><div class="event-date">'+meta+'</div>'+(e.note?'<p class="event-quote">\u201C'+esc(e.note)+'\u201D</p>':'')+'<div class="reactions">'+(e.reactions||[]).map((r,ri)=>'<span class="react"><span class="react-text">'+esc(r)+'</span><button class="react-delete" type="button" data-delete-reaction="'+i+':'+ri+'" aria-label="Eyða kommenti">×</button></span>').join('')+'</div></article>'
   }).join('');
   openOv('journeyModal');
+}
+
+async function deleteJourneyReaction(entryIndex,reactionIndex){
+  const b=books.find(x=>x.id===selBookId);if(!b||!Array.isArray(b.journeyEntries))return;
+  const entries=b.journeyEntries.map(e=>({...e,reactions:Array.isArray(e.reactions)?[...e.reactions]:[]}));
+  if(!entries[entryIndex]||!entries[entryIndex].reactions||entries[entryIndex].reactions[reactionIndex]===undefined)return;
+  if(!confirm('Eyða kommenti?'))return;
+  entries[entryIndex].reactions.splice(reactionIndex,1);
+  try{
+    if(b._demo){b.journeyEntries=entries;render();openJourney(b.id);return}
+    await updBook(b.id,{journeyEntries:entries});
+    b.journeyEntries=entries;
+    render();openJourney(b.id);
+  }catch(err){console.error('Delete reaction failed:',err);alert('Villa við að eyða kommenti.')}
 }
 
 document.getElementById('journeyUpdateBtn').addEventListener('click',async()=>{
@@ -1238,6 +1335,13 @@ document.getElementById('closeGoalOverview2').addEventListener('click',()=>close
 document.getElementById('editGoalsFromOverview').addEventListener('click',()=>{closeOv('goalOverviewModal');openGoalModal()});
 document.getElementById('closeGoal').addEventListener('click',()=>closeOv('goalModal'));
 document.getElementById('closeGoal2').addEventListener('click',()=>closeOv('goalModal'));
+
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-delete-reaction]');if(!btn)return;
+  e.preventDefault();e.stopPropagation();
+  const parts=String(btn.dataset.deleteReaction||'').split(':').map(Number);
+  if(parts.length===2&&Number.isFinite(parts[0])&&Number.isFinite(parts[1]))deleteJourneyReaction(parts[0],parts[1]);
+});
 
 document.getElementById('openAdd').addEventListener('click',openAddM);
 document.getElementById('closeAdd').addEventListener('click',()=>{resetF();closeOv('addModal')});
