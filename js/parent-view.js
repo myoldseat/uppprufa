@@ -27,7 +27,26 @@ const GOAL_TYPES = {
   days:    { icon: _GOAL_SVG.days,    name: 'Dagar',     unit: 'daga'  }
 };
 
-// ── makeDateKey: match Firestore format "2026-4-20" (no zero-padding) ──
+// ── Audio URL cache (15 min TTL) ──
+const _audioUrlCache = {};
+const _AUDIO_CACHE_TTL = 15 * 60 * 1000;
+
+async function getCachedAudioUrl(storagePath) {
+  if (!storagePath) return null;
+  const now = Date.now();
+  const cached = _audioUrlCache[storagePath];
+  if (cached && cached.expires > now) return cached.url;
+  try {
+    const url = await getDownloadURL(ref(storage, storagePath));
+    _audioUrlCache[storagePath] = { url, expires: now + _AUDIO_CACHE_TTL };
+    return url;
+  } catch (e) {
+    console.warn('Audio URL fetch failed:', storagePath, e);
+    return null;
+  }
+}
+
+
 function makeDateKey(d) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
@@ -446,9 +465,40 @@ function renderJourneyCard() {
         <span class="ph-jn-meira-pill">Meira &rsaquo;</span>
         <span class="ph-jn-total-hint">${totalCount} ${totalCount === 1 ? 'færsla' : 'færslur'}</span>
       </div>
+      ${_getGoldMomentPreview(hero)}
     ` : `
       <div class="ph-jn-empty-text">Engar færslur enn</div>
     `}`;
+}
+
+// ── Gold moment preview for dashboard card ──
+function _getGoldMomentPreview(hero) {
+  const childKey = _phSelectedKey;
+  if (!childKey) return '';
+  const gm = (S.sessions || []).find(s =>
+    s.childKey === childKey &&
+    s.favClipLabel &&
+    s.audioPaths?.[s.favClipLabel] &&
+    (!s.bookTitle || s.bookTitle === hero?.title)
+  );
+  if (!gm) return '';
+  const saver = gm.lastListenerName || 'Foreldri';
+
+  // Cache for bookshelf hero to read
+  try {
+    const gmKey = 'upphatt_gm_' + S.familyId + '_' + childKey;
+    localStorage.setItem(gmKey, JSON.stringify({
+      saver,
+      clipPath: gm.audioPaths[gm.favClipLabel],
+      date: gm.date || ''
+    }));
+  } catch (e) { /* ok */ }
+
+  return `
+    <div class="ph-jn-gm-preview">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <span>${_esc(saver)} varðveitti gullmola</span>
+    </div>`;
 }
 
 // ── Journey full-screen modal ──
@@ -519,6 +569,9 @@ function _renderJourneyModal(bookId) {
       </div>`;
   }).join('');
 
+  // ── Gullmolar (varðveitt upptaka) ──
+  _renderGoldMoments(hero, feed);
+
   // Scroll to bottom (newest is first visually, feed is reversed)
   feed.scrollTop = 0;
 
@@ -537,6 +590,98 @@ function _renderJourneyModal(bookId) {
     });
   }
 }
+
+// ── Gullmolar (varðveitt upptaka) í journey feed ──
+function _renderGoldMoments(hero, feedEl) {
+  const childKey = _phSelectedKey;
+  if (!childKey || !hero?.title) return;
+
+  // Find sessions for this child that have a saved gold moment
+  const goldSessions = (S.sessions || []).filter(s =>
+    s.childKey === childKey &&
+    s.favClipLabel &&
+    s.audioPaths &&
+    s.audioPaths[s.favClipLabel] &&
+    // Match book title if available, otherwise show all
+    (!s.bookTitle || s.bookTitle === hero.title)
+  );
+
+  if (!goldSessions.length) return;
+
+  goldSessions.forEach(session => {
+    const clipPath = session.audioPaths[session.favClipLabel];
+    if (!clipPath) return;
+
+    // Date
+    let dateLbl = '';
+    if (session.date) {
+      const p = session.date.split('-');
+      if (p.length === 3) dateLbl = `${parseInt(p[2])}. ${IS_MONTHS_SHORT[parseInt(p[1]) - 1] || ''}`;
+    }
+
+    // Duration
+    const secs = session.seconds || 0;
+    const durLbl = secs >= 60 ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')} mín` : '';
+
+    // Who saved it
+    const saver = session.lastListenerName || 'Foreldri';
+
+    const cardId = `gm-${session._docId || Date.now()}`;
+
+    const card = document.createElement('div');
+    card.className = 'jm-gold-moment';
+    card.innerHTML = `
+      <div class="jm-gm-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span class="jm-gm-title">Varðveitt upptaka</span>
+      </div>
+      <div class="jm-gm-meta">${_esc(saver)} varðveitti gullmola${dateLbl ? ' · ' + _esc(dateLbl) : ''}${durLbl ? ' · ' + _esc(durLbl) : ''}</div>
+      <button class="jm-gm-play" id="${cardId}-btn" onclick="document.dispatchEvent(new CustomEvent('playGoldMoment',{detail:'${_esc(clipPath)}'}))">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Hlusta
+      </button>
+      <div class="jm-gm-player" id="${cardId}-player"></div>
+    `;
+    feedEl.appendChild(card);
+  });
+}
+
+// Global listener for play events from gold moment cards
+document.addEventListener('playGoldMoment', async (e) => {
+  const clipPath = e.detail;
+  if (!clipPath) return;
+
+  // Find the player element near the button that triggered this
+  const btns = document.querySelectorAll('.jm-gm-play');
+  let playerEl = null;
+  btns.forEach(btn => {
+    const card = btn.closest('.jm-gold-moment');
+    if (card && btn.getAttribute('onclick')?.includes(clipPath)) {
+      playerEl = card.querySelector('.jm-gm-player');
+      btn.disabled = true;
+      btn.innerHTML = '<span style="opacity:.6">Hleð...</span>';
+    }
+  });
+
+  if (!playerEl) return;
+
+  const url = await getCachedAudioUrl(clipPath);
+  if (!url) {
+    playerEl.innerHTML = '<div style="font-size:12px;color:#ff6b6b;margin-top:6px">Ekki tókst að hlaða</div>';
+    return;
+  }
+
+  playerEl.innerHTML = `<audio controls preload="auto" src="${url}" style="width:100%;margin-top:8px;border-radius:8px;height:36px"></audio>`;
+  const audio = playerEl.querySelector('audio');
+  if (audio) {
+    audio.play().catch(() => {});
+    // Reset button when done
+    audio.addEventListener('ended', () => {
+      const btn = playerEl.closest('.jm-gold-moment')?.querySelector('.jm-gm-play');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Hlusta'; }
+    });
+  }
+});
 
 function _getListenerName() {
   if (S.role === 'guest' && S.guestName) {
