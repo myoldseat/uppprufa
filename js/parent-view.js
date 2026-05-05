@@ -402,12 +402,11 @@ function renderNowReading(filteredSessions) {
       ${coverHtml}
       <div class="ph-nr-info">
         <div class="ph-nr-title">${_esc(title)}</div>
-        <div class="ph-nr-author">${_esc(author)}</div>
-        <div class="ph-nr-progress">
+        <div class="ph-nr-meta">${pages}</div>
+        <div class="ph-nr-progress" aria-label="${pct}% búið">
           <div class="ph-nr-bar"><div class="ph-nr-fill" style="width:${pct}%"></div></div>
           <span class="ph-nr-pct">${pct}%</span>
         </div>
-        <div class="ph-nr-meta">${pages}${avgMin ? ` · ~${avgMin} mín/dag` : ''}</div>
       </div>
     </div>`;
 }
