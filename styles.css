@@ -2236,3 +2236,90 @@ audio { width: 100%; border-radius: 8px }
     transform: rotate(10deg) translateX(50px) translateY(7px);
   }
 }
+
+/* ═══════════════════════════════════════
+   FINAL parent dashboard override — Að lesa + Bókasafn only
+   Fixes mobile cascade: bigger Að lesa cover, wrapped title, centered bookshelf fan
+════════════════════════════════════════ */
+#screen-parent-home #ph-now-reading .ph-nr-row {
+  gap: 12px !important;
+  align-items: center !important;
+}
+
+#screen-parent-home #ph-now-reading .ph-nr-cover,
+#screen-parent-home #ph-now-reading .ph-nr-cover-ph {
+  width: 104px !important;
+  height: 148px !important;
+  max-width: 44% !important;
+  border-radius: 9px !important;
+  flex: 0 0 auto !important;
+}
+
+#screen-parent-home #ph-now-reading .ph-nr-info {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+#screen-parent-home #ph-now-reading .ph-nr-title {
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  line-height: 1.05 !important;
+}
+
+#screen-parent-home .ph-bs-fan {
+  left: auto !important;
+  right: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: translateX(0) !important;
+}
+
+@media (max-width: 520px) {
+  #screen-parent-home #ph-now-reading .ph-nr-cover,
+  #screen-parent-home #ph-now-reading .ph-nr-cover-ph {
+    width: 96px !important;
+    height: 136px !important;
+    max-width: 46% !important;
+  }
+
+  #screen-parent-home #ph-now-reading .ph-nr-row {
+    gap: 9px !important;
+  }
+
+  #screen-parent-home #ph-now-reading .ph-nr-title {
+    font-size: 16px !important;
+  }
+
+  #screen-parent-home #ph-now-reading .ph-nr-bar {
+    min-width: 48px !important;
+  }
+
+  #screen-parent-home .ph-bs-fan {
+    width: 100% !important;
+    max-width: 190px !important;
+    height: 140px !important;
+  }
+
+  #screen-parent-home .ph-bs-fan-img {
+    width: 76px !important;
+    height: 106px !important;
+  }
+
+  #screen-parent-home .ph-bs-fan-center {
+    width: 92px !important;
+    height: 130px !important;
+    transform: translateY(-5px) !important;
+  }
+
+  #screen-parent-home .ph-bs-fan-left {
+    transform: rotate(-10deg) translateX(-46px) translateY(8px) !important;
+  }
+
+  #screen-parent-home .ph-bs-fan-right {
+    transform: rotate(10deg) translateX(46px) translateY(8px) !important;
+  }
+}
