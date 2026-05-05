@@ -132,11 +132,18 @@ export async function toggleClipFav(docId, clipKey, starElId) {
 
   // Lesa núverandi stöðu úr sessions cache
   const session = S.sessions?.find(s => s._docId === docId);
+  if (!session) return;
+
   const current = !!(session?.favorites?.[clipKey]);
   const next    = !current;
 
   // Guest má bæta við favorites en ekki fjarlægja
   if (S.role === 'guest' && current) return;
+
+  const listenerName = _getListenerName();
+  const clipPath = _getClipPathFromSession(session, clipKey);
+  const book = _findBookForSession(session);
+  const now = Date.now();
 
   // Uppfæra UI strax (optimistic)
   if (starEl) {
@@ -146,12 +153,172 @@ export async function toggleClipFav(docId, clipKey, starElId) {
   }
 
   // Uppfæra local cache
-  if (session) {
-    if (!session.favorites) session.favorites = {};
-    session.favorites[clipKey] = next;
+  const prevFavorites = { ...(session.favorites || {}) };
+  const prevFavClipLabel = session.favClipLabel;
+  const prevFavClipPath = session.favClipPath;
+  const prevFavSavedBy = session.favSavedBy;
+  const prevFavSavedAt = session.favSavedAt;
+  const prevBookId = session.bookId;
+  const prevBookTitle = session.bookTitle;
+
+  if (!session.favorites) session.favorites = {};
+  session.favorites[clipKey] = next;
+
+  if (next && clipPath) {
+    session.favClipLabel = clipKey;
+    session.favClipPath = clipPath;
+    session.favSavedAt = now;
+    session.favSavedBy = listenerName;
+    session.bookId = session.bookId || book?.id || null;
+    session.bookTitle = session.bookTitle || book?.title || '';
+  } else if (!next && session.favClipLabel === clipKey) {
+    const remaining = Object.keys(session.favorites).find(k => session.favorites[k]);
+    if (remaining) {
+      const remainingPath = _getClipPathFromSession(session, remaining);
+      session.favClipLabel = remaining;
+      session.favClipPath = remainingPath || null;
+    } else {
+      session.favClipLabel = null;
+      session.favClipPath = null;
+      session.favSavedAt = null;
+      session.favSavedBy = null;
+    }
   }
 
   // Uppfæra header stjörnu
+  _updateRowStar(docId);
+
+  const sessionUpdate = {
+    [`favorites.${clipKey}`]: next
+  };
+
+  if (next && clipPath) {
+    sessionUpdate.favClipLabel = clipKey;
+    sessionUpdate.favClipPath = clipPath;
+    sessionUpdate.favSavedAt = now;
+    sessionUpdate.favSavedBy = listenerName;
+    if (book?.id) sessionUpdate.bookId = book.id;
+    if (book?.title) sessionUpdate.bookTitle = book.title;
+  } else if (!next && prevFavClipLabel === clipKey) {
+    const remaining = Object.keys(session.favorites || {}).find(k => session.favorites[k]);
+    if (remaining) {
+      sessionUpdate.favClipLabel = remaining;
+      sessionUpdate.favClipPath = _getClipPathFromSession(session, remaining) || null;
+    } else {
+      sessionUpdate.favClipLabel = null;
+      sessionUpdate.favClipPath = null;
+      sessionUpdate.favSavedAt = null;
+      sessionUpdate.favSavedBy = null;
+    }
+  }
+
+  // Skrifa á Firestore — session er source of truth fyrir saved clip
+  try {
+    await updateDoc(doc(db, 'sessions', docId), sessionUpdate);
+
+    // Skrifa líka í books/{bookId}.journeyEntries svo parent journey og kid bookshelf lesi sömu reglu úr Firestore.
+    if (book?.id && clipPath) {
+      await _syncGoldMomentToBook(book, session, clipKey, clipPath, listenerName, next, now);
+    }
+
+    // Local er bara playback/cache bridge — ekki source of truth.
+    if (next && clipPath) _cacheGoldMomentLocal(session, clipKey, clipPath, listenerName, book);
+  } catch (e) {
+    console.error('toggleClipFav villa:', e);
+    // Rollback
+    if (starEl) {
+      starEl.textContent = current ? '★' : '☆';
+      starEl.classList.toggle('ph-clip-fav-active', current);
+      starEl.title = current ? 'Fjarlægja úr uppáhaldi' : 'Vista klippingu';
+    }
+    session.favorites = prevFavorites;
+    session.favClipLabel = prevFavClipLabel;
+    session.favClipPath = prevFavClipPath;
+    session.favSavedBy = prevFavSavedBy;
+    session.favSavedAt = prevFavSavedAt;
+    session.bookId = prevBookId;
+    session.bookTitle = prevBookTitle;
+    _updateRowStar(docId);
+  }
+}
+
+function _getClipPathFromSession(session, clipKey) {
+  if (!session || !clipKey) return null;
+  return session.audioPaths?.[clipKey]
+    || session[`audioPath_${clipKey}`]
+    || (clipKey === 'min1' ? session.audioPath : null)
+    || null;
+}
+
+function _findBookForSession(session) {
+  const books = S.books || [];
+  if (!session) return null;
+  if (session.bookId) {
+    const byId = books.find(b => b.id === session.bookId);
+    if (byId) return byId;
+  }
+  if (session.bookTitle) {
+    const byTitle = books.find(b =>
+      b.childKey === session.childKey &&
+      String(b.title || '').trim().toLowerCase() === String(session.bookTitle || '').trim().toLowerCase()
+    );
+    if (byTitle) return byTitle;
+  }
+  const current = _getReadingBook();
+  if (current && (!session.childKey || current.childKey === session.childKey)) return current;
+  return books.find(b => b.childKey === session.childKey && b.status === 'reading') || null;
+}
+
+function _makeGoldMomentEntry(session, clipKey, clipPath, listenerName, now) {
+  const pageFrom = session.pageFrom || session.currentPageFrom || null;
+  const pageTo = session.pageTo || session.currentPageTo || null;
+  return {
+    type: 'gold_moment',
+    id: `gm_${session._docId || session.id || 'session'}_${clipKey}`,
+    sessionId: session._docId || session.id || '',
+    clipKey,
+    clipPath,
+    date: session.date || makeDateKey(new Date()),
+    savedAt: now,
+    savedBy: listenerName || 'Foreldri',
+    text: `${listenerName || 'Foreldri'} geymdi lesturinn þinn`,
+    pageFrom,
+    pageTo
+  };
+}
+
+async function _syncGoldMomentToBook(book, session, clipKey, clipPath, listenerName, next, now) {
+  if (!book?.id) return;
+  const entryId = `gm_${session._docId || session.id || 'session'}_${clipKey}`;
+  const snap = await getDoc(doc(db, 'books', book.id));
+  const fresh = snap.exists() ? snap.data() : book;
+  let entries = Array.isArray(fresh.journeyEntries) ? [...fresh.journeyEntries] : [];
+  entries = entries.filter(e => !(e?.type === 'gold_moment' && (e.id === entryId || (e.sessionId === (session._docId || session.id) && e.clipKey === clipKey))));
+  if (next) entries.unshift(_makeGoldMomentEntry(session, clipKey, clipPath, listenerName, now));
+  await updateDoc(doc(db, 'books', book.id), { journeyEntries: entries, updatedAt: serverTimestamp() });
+
+  // Optimistic local S.books update
+  const localBook = (S.books || []).find(b => b.id === book.id);
+  if (localBook) localBook.journeyEntries = entries;
+}
+
+function _cacheGoldMomentLocal(session, clipKey, clipPath, listenerName, book) {
+  try {
+    if (!S.familyId || !session?.childKey || !clipPath) return;
+    const gmKey = 'upphatt_gm_' + S.familyId + '_' + session.childKey;
+    localStorage.setItem(gmKey, JSON.stringify({
+      saver: listenerName || 'Foreldri',
+      clipPath,
+      clipKey,
+      sessionId: session._docId || session.id || '',
+      bookId: book?.id || session.bookId || '',
+      bookTitle: book?.title || session.bookTitle || '',
+      date: session.date || ''
+    }));
+  } catch (e) { /* local cache only */ }
+}
+
+// Uppfæra header stjörnu
   _updateRowStar(docId);
 
   // Skrifa á Firestore
@@ -474,24 +641,29 @@ function renderJourneyCard() {
 function _getGoldMomentPreview(hero) {
   const childKey = _phSelectedKey;
   if (!childKey) return '';
+
+  // Firestore/book journey is source of truth first
+  const entry = (hero?.journeyEntries || []).find(e => e?.type === 'gold_moment' && e.clipPath);
+  if (entry) {
+    _cacheGoldMomentLocal({ childKey, _docId: entry.sessionId, date: entry.date, bookTitle: hero.title }, entry.clipKey || 'gold', entry.clipPath, entry.savedBy || 'Foreldri', hero);
+    return `
+      <div class="ph-jn-gm-preview">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span>${_esc(entry.savedBy || 'Foreldri')} varðveitti gullmola</span>
+      </div>`;
+  }
+
+  // Fallback: legacy sessions with favClipLabel/favClipPath
   const gm = (S.sessions || []).find(s =>
     s.childKey === childKey &&
-    s.favClipLabel &&
-    s.audioPaths?.[s.favClipLabel] &&
+    (s.favClipPath || (s.favClipLabel && (s.audioPaths?.[s.favClipLabel] || s[`audioPath_${s.favClipLabel}`] || (s.favClipLabel === 'min1' ? s.audioPath : null)))) &&
     (!s.bookTitle || s.bookTitle === hero?.title)
   );
   if (!gm) return '';
-  const saver = gm.lastListenerName || 'Foreldri';
+  const saver = gm.favSavedBy || gm.lastListenerName || 'Foreldri';
+  const clipPath = gm.favClipPath || _getClipPathFromSession(gm, gm.favClipLabel);
 
-  // Cache for bookshelf hero to read
-  try {
-    const gmKey = 'upphatt_gm_' + S.familyId + '_' + childKey;
-    localStorage.setItem(gmKey, JSON.stringify({
-      saver,
-      clipPath: gm.audioPaths[gm.favClipLabel],
-      date: gm.date || ''
-    }));
-  } catch (e) { /* ok */ }
+  _cacheGoldMomentLocal(gm, gm.favClipLabel || 'gold', clipPath, saver, hero);
 
   return `
     <div class="ph-jn-gm-preview">
@@ -593,45 +765,56 @@ function _renderJourneyModal(bookId) {
 // ── Gullmolar (varðveitt upptaka) í journey feed ──
 function _renderGoldMoments(hero, feedEl) {
   const childKey = _phSelectedKey;
-  if (!childKey || !hero?.title) return;
+  if (!childKey || !hero) return;
 
-  // Find sessions for this child that have a saved gold moment
-  const goldSessions = (S.sessions || []).filter(s =>
-    s.childKey === childKey &&
-    s.favClipLabel &&
-    s.audioPaths &&
-    s.audioPaths[s.favClipLabel] &&
-    // Match book title if available, otherwise show all
-    (!s.bookTitle || s.bookTitle === hero.title)
-  );
+  const entries = (hero.journeyEntries || []).filter(e => e?.type === 'gold_moment' && e.clipPath);
+  const fromSessions = (S.sessions || [])
+    .filter(s =>
+      s.childKey === childKey &&
+      (s.favClipPath || (s.favClipLabel && _getClipPathFromSession(s, s.favClipLabel))) &&
+      (!s.bookTitle || s.bookTitle === hero.title)
+    )
+    .map(s => ({
+      type: 'gold_moment',
+      id: `gm_${s._docId || s.id}_${s.favClipLabel || 'gold'}`,
+      sessionId: s._docId || s.id || '',
+      clipKey: s.favClipLabel || 'gold',
+      clipPath: s.favClipPath || _getClipPathFromSession(s, s.favClipLabel),
+      date: s.date || '',
+      savedBy: s.favSavedBy || s.lastListenerName || 'Foreldri',
+      seconds: s.seconds || 0
+    }));
 
-  if (!goldSessions.length) return;
+  const seen = new Set();
+  const goldMoments = [...entries, ...fromSessions].filter(g => {
+    const key = g.id || `${g.sessionId}_${g.clipKey}_${g.clipPath}`;
+    if (!g.clipPath || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
-  goldSessions.forEach(session => {
-    const clipPath = session.audioPaths[session.favClipLabel];
+  if (!goldMoments.length) return;
+
+  goldMoments.forEach(gm => {
+    const clipPath = gm.clipPath;
     if (!clipPath) return;
 
-    // Date
     let dateLbl = '';
-    if (session.date) {
-      const p = session.date.split('-');
+    if (gm.date) {
+      const p = gm.date.split('-');
       if (p.length === 3) dateLbl = `${parseInt(p[2])}. ${IS_MONTHS_SHORT[parseInt(p[1]) - 1] || ''}`;
     }
 
-    // Duration
-    const secs = session.seconds || 0;
+    const secs = gm.seconds || 0;
     const durLbl = secs >= 60 ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')} mín` : '';
-
-    // Who saved it
-    const saver = session.lastListenerName || 'Foreldri';
-
-    const cardId = `gm-${session._docId || Date.now()}`;
+    const saver = gm.savedBy || 'Foreldri';
+    const cardId = `gm-${String(gm.id || gm.sessionId || Date.now()).replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
     const card = document.createElement('div');
     card.className = 'jm-gold-moment';
     card.innerHTML = `
       <div class="jm-gm-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#1dcdd3" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         <span class="jm-gm-title">Varðveitt upptaka</span>
       </div>
       <div class="jm-gm-meta">${_esc(saver)} varðveitti gullmola${dateLbl ? ' · ' + _esc(dateLbl) : ''}${durLbl ? ' · ' + _esc(durLbl) : ''}</div>
@@ -1140,7 +1323,7 @@ function renderRecordings() {
   if (_recTab === 'saved') {
     // Varðveitt: allar sessions sem hafa einhverja favorite clip
     filtered = withAudio.filter(s =>
-      s.favorites && Object.values(s.favorites).some(v => v)
+      (s.favorites && Object.values(s.favorites).some(v => v)) || s.favClipLabel || s.favClipPath
     );
   } else {
     // Nýlegt: síðustu 14 dagar
@@ -1200,7 +1383,7 @@ function renderRecordings() {
     const sep = '<span class="ph-rec-sep">─</span>';
 
     // Hefur einhver clip verið stjörnumerkt?
-    const hasFav = s.favorites && Object.values(s.favorites).some(v => v);
+    const hasFav = (s.favorites && Object.values(s.favorites).some(v => v)) || !!s.favClipLabel || !!s.favClipPath;
 
     // Clip takkar inni í accordion
     const clips = (available.length ? available : (s.audioPath ? [{ key: 'audioPath_min1', label: 'Mín. 1' }] : [])).map(({key: pathKey, label: clipLabel}, i) => {
