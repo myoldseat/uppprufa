@@ -162,6 +162,47 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .admin-date-pill{padding:8px 10px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(29,205,211,0.08);color:#7a8fa0;font-size:12px;font-weight:700}
 .admin-meta-line{display:flex;flex-wrap:wrap;gap:8px}
 .admin-meta-line span{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(29,205,211,0.08);color:#7a8fa0;font-size:13px}
+
+/* ── Per-snippet admin toggle ── */
+.admin-snippet-toggle{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:center;
+  margin:-2px 0 2px;
+}
+.admin-snippet-btn{
+  border:1px solid rgba(29,205,211,0.12);
+  background:rgba(255,255,255,0.025);
+  color:#7a8fa0;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  line-height:1;
+}
+.admin-snippet-btn:hover{border-color:rgba(29,205,211,0.28);color:#d9e5ef}
+.admin-snippet-btn.active{
+  background:rgba(29,205,211,0.13);
+  border-color:rgba(29,205,211,0.36);
+  color:#1dcdd3;
+  box-shadow:0 0 14px rgba(29,205,211,0.08);
+}
+.admin-snippet-btn.unusable{
+  opacity:.45;
+  border-style:dashed;
+}
+.admin-snippet-note{
+  color:#7a8fa0;
+  font-size:12px;
+  line-height:1.35;
+  padding:9px 10px;
+  border:1px dashed rgba(248,113,113,0.22);
+  border-radius:12px;
+  background:rgba(248,113,113,0.045);
+}
+.admin-snippet-note strong{color:#fbbf24}
 .admin-quality-good{color:#4ade80 !important}
 .admin-quality-fair{color:#fbbf24 !important}
 .admin-quality-poor{color:#f87171 !important}
@@ -538,6 +579,7 @@ let _lastDoc = null;
 let _hasMore = true;
 let _totalCount = 0;
 let _activeTab = 'overview';
+let _adminSnippetViewByDoc = {};
 
 // ══════════════════════════════════════════
 // ADMIN — metrics extraction (new seven metrics)
@@ -576,7 +618,106 @@ function getMetrics(s) {
     speakingTime: Number((usable.reduce((a, sn) => a + val(sn, 'speakingTime'), 0) / usable.length).toFixed(1)),
     disruptionCount: Number((usable.reduce((a, sn) => a + val(sn, 'disruptionCount', 'decodingPauseCount'), 0) / usable.length).toFixed(1))
   };
+
 }
+
+const ADMIN_SNIPPET_ORDER = ['min1', 'min2', 'min5', 'min8', 'min10'];
+
+function snippetVal(sn, key, ...legacyKeys) {
+  if (!sn) return 0;
+  if (sn.summary && sn.summary[key] != null) return sn.summary[key];
+  for (const lk of legacyKeys) {
+    if (lk && sn[lk] != null) return sn[lk];
+  }
+  if (sn[key] != null) return sn[key];
+  return 0;
+}
+
+function averageSnippetMetrics(usable) {
+  if (!usable.length) return {
+    syllables: 0, cleanReadingPct: 0, articulationRate: 0, speechRate: 0,
+    formantVariation: 0, meanF1Variation: 0, meanF2Variation: 0,
+    speakingTime: 0, disruptionCount: 0
+  };
+  return {
+    syllables: Math.round(usable.reduce((a, sn) => a + snippetVal(sn, 'syllables', 'praatSyllables'), 0) / usable.length),
+    cleanReadingPct: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'cleanReadingPct'), 0) / usable.length).toFixed(1)),
+    articulationRate: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'articulationRate', 'praatArticulationRate'), 0) / usable.length).toFixed(2)),
+    speechRate: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'speechRate', 'praatSpeechRate'), 0) / usable.length).toFixed(2)),
+    formantVariation: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'formantVariation'), 0) / usable.length).toFixed(1)),
+    meanF1Variation: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'meanF1Variation'), 0) / usable.length).toFixed(1)),
+    meanF2Variation: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'meanF2Variation'), 0) / usable.length).toFixed(1)),
+    speakingTime: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'speakingTime'), 0) / usable.length).toFixed(1)),
+    disruptionCount: Number((usable.reduce((a, sn) => a + snippetVal(sn, 'disruptionCount', 'decodingPauseCount'), 0) / usable.length).toFixed(1))
+  };
+}
+
+function getSnippetSlots(s) {
+  const snippets = s.analysis?.snippets || {};
+  const preferred = ADMIN_SNIPPET_ORDER.filter(k => snippets[k]);
+  const extra = Object.keys(snippets).filter(k => !preferred.includes(k)).sort();
+  return [...preferred, ...extra].slice(0, 5).map((key, idx) => ({
+    label: String(idx + 1),
+    key,
+    snippet: snippets[key]
+  }));
+}
+
+function getSnippetScore(sn) {
+  if (!sn) return '—';
+  const candidates = [
+    sn.score,
+    sn.readingScore,
+    sn.overallScore,
+    sn.summary?.score,
+    sn.summary?.readingScore,
+    sn.summary?.overallScore
+  ];
+  const found = candidates.find(v => v != null && v !== '');
+  return found != null ? found : '—';
+}
+
+function getSessionScoreForView(s, view) {
+  if (view === 'total') return s.analysis?.overall?.avgScore ?? '—';
+  const slot = getSnippetSlots(s)[Number(view) - 1];
+  return getSnippetScore(slot?.snippet);
+}
+
+function getMetricsForView(s, view) {
+  if (!view || view === 'total') return { ...getMetrics(s), _viewLabel: 'Total' };
+  const slot = getSnippetSlots(s)[Number(view) - 1];
+  const sn = slot?.snippet;
+  if (!sn) {
+    return { ...averageSnippetMetrics([]), _viewLabel: `Snippet ${view}`, _missing: true, _reason: 'Vantar snippet' };
+  }
+  if (!sn.usable) {
+    return { ...averageSnippetMetrics([]), _viewLabel: `Snippet ${view}`, _unusable: true, _reason: sn.reason || sn.quality || 'ónothæft' };
+  }
+  return { ...averageSnippetMetrics([sn]), _viewLabel: `Snippet ${view}`, _snippetKey: slot.key };
+}
+
+function renderSnippetToggle(s, selectedView) {
+  const slots = getSnippetSlots(s);
+  const btns = ['total', '1', '2', '3', '4', '5'].map(view => {
+    const active = selectedView === view;
+    let cls = 'admin-snippet-btn' + (active ? ' active' : '');
+    let title = view === 'total' ? 'Meðaltal af nothæfum snippets' : `Snippet ${view}`;
+    if (view !== 'total') {
+      const slot = slots[Number(view) - 1];
+      if (!slot || !slot.snippet?.usable) cls += ' unusable';
+      if (slot?.key) title += ` (${slot.key})`;
+      if (slot?.snippet && !slot.snippet.usable) title += ` — ${slot.snippet.reason || 'ónothæft'}`;
+    }
+    return `<button class="${cls}" type="button" title="${esc(title)}" onclick="setAdminSnippetView('${esc(s._docId || '')}','${view}')">${view === 'total' ? 'Total' : view}</button>`;
+  }).join('');
+  return `<div class="admin-snippet-toggle" aria-label="Velja snippet">${btns}</div>`;
+}
+
+window.setAdminSnippetView = function(docId, view) {
+  if (!docId) return;
+  _adminSnippetViewByDoc[docId] = view || 'total';
+  renderContent();
+};
 
 // Profile classification — matches grading logic
 // Grunnur: articulation rate (talhraði)
@@ -1802,12 +1943,16 @@ function distBar(label, count, color, total) {
 function renderSessionCards(sessions) {
   return sessions.map(s => {
     const a = s.analysis;
-    const m = getMetrics(s);
+    const selectedView = _adminSnippetViewByDoc[s._docId] || 'total';
+    const m = getMetricsForView(s, selectedView);
     const prof = getProfile(m);
-    const q = a?.overall?.readingQuality || '—';
-    const score = a?.overall?.avgScore ?? '—';
+    const q = selectedView === 'total' ? (a?.overall?.readingQuality || '—') : (m._unusable || m._missing ? '—' : (getSnippetSlots(s)[Number(selectedView) - 1]?.snippet?.quality || a?.overall?.readingQuality || '—'));
+    const score = getSessionScoreForView(s, selectedView);
     const usable = a?.overall?.usableCount ?? 0;
     const total = a?.overall?.totalSnippets ?? '?';
+    const snippetNote = (m._unusable || m._missing)
+      ? `<div class="admin-snippet-note"><strong>${esc(m._viewLabel)}:</strong> ${esc(m._reason || 'ónothæft')}</div>`
+      : '';
     return `
       <article class="admin-session-card">
         <div class="admin-session-top">
@@ -1822,8 +1967,10 @@ function renderSessionCards(sessions) {
           <span>Nothæf: ${esc(usable)} / ${esc(total)}</span>
           <span class="${qualityClass(q)}">Gæði: ${esc(q)}</span>
         </div>
+        ${renderSnippetToggle(s, selectedView)}
+        ${snippetNote}
         <div>
-          <div class="admin-session-label">Admin flokkur</div>
+          <div class="admin-session-label">Admin flokkur ${selectedView === 'total' ? '' : '· ' + esc(m._viewLabel)}</div>
           <div class="admin-profile-text" style="color:${PROFILE_COLORS[prof]}">${esc(PROFILE_LABELS[prof])}</div>
         </div>
         <div class="admin-metrics-grid">
