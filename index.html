@@ -415,16 +415,6 @@
     </div>
     <div class="jm-feed" id="jm-feed"></div>
     <div class="jm-compose">
-      <div class="jm-emoji-row">
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('❤️')" type="button">❤️</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('🌟')" type="button">🌟</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('👏')" type="button">👏</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('🎉')" type="button">🎉</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('🔥')" type="button">🔥</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('💪')" type="button">💪</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('😍')" type="button">😍</button>
-        <button class="jm-emoji-btn" onclick="jmTapEmoji('🥰')" type="button">🥰</button>
-      </div>
       <div class="jm-input-row">
         <input class="ph-jn-input jm-input" id="jm-input" placeholder="Skrifa hvatningu..." maxlength="80">
         <button class="ph-jn-send" id="jm-send" title="Senda">↑</button>
@@ -432,10 +422,6 @@
     </div>
     <style>
       .jm-compose { padding: 10px 14px 14px; border-top: 1px solid rgba(29,205,211,0.1); display:flex; flex-direction:column; gap:8px; }
-      .jm-emoji-row { display:flex; gap:4px; }
-      .jm-emoji-btn { background: none; border: none; border-radius: 8px; padding: 4px 6px; font-size: 18px; cursor: pointer; transition: background 0.12s, transform 0.1s; line-height: 1; opacity: 0.55; }
-      .jm-emoji-btn:hover { opacity: 1; }
-      .jm-emoji-btn:active { transform: scale(0.88); opacity: 1; background: rgba(29,205,211,0.12); }
       .jm-input-row { display:flex; gap:8px; align-items:center; }
       .jm-input-row .ph-jn-input { flex: 1; }
     </style>
